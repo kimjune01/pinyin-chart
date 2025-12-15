@@ -22,7 +22,7 @@ import {
 export const TONE_QUIZ: QuizConfig = {
   id: 'tone-recognition',
   name: 'Tone Recognition',
-  description: 'Listen to a syllable and identify which of the 4 (or 5) tones is being used.',
+  description: 'Listen to a syllable and identify which of the 4 tones is being used.',
   icon: '🎵',
   levels: [
     {
@@ -36,22 +36,23 @@ export const TONE_QUIZ: QuizConfig = {
     },
     {
       id: 1,
-      name: 'All Five Tones',
-      description: 'Including neutral tone',
+      name: 'Timed',
+      description: '5 seconds per question',
       questionCount: 15,
-      optionCount: 5,
+      optionCount: 4,
       difficulty: 'medium',
       unlockThreshold: 80,
+      questionTimeLimit: 5,
     },
     {
       id: 2,
       name: 'Master',
-      description: 'Fast-paced tone recognition',
+      description: '2.5 seconds per question',
       questionCount: 20,
-      optionCount: 5,
+      optionCount: 4,
       difficulty: 'hard',
       unlockThreshold: 85,
-      timeLimit: 180, // 3 minutes
+      questionTimeLimit: 2.5,
     },
   ],
   generateQuestions: generateToneQuestions,

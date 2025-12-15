@@ -101,7 +101,7 @@ export function isValidPinyin(syllable: string, tone: number): boolean {
  * Get tone name
  */
 export function getToneName(tone: number): string {
-  const names = ['', '1st Tone', '2nd Tone', '3rd Tone', '4th Tone', 'Neutral Tone'];
+  const names = ['', '1st Tone', '2nd Tone', '3rd Tone', '4th Tone'];
   return names[tone] || '';
 }
 

@@ -13,20 +13,24 @@
  * - Empty cells for invalid combinations
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import SyllableButton from './SyllableButton';
 import { PINYIN_SYLLABLES, getSyllablesByInitial } from '../../data/pinyinSyllables';
 import { INITIALS, INITIAL_GROUPS } from '../../data/pinyinInitials';
 import { FINALS, FINAL_GROUPS } from '../../data/pinyinFinals';
 import { addToneMarks } from '../../lib/utils/pinyinUtils';
+import { audioService } from '../../lib/audio/AudioService';
 
 interface PinyinGridProps {
   selectedTone: number;
+  onSyllableSelect?: (pinyin: string) => void;
+  selectedSyllable?: string | null;
 }
 
-export default function PinyinGrid({ selectedTone }: PinyinGridProps) {
+export default function PinyinGrid({ selectedTone, onSyllableSelect, selectedSyllable }: PinyinGridProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [hoveredCol, setHoveredCol] = useState<string | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Build grid data structure
   const gridData = useMemo(() => {
@@ -59,9 +63,141 @@ export default function PinyinGrid({ selectedTone }: PinyinGridProps) {
     });
   }, [selectedTone]);
 
+  // Get active finals (rows with at least one syllable)
+  const activeFinals = useMemo(() => {
+    return FINALS.filter(final => {
+      const row = gridData.get(final);
+      return row && row.size > 0;
+    });
+  }, [gridData]);
+
+  // Build a 2D array for keyboard navigation
+  const gridMatrix = useMemo(() => {
+    return activeFinals.map(final => {
+      const row = gridData.get(final)!;
+      return activeInitials.map(initial => row.get(initial) || null);
+    });
+  }, [activeFinals, activeInitials, gridData]);
+
+  // Find first valid cell
+  const findFirstValidCell = useCallback(() => {
+    for (let row = 0; row < gridMatrix.length; row++) {
+      for (let col = 0; col < gridMatrix[row].length; col++) {
+        if (gridMatrix[row][col]) {
+          return { row, col };
+        }
+      }
+    }
+    return { row: 0, col: 0 };
+  }, [gridMatrix]);
+
+  // Initialize selection to first syllable on mount
+  useEffect(() => {
+    if (!selectedSyllable) {
+      const first = findFirstValidCell();
+      const syllable = gridMatrix[first.row]?.[first.col];
+      if (syllable) {
+        onSyllableSelect?.(syllable);
+      }
+    }
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(e.key)) {
+        return;
+      }
+
+      // Don't handle if typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      e.preventDefault();
+
+      // Find current position based on selectedSyllable
+      let currentRow = 0;
+      let currentCol = 0;
+
+      if (selectedSyllable) {
+        for (let r = 0; r < gridMatrix.length; r++) {
+          for (let c = 0; c < gridMatrix[r].length; c++) {
+            if (gridMatrix[r][c] === selectedSyllable) {
+              currentRow = r;
+              currentCol = c;
+              break;
+            }
+          }
+        }
+      }
+
+      // Handle Enter/Space to play sound
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (selectedSyllable) {
+          audioService.play(`${selectedSyllable}${selectedTone}`);
+        }
+        return;
+      }
+
+      // Calculate new position
+      let newRow = currentRow;
+      let newCol = currentCol;
+
+      const findNextValid = (startRow: number, startCol: number, dRow: number, dCol: number) => {
+        let r = startRow + dRow;
+        let c = startCol + dCol;
+
+        // Wrap around
+        while (r >= 0 && r < gridMatrix.length && c >= 0 && c < gridMatrix[0].length) {
+          if (gridMatrix[r][c]) {
+            return { row: r, col: c };
+          }
+          r += dRow;
+          c += dCol;
+        }
+        return null;
+      };
+
+      let next: { row: number; col: number } | null = null;
+
+      switch (e.key) {
+        case 'ArrowUp':
+          next = findNextValid(currentRow, currentCol, -1, 0);
+          break;
+        case 'ArrowDown':
+          next = findNextValid(currentRow, currentCol, 1, 0);
+          break;
+        case 'ArrowLeft':
+          next = findNextValid(currentRow, currentCol, 0, -1);
+          break;
+        case 'ArrowRight':
+          next = findNextValid(currentRow, currentCol, 0, 1);
+          break;
+      }
+
+      if (next) {
+        const syllable = gridMatrix[next.row][next.col];
+        if (syllable) {
+          onSyllableSelect?.(syllable);
+          audioService.play(`${syllable}${selectedTone}`);
+
+          // Scroll cell into view
+          setTimeout(() => {
+            const cell = gridRef.current?.querySelector(`[data-syllable="${syllable}"]`);
+            cell?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+          }, 0);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedSyllable, selectedTone, gridMatrix, onSyllableSelect]);
+
   return (
     <div className="pinyin-grid-container">
-      <div className="pinyin-grid-scroll">
+      <div className="pinyin-grid-scroll" ref={gridRef}>
         <table className="pinyin-grid">
           <thead>
             <tr>
@@ -114,6 +250,8 @@ export default function PinyinGrid({ selectedTone }: PinyinGridProps) {
                             pinyin={syllable}
                             tone={selectedTone}
                             displayPinyin={displayPinyin}
+                            onSelect={onSyllableSelect}
+                            isSelected={syllable === selectedSyllable}
                           />
                         </td>
                       );

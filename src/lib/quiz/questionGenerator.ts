@@ -49,8 +49,8 @@ export async function generateToneQuestions(
 ): Promise<Question[]> {
   const questions: Question[] = [];
 
-  // Get available tones for this level
-  const availableTones = level.id === 0 ? [1, 2, 3, 4] : [1, 2, 3, 4, 5];
+  // All four tones
+  const availableTones = [1, 2, 3, 4];
 
   for (let i = 0; i < count; i++) {
     // Pick a random syllable that has multiple tones
@@ -78,7 +78,7 @@ export async function generateToneQuestions(
       id: `tone-${i}`,
       audioUrl,
       correctAnswer: correctTone.toString(),
-      options: shuffle(toneOptions),
+      options: toneOptions, // Keep tones in order (1, 2, 3, 4)
       syllable: `${syllable.pinyin}${correctTone}`,
       explanation: `Correct answer: ${getToneLabel(correctTone)} (${addToneMarks(syllable.pinyin, correctTone)})`,
     });
@@ -88,7 +88,7 @@ export async function generateToneQuestions(
 }
 
 function getToneLabel(tone: number): string {
-  const labels = ['', '1st Tone (mā)', '2nd Tone (má)', '3rd Tone (mǎ)', '4th Tone (mà)', 'Neutral (ma)'];
+  const labels = ['', '1st Tone (mā)', '2nd Tone (má)', '3rd Tone (mǎ)', '4th Tone (mà)'];
   return labels[tone] || '';
 }
 

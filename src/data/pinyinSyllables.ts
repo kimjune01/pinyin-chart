@@ -30,8 +30,7 @@ function syllable(pinyin: string, initial: string, final: string, tones: number[
 }
 
 // Common tones shorthand
-const T1234 = [1, 2, 3, 4];        // Most common
-const T12345 = [1, 2, 3, 4, 5];    // All tones including neutral
+const T1234 = [1, 2, 3, 4];        // All four tones
 const T123 = [1, 2, 3];
 const T234 = [2, 3, 4];
 
@@ -42,7 +41,7 @@ const T234 = [2, 3, 4];
 export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   // Null initial (vowel-starting syllables)
   syllable('a', '', 'a', T1234),
-  syllable('o', '', 'o', T1234),
+  // Note: standalone 'o' is extremely rare and audio not available
   syllable('e', '', 'e', T1234),
   syllable('ai', '', 'ai', T1234),
   syllable('ei', '', 'ei', T1234),
@@ -51,12 +50,12 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('an', '', 'an', T1234),
   syllable('en', '', 'en', T1234),
   syllable('ang', '', 'ang', T1234),
-  syllable('eng', '', 'eng', T1234),
+  // Note: standalone 'eng' audio not available
   syllable('er', '', 'er', T234),
 
   // Labials: b, p, m, f
   syllable('ba', 'b', 'a', T1234),
-  syllable('bo', 'b', 'o', T12345),
+  syllable('bo', 'b', 'o', T1234),
   syllable('bai', 'b', 'ai', T1234),
   syllable('bei', 'b', 'ei', T1234),
   syllable('bao', 'b', 'ao', T1234),
@@ -66,7 +65,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('beng', 'b', 'eng', T1234),
   syllable('bi', 'b', 'i', T1234),
   syllable('bie', 'b', 'ie', T1234),
-  syllable('biao', 'b', 'iao', T1234),
+  syllable('biao', 'b', 'iao', T234),
   syllable('bian', 'b', 'ian', T1234),
   syllable('bin', 'b', 'in', T1234),
   syllable('bing', 'b', 'ing', T1234),
@@ -89,15 +88,15 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('ping', 'p', 'ing', T1234),
   syllable('pu', 'p', 'u', T1234),
 
-  syllable('ma', 'm', 'a', T12345),
+  syllable('ma', 'm', 'a', T1234),
   syllable('mo', 'm', 'o', T1234),
-  syllable('me', 'm', 'e', T12345),
+  syllable('me', 'm', 'e', T1234),
   syllable('mai', 'm', 'ai', T1234),
   syllable('mei', 'm', 'ei', T1234),
   syllable('mao', 'm', 'ao', T1234),
-  syllable('mou', 'm', 'ou', T1234),
+  syllable('mou', 'm', 'ou', [1, 2, 4]),
   syllable('man', 'm', 'an', T1234),
-  syllable('men', 'm', 'en', T12345),
+  syllable('men', 'm', 'en', T1234),
   syllable('mang', 'm', 'ang', T1234),
   syllable('meng', 'm', 'eng', T1234),
   syllable('mi', 'm', 'i', T1234),
@@ -121,7 +120,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
 
   // Dentals: d, t, n, l
   syllable('da', 'd', 'a', T1234),
-  syllable('de', 'd', 'e', T12345),
+  syllable('de', 'd', 'e', T1234),
   syllable('dai', 'd', 'ai', T1234),
   syllable('dei', 'd', 'ei', T1234),
   syllable('dao', 'd', 'ao', T1234),
@@ -131,7 +130,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('deng', 'd', 'eng', T1234),
   syllable('di', 'd', 'i', T1234),
   syllable('die', 'd', 'ie', T1234),
-  syllable('diao', 'd', 'iao', T1234),
+  syllable('diao', 'd', 'iao', T234),
   syllable('diu', 'd', 'iu', T1234),
   syllable('dian', 'd', 'ian', T1234),
   syllable('ding', 'd', 'ing', T1234),
@@ -178,17 +177,16 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('niu', 'n', 'iu', T1234),
   syllable('nian', 'n', 'ian', T1234),
   syllable('nin', 'n', 'in', T234),
-  syllable('niang', 'n', 'iang', T1234),
+  syllable('niang', 'n', 'iang', T234),
   syllable('ning', 'n', 'ing', T1234),
   syllable('nu', 'n', 'u', T1234),
-  syllable('nuo', 'n', 'uo', T1234),
+  syllable('nuo', 'n', 'uo', T234),
   syllable('nuan', 'n', 'uan', T1234),
   syllable('nong', 'n', 'ong', T1234),
-  syllable('nü', 'n', 'ü', T1234),
-  syllable('nüe', 'n', 'üe', T1234),
+  // Note: nü/nüe audio not available (uses ü character)
 
   syllable('la', 'l', 'a', T1234),
-  syllable('le', 'l', 'e', T12345),
+  syllable('le', 'l', 'e', T1234),
   syllable('lai', 'l', 'ai', T1234),
   syllable('lei', 'l', 'ei', T1234),
   syllable('lao', 'l', 'ao', T1234),
@@ -202,20 +200,19 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('liao', 'l', 'iao', T1234),
   syllable('liu', 'l', 'iu', T1234),
   syllable('lian', 'l', 'ian', T1234),
-  syllable('lin', 'l', 'in', T1234),
+  syllable('lin', 'l', 'in', T234),
   syllable('liang', 'l', 'iang', T1234),
   syllable('ling', 'l', 'ing', T1234),
   syllable('lu', 'l', 'u', T1234),
   syllable('luo', 'l', 'uo', T1234),
   syllable('luan', 'l', 'uan', T1234),
-  syllable('lun', 'l', 'un', T1234),
+  syllable('lun', 'l', 'un', T234),
   syllable('long', 'l', 'ong', T1234),
-  syllable('lü', 'l', 'ü', T1234),
-  syllable('lüe', 'l', 'üe', T1234),
+  // Note: lü/lüe audio not available (uses ü character)
 
   // Gutturals: g, k, h
   syllable('ga', 'g', 'a', T1234),
-  syllable('ge', 'g', 'e', T12345),
+  syllable('ge', 'g', 'e', T1234),
   syllable('gai', 'g', 'ai', T1234),
   syllable('gei', 'g', 'ei', T1234),
   syllable('gao', 'g', 'ao', T1234),
@@ -241,7 +238,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('kou', 'k', 'ou', T1234),
   syllable('kan', 'k', 'an', T1234),
   syllable('ken', 'k', 'en', T1234),
-  syllable('kang', 'k', 'ang', T1234),
+  syllable('kang', 'k', 'ang', [1, 2, 4]),
   syllable('keng', 'k', 'eng', T1234),
   syllable('ku', 'k', 'u', T1234),
   syllable('kua', 'k', 'ua', T1234),
@@ -254,7 +251,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('kong', 'k', 'ong', T1234),
 
   syllable('ha', 'h', 'a', T1234),
-  syllable('he', 'h', 'e', T12345),
+  syllable('he', 'h', 'e', T1234),
   syllable('hai', 'h', 'ai', T1234),
   syllable('hei', 'h', 'ei', T1234),
   syllable('hao', 'h', 'ao', T1234),
@@ -282,7 +279,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('jian', 'j', 'ian', T1234),
   syllable('jin', 'j', 'in', T1234),
   syllable('jiang', 'j', 'iang', T1234),
-  syllable('jing', 'j', 'ing', T1234),
+  syllable('jing', 'j', 'ing', [1, 3, 4]),
   syllable('jiong', 'j', 'iong', T1234),
   syllable('ju', 'j', 'ü', T1234),
   syllable('jue', 'j', 'üe', T1234),
@@ -306,12 +303,12 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
 
   syllable('xi', 'x', 'i', T1234),
   syllable('xia', 'x', 'ia', T1234),
-  syllable('xie', 'x', 'ie', T12345),
+  syllable('xie', 'x', 'ie', T1234),
   syllable('xiao', 'x', 'iao', T1234),
-  syllable('xiu', 'x', 'iu', T1234),
+  syllable('xiu', 'x', 'iu', T234),
   syllable('xian', 'x', 'ian', T1234),
-  syllable('xin', 'x', 'in', T1234),
-  syllable('xiang', 'x', 'iang', T1234),
+  syllable('xin', 'x', 'in', [1, 2, 4]),
+  syllable('xiang', 'x', 'iang', [1, 3, 4]),
   syllable('xing', 'x', 'ing', T1234),
   syllable('xiong', 'x', 'iong', T1234),
   syllable('xu', 'x', 'ü', T1234),
@@ -321,12 +318,12 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
 
   // Retroflexes: zh, ch, sh, r
   syllable('zha', 'zh', 'a', T1234),
-  syllable('zhe', 'zh', 'e', T12345),
-  syllable('zhai', 'zh', 'ai', T1234),
+  syllable('zhe', 'zh', 'e', T1234),
+  syllable('zhai', 'zh', 'ai', T123),
   syllable('zhei', 'zh', 'ei', T1234),
   syllable('zhao', 'zh', 'ao', T1234),
   syllable('zhou', 'zh', 'ou', T1234),
-  syllable('zhan', 'zh', 'an', T1234),
+  syllable('zhan', 'zh', 'an', T234),
   syllable('zhen', 'zh', 'en', T1234),
   syllable('zhang', 'zh', 'ang', T1234),
   syllable('zheng', 'zh', 'eng', T1234),
@@ -368,7 +365,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('shao', 'sh', 'ao', T1234),
   syllable('shou', 'sh', 'ou', T1234),
   syllable('shan', 'sh', 'an', T1234),
-  syllable('shen', 'sh', 'en', T12345),
+  syllable('shen', 'sh', 'en', T1234),
   syllable('shang', 'sh', 'ang', T1234),
   syllable('sheng', 'sh', 'eng', T1234),
   syllable('shi', 'sh', 'i', T1234),
@@ -391,7 +388,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('ri', 'r', 'i', T1234),
   syllable('ru', 'r', 'u', T1234),
   syllable('ruo', 'r', 'uo', T1234),
-  syllable('rui', 'r', 'ui', T1234),
+  syllable('rui', 'r', 'ui', T234),
   syllable('ruan', 'r', 'uan', T1234),
   syllable('run', 'r', 'un', T1234),
   syllable('rong', 'r', 'ong', T1234),
@@ -399,7 +396,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   // Sibilants: z, c, s
   syllable('za', 'z', 'a', T1234),
   syllable('ze', 'z', 'e', T1234),
-  syllable('zai', 'z', 'ai', T1234),
+  syllable('zai', 'z', 'ai', [1, 3, 4]),
   syllable('zei', 'z', 'ei', T1234),
   syllable('zao', 'z', 'ao', T1234),
   syllable('zou', 'z', 'ou', T1234),
@@ -426,7 +423,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('ceng', 'c', 'eng', T1234),
   syllable('ci', 'c', 'i', T1234),
   syllable('cu', 'c', 'u', T1234),
-  syllable('cuo', 'c', 'uo', T1234),
+  syllable('cuo', 'c', 'uo', [1, 3, 4]),
   syllable('cui', 'c', 'ui', T1234),
   syllable('cuan', 'c', 'uan', T1234),
   syllable('cun', 'c', 'un', T1234),
@@ -439,7 +436,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('sou', 's', 'ou', T1234),
   syllable('san', 's', 'an', T1234),
   syllable('sen', 's', 'en', T1234),
-  syllable('sang', 's', 'ang', T1234),
+  syllable('sang', 's', 'ang', [1, 2, 4]),
   syllable('seng', 's', 'eng', T1234),
   syllable('si', 's', 'i', T1234),
   syllable('su', 's', 'u', T1234),

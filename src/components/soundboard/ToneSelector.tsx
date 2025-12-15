@@ -9,6 +9,7 @@
  */
 
 import { useEffect } from 'react';
+import RecordButton from './RecordButton';
 
 interface ToneSelectorProps {
   selectedTone: number;
@@ -16,11 +17,10 @@ interface ToneSelectorProps {
 }
 
 const TONES = [
-  { number: 1, label: 'mā', name: '1st Tone', color: 'var(--tone-1-color)', key: '1' },
-  { number: 2, label: 'má', name: '2nd Tone', color: 'var(--tone-2-color)', key: '2' },
-  { number: 3, label: 'mǎ', name: '3rd Tone', color: 'var(--tone-3-color)', key: '3' },
-  { number: 4, label: 'mà', name: '4th Tone', color: 'var(--tone-4-color)', key: '4' },
-  { number: 5, label: 'ma', name: 'Neutral', color: 'var(--tone-5-color)', key: '5' },
+  { number: 1, label: 'ā', name: '1st Tone', color: 'var(--tone-1-color)', key: '1' },
+  { number: 2, label: 'á', name: '2nd Tone', color: 'var(--tone-2-color)', key: '2' },
+  { number: 3, label: 'ǎ', name: '3rd Tone', color: 'var(--tone-3-color)', key: '3' },
+  { number: 4, label: 'à', name: '4th Tone', color: 'var(--tone-4-color)', key: '4' },
 ];
 
 export default function ToneSelector({ selectedTone, onToneChange }: ToneSelectorProps) {
@@ -37,7 +37,7 @@ export default function ToneSelector({ selectedTone, onToneChange }: ToneSelecto
       }
 
       const toneMap: Record<string, number> = {
-        '1': 1, '2': 2, '3': 3, '4': 4, '5': 5
+        '1': 1, '2': 2, '3': 3, '4': 4
       };
 
       const tone = toneMap[e.key];
@@ -81,6 +81,7 @@ export default function ToneSelector({ selectedTone, onToneChange }: ToneSelecto
               <span className="tone-name">{tone.name}</span>
             </label>
           ))}
+          <RecordButton />
         </div>
       </div>
     </div>

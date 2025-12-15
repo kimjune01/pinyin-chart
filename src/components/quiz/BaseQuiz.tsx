@@ -5,20 +5,27 @@
  * All quiz types use this component with different configurations.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { QuizConfig } from '../../lib/quiz/types';
 import { useQuizEngine, useQuizProgress } from '../../lib/quiz/quizEngine';
+import { getQuizById } from '../../data/quizConfigs';
 import QuizLevelSelector from './QuizLevelSelector';
 import QuizHeader from './QuizHeader';
 import QuizGameArea from './QuizGameArea';
 import QuizCompletionScreen from './QuizCompletionScreen';
 
 interface BaseQuizProps {
-  config: QuizConfig;
+  quizId: string;
 }
 
-export default function BaseQuiz({ config }: BaseQuizProps) {
-  const { progress, refresh } = useQuizProgress(config.id);
+export default function BaseQuiz({ quizId }: BaseQuizProps) {
+  // Track if component has mounted (client-side)
+  const [mounted, setMounted] = useState(false);
+
+  // Look up config on client side to preserve functions
+  const config = getQuizById(quizId);
+
+  const { progress, refresh } = useQuizProgress(quizId);
 
   const {
     gameState,
@@ -40,7 +47,12 @@ export default function BaseQuiz({ config }: BaseQuizProps) {
     exitQuiz,
 
     levelResult,
-  } = useQuizEngine(config);
+  } = useQuizEngine(config!);
+
+  // Set mounted after hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Refresh progress when level completes
   useEffect(() => {
@@ -49,8 +61,13 @@ export default function BaseQuiz({ config }: BaseQuizProps) {
     }
   }, [gameState, refresh]);
 
-  // Loading state
-  if (gameState === 'loading') {
+  // Config not found (after hooks)
+  if (!config) {
+    return <div className="quiz-container">Quiz not found: {quizId}</div>;
+  }
+
+  // Show loading until mounted to avoid hydration mismatch
+  if (!mounted || gameState === 'loading') {
     return (
       <div className="quiz-container">
         <div style={{
@@ -84,6 +101,9 @@ export default function BaseQuiz({ config }: BaseQuizProps) {
 
   // Playing or answered state
   if ((gameState === 'playing' || gameState === 'answered') && currentQuestion && session) {
+    const currentLevel = config.levels.find(l => l.id === session.levelId);
+    const questionTimeLimit = currentLevel?.questionTimeLimit;
+
     return (
       <div className="quiz-container">
         <QuizHeader
@@ -102,6 +122,7 @@ export default function BaseQuiz({ config }: BaseQuizProps) {
           isCorrect={isCorrect}
           onSubmitAnswer={submitAnswer}
           onNextQuestion={nextQuestion}
+          questionTimeLimit={questionTimeLimit}
         />
       </div>
     );

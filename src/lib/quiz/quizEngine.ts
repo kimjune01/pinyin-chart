@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type {
   QuizConfig,
   QuizSession,
+  QuizProgress,
   Question,
   QuizAnswer,
   GameState,
@@ -306,9 +307,35 @@ function extractPinyinFromUrl(url: string): string {
 
 /**
  * Helper hook: Get quiz progress
+ * Defers localStorage read until after hydration to avoid SSR mismatch
  */
 export function useQuizProgress(quizId: string) {
-  const [progress, setProgress] = useState(() => loadQuizProgress(quizId));
+  const [progress, setProgress] = useState<QuizProgress>(() => ({
+    quizId,
+    currentLevel: 0,
+    levels: {
+      0: {
+        levelId: 0,
+        attempts: 0,
+        bestScore: 0,
+        lastScore: 0,
+        totalQuestions: 0,
+        correctAnswers: 0,
+        averageTime: 0,
+        lastAttempt: '',
+        unlocked: true,
+      },
+    },
+    totalAttempts: 0,
+    totalCorrect: 0,
+    totalQuestions: 0,
+    overallAccuracy: 0,
+  }));
+
+  // Load from localStorage after hydration
+  useEffect(() => {
+    setProgress(loadQuizProgress(quizId));
+  }, [quizId]);
 
   const refresh = useCallback(() => {
     setProgress(loadQuizProgress(quizId));

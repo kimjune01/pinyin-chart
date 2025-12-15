@@ -49,7 +49,8 @@ export interface LevelConfig {
   optionCount: number;           // Number of multiple choice options
   difficulty: 'easy' | 'medium' | 'hard';
   unlockThreshold: number;       // Percentage score needed to unlock (0-100)
-  timeLimit?: number;            // Optional time limit in seconds
+  timeLimit?: number;            // Optional total time limit in seconds
+  questionTimeLimit?: number;    // Optional per-question time limit in seconds
 }
 
 /**

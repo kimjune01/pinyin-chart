@@ -76,13 +76,20 @@ const description = 'Track your learning journey and view statistics';
               <p>Sharp falling pitch - like saying "No!"</p>
             </div>
           </div>
-          <div class="tone-item">
-            <span class="tone-number" style="background: var(--tone-5-color)">5</span>
-            <div class="tone-details">
-              <strong>Neutral Tone (ma)</strong>
-              <p>Light, unstressed - like "uh" in English</p>
-            </div>
-          </div>
+        </div>
+      </div>
+
+      <div class="reference-section">
+        <h3>What About the "5th Tone"?</h3>
+        <div class="neutral-tone-info">
+          <p>You may have heard of a "neutral tone" or "5th tone" in Mandarin. This app focuses on the four main tones because:</p>
+          <ul>
+            <li><strong>It's not a real tone</strong> — The neutral tone has no fixed pitch. Its sound depends entirely on the tone that comes before it.</li>
+            <li><strong>It can't be practiced in isolation</strong> — Unlike tones 1-4, you can't say a neutral tone syllable by itself.</li>
+            <li><strong>It's better learned through vocabulary</strong> — Words like 妈妈 (māma) naturally teach neutral tone in context.</li>
+            <li><strong>Regional variation</strong> — Beijing Mandarin uses it heavily, while Taiwan Mandarin uses it less.</li>
+          </ul>
+          <p class="neutral-tone-tip">Master the four main tones first, then the neutral tone will come naturally as you learn vocabulary and phrases.</p>
         </div>
       </div>
 
@@ -309,6 +316,35 @@ const description = 'Track your learning journey and view statistics';
       margin: 0;
       color: var(--color-text-secondary);
       font-size: var(--font-size-sm);
+    }
+
+    .neutral-tone-info p {
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin: 0 0 var(--spacing-md) 0;
+    }
+
+    .neutral-tone-info ul {
+      margin: 0 0 var(--spacing-md) 0;
+      padding-left: var(--spacing-xl);
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+    }
+
+    .neutral-tone-info li {
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .neutral-tone-info strong {
+      color: var(--color-text);
+    }
+
+    .neutral-tone-tip {
+      padding: var(--spacing-md);
+      background: rgba(74, 144, 226, 0.1);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--color-primary);
+      font-style: italic;
     }
 
     .confusion-grid {

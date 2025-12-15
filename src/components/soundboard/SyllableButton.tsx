@@ -15,9 +15,11 @@ interface SyllableButtonProps {
   pinyin: string;
   tone: number;
   displayPinyin: string; // With tone marks (e.g., "mā")
+  onSelect?: (pinyin: string) => void;
+  isSelected?: boolean;
 }
 
-export default function SyllableButton({ pinyin, tone, displayPinyin }: SyllableButtonProps) {
+export default function SyllableButton({ pinyin, tone, displayPinyin, onSelect, isSelected }: SyllableButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -26,6 +28,7 @@ export default function SyllableButton({ pinyin, tone, displayPinyin }: Syllable
 
     setIsPlaying(true);
     setHasError(false);
+    onSelect?.(pinyin);
 
     try {
       const pinyinWithTone = `${pinyin}${tone}`;
@@ -41,11 +44,12 @@ export default function SyllableButton({ pinyin, tone, displayPinyin }: Syllable
 
   return (
     <button
-      className={`syllable-button ${isPlaying ? 'playing' : ''} ${hasError ? 'error' : ''}`}
+      className={`syllable-button ${isPlaying ? 'playing' : ''} ${hasError ? 'error' : ''} ${isSelected ? 'selected' : ''}`}
       onClick={handleClick}
       disabled={isPlaying}
       aria-label={`Play ${displayPinyin}`}
       title={`Click to hear ${displayPinyin}`}
+      data-syllable={pinyin}
     >
       <span className="syllable-text">{displayPinyin}</span>
       {isPlaying && <span className="playing-indicator">🔊</span>}

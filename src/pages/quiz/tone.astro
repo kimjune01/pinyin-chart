@@ -5,7 +5,6 @@
 
 import AppLayout from '../../components/layout/AppLayout.astro';
 import BaseQuiz from '../../components/quiz/BaseQuiz';
-import { TONE_QUIZ } from '../../data/quizConfigs';
 import '../../styles/quiz.css';
 
 const title = 'Tone Recognition Quiz';
@@ -13,5 +12,5 @@ const description = 'Listen to syllables and identify which tone is being used.'
 ---
 
 <AppLayout title={title} currentSection="quiz">
-  <BaseQuiz config={TONE_QUIZ} client:load />
+  <BaseQuiz quizId="tone-recognition" client:load />
 </AppLayout>

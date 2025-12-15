@@ -10,8 +10,8 @@
   top: 0;
   z-index: 100;
   background: var(--color-background);
-  border-bottom: 2px solid var(--color-border);
-  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
   box-shadow: var(--shadow-sm);
 }
 
@@ -21,24 +21,20 @@
 }
 
 .tone-selector-label {
-  display: block;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  margin-bottom: var(--spacing-md);
+  display: none;
 }
 
 .tone-options {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
 .tone-option {
   position: relative;
   cursor: pointer;
-  flex: 1;
-  min-width: 120px;
+  flex: 0 1 auto;
+  min-width: 70px;
 }
 
 .tone-option input[type="radio"] {
@@ -50,15 +46,15 @@
 
 .tone-button {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
   border: 2px solid var(--tone-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   transition: all var(--transition-fast);
-  min-height: 80px;
+  min-height: 36px;
   justify-content: center;
 }
 
@@ -75,8 +71,8 @@
 }
 
 .tone-label {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
 }
 
 .tone-option.selected .tone-label {
@@ -87,13 +83,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border: 1px solid var(--tone-color);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--tone-color);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   font-family: var(--font-family-mono);
 }
@@ -105,16 +101,88 @@
 }
 
 .tone-name {
-  display: block;
-  text-align: center;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-top: var(--spacing-xs);
+  display: none;
 }
 
 .tone-option.selected .tone-name {
   color: var(--tone-color);
   font-weight: var(--font-weight-semibold);
+}
+
+/* ==================== RecordButton Styles ==================== */
+
+.record-button-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.record-button {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  touch-action: none;
+  user-select: none;
+}
+
+.record-button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-border-light);
+}
+
+.record-button.recording {
+  border-color: var(--color-error);
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.record-icon {
+  font-size: var(--font-size-base);
+  z-index: 1;
+}
+
+.record-progress {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 40px;
+  height: 40px;
+}
+
+.record-progress-bg {
+  stroke: var(--color-border);
+}
+
+.record-progress-bar {
+  stroke: var(--color-error);
+  stroke-linecap: round;
+}
+
+.record-instruction {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-background);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  z-index: 10;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 /* ==================== PinyinGrid Styles ==================== */
@@ -283,6 +351,11 @@ tr.highlighted .final-header {
 .syllable-button.error {
   background: rgba(231, 76, 60, 0.1);
   border-color: var(--color-error);
+}
+
+.syllable-button.selected {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
 }
 
 .syllable-text {
