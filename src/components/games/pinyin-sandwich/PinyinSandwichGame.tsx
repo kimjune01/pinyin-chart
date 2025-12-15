@@ -290,13 +290,6 @@ export default function PinyinSandwichGame() {
             </p>
           </div>
 
-          {/* High Score */}
-          {highScore > 0 && (
-            <div className="sandwich-high-score">
-              Best Score: <span>{highScore}</span>
-            </div>
-          )}
-
           {/* Start Button */}
           <button className="sandwich-start-btn" onClick={startGame}>
             Start Game
