@@ -13,7 +13,7 @@ import '../../styles/global.css';
 
 export interface Props {
   title: string;
-  currentSection?: 'home' | 'soundboard' | 'quiz' | 'reference';
+  currentSection?: 'home' | 'soundboard' | 'quiz' | 'games' | 'reference';
 }
 
 const { title, currentSection = 'home' } = Astro.props;
@@ -69,11 +69,6 @@ const fullTitle = `${title} | Pinyin Chart`;
         <main class="page-content">
           <slot />
         </main>
-
-        <!-- Footer -->
-        <footer class="app-footer">
-          <p>&copy; {new Date().getFullYear()} Pinyin Chart. Built for Mandarin learners.</p>
-        </footer>
       </div>
     </div>
 
@@ -131,19 +126,6 @@ const fullTitle = `${title} | Pinyin Chart`;
         }
       }
 
-      /* Footer */
-      .app-footer {
-        padding: var(--spacing-xl);
-        text-align: center;
-        border-top: 1px solid var(--color-border);
-        background-color: var(--color-surface);
-      }
-
-      .app-footer p {
-        margin: 0;
-        font-size: var(--font-size-sm);
-        color: var(--color-text-secondary);
-      }
     </style>
   </body>
 </html>
