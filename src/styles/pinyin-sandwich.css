@@ -551,10 +551,17 @@
 
 /* Tone button specific styling */
 .ingredient-btn-tone {
-  font-size: var(--font-size-2xl);
-  min-width: 50px;
-  min-height: 50px;
-  font-weight: var(--font-weight-bold);
+  min-width: 56px;
+  min-height: 56px;
+  padding: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ingredient-btn-tone .tone-icon {
+  width: 36px;
+  height: 36px;
 }
 
 .ingredient-btn-tone.selected {
