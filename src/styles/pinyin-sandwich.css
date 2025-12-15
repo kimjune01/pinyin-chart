@@ -550,6 +550,13 @@
 }
 
 /* Tone button specific styling */
+.ingredient-btn-tone {
+  font-size: var(--font-size-2xl);
+  min-width: 50px;
+  min-height: 50px;
+  font-weight: var(--font-weight-bold);
+}
+
 .ingredient-btn-tone.selected {
   background: #FFD700;
   border-color: #FFA500;

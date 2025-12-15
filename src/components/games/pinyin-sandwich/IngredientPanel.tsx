@@ -13,11 +13,11 @@ interface IngredientPanelProps {
   showFeedback?: boolean;
 }
 
-const TONE_LABELS: Record<number, string> = {
-  1: '1st (ˉ)',
-  2: '2nd (ˊ)',
-  3: '3rd (ˇ)',
-  4: '4th (ˋ)',
+const TONE_MARKS: Record<number, string> = {
+  1: 'ˉ',
+  2: 'ˊ',
+  3: 'ˇ',
+  4: 'ˋ',
 };
 
 export default function IngredientPanel({
@@ -32,7 +32,7 @@ export default function IngredientPanel({
 }: IngredientPanelProps) {
   const getDisplayValue = (value: string | number): string => {
     if (type === 'tone' && typeof value === 'number') {
-      return TONE_LABELS[value] || String(value);
+      return TONE_MARKS[value] || String(value);
     }
     // For initials/finals, show empty initial as "∅" or just the value
     if (type === 'initial' && value === '') {
