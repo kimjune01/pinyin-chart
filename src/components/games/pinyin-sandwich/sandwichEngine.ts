@@ -178,7 +178,12 @@ function generateInitialOptions(
     }
   }
 
-  return shuffle(Array.from(options));
+  // Safety check: ensure correct answer is always included
+  const result = shuffle(Array.from(options));
+  if (!result.includes(correctInitial)) {
+    result[0] = correctInitial;
+  }
+  return result;
 }
 
 // Generate final options for a question
@@ -221,7 +226,12 @@ function generateFinalOptions(
     }
   }
 
-  return shuffle(Array.from(options));
+  // Safety check: ensure correct answer is always included
+  const result = shuffle(Array.from(options));
+  if (!result.includes(correctFinal)) {
+    result[0] = correctFinal;
+  }
+  return result;
 }
 
 // Get syllable pool based on difficulty
