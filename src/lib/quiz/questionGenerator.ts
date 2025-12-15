@@ -6,7 +6,7 @@
  */
 
 import type { Question, QuizOption, LevelConfig } from './types';
-import { PINYIN_SYLLABLES } from '../../data/pinyinSyllables';
+import { PINYIN_SYLLABLES, type PinyinSyllable } from '../../data/pinyinSyllables';
 import { INITIALS } from '../../data/pinyinInitials';
 import { FINALS } from '../../data/pinyinFinals';
 import { getAudioUrl } from '../audio/audioConfig';
@@ -39,6 +39,48 @@ function randomItems<T>(array: T[], count: number): T[] {
   return shuffled.slice(0, Math.min(count, array.length));
 }
 
+/**
+ * Shuffle and slice options, ensuring the correct answer is always included
+ */
+function shuffleOptionsWithCorrect(options: QuizOption[], count: number): QuizOption[] {
+  const correctOption = options.find(o => o.isCorrect);
+  if (!correctOption) {
+    return shuffle(options).slice(0, count);
+  }
+
+  // Get wrong options and shuffle them
+  const wrongOptions = shuffle(options.filter(o => !o.isCorrect));
+
+  // Take (count - 1) wrong options and add the correct one
+  const selected = wrongOptions.slice(0, count - 1);
+  selected.push(correctOption);
+
+  // Shuffle the final selection so correct answer isn't always last
+  return shuffle(selected);
+}
+
+/**
+ * Pick a random item from array, avoiding recently used items
+ * Returns null if no valid item can be found
+ */
+function randomItemAvoiding<T>(
+  array: T[],
+  recentItems: T[],
+  getKey: (item: T) => string = (item) => String(item)
+): T | null {
+  const recentKeys = new Set(recentItems.map(getKey));
+  const available = array.filter(item => !recentKeys.has(getKey(item)));
+
+  if (available.length === 0) {
+    // Fallback: if all items are recent, just pick any random one
+    return array.length > 0 ? randomItem(array) : null;
+  }
+
+  return randomItem(available);
+}
+
+const RECENT_WINDOW_SIZE = 5;
+
 // ============================================================================
 // 1. TONE RECOGNITION
 // ============================================================================
@@ -48,16 +90,28 @@ export async function generateToneQuestions(
   count: number
 ): Promise<Question[]> {
   const questions: Question[] = [];
+  const recentSyllables: PinyinSyllable[] = [];
 
   // All four tones
   const availableTones = [1, 2, 3, 4];
 
+  // Get all valid syllables upfront
+  const syllablesWithTones = PINYIN_SYLLABLES.filter(s =>
+    s.tones.length >= 3 && s.tones.some(t => availableTones.includes(t))
+  );
+
   for (let i = 0; i < count; i++) {
-    // Pick a random syllable that has multiple tones
-    const syllablesWithTones = PINYIN_SYLLABLES.filter(s =>
-      s.tones.length >= 3 && s.tones.some(t => availableTones.includes(t))
+    // Pick a random syllable, avoiding recent ones
+    const syllable = randomItemAvoiding(
+      syllablesWithTones,
+      recentSyllables.slice(-RECENT_WINDOW_SIZE),
+      s => s.pinyin
     );
-    const syllable = randomItem(syllablesWithTones);
+
+    if (!syllable) continue;
+
+    // Track recent syllables
+    recentSyllables.push(syllable);
 
     // Pick a random tone from available tones for this syllable
     const validTones = syllable.tones.filter(t => availableTones.includes(t));
@@ -101,6 +155,7 @@ export async function generateInitialQuestions(
   count: number
 ): Promise<Question[]> {
   const questions: Question[] = [];
+  const recentSyllables: PinyinSyllable[] = [];
 
   // Define confusing initial groups by level
   const confusingGroups = [
@@ -114,6 +169,11 @@ export async function generateInitialQuestions(
     ['ch', 'c', 'q'],               // Very confusing
     ['sh', 's', 'x'],               // Very confusing
   ];
+
+  // Helper to check if initial + final is valid
+  const isValidInitialFinal = (initial: string, final: string): boolean => {
+    return PINYIN_SYLLABLES.some(s => s.initial === initial && s.final === final);
+  };
 
   for (let i = 0; i < count; i++) {
     // Pick a confusing group (harder groups for higher levels)
@@ -132,21 +192,36 @@ export async function generateInitialQuestions(
 
     if (syllablesWithInitial.length === 0) continue;
 
-    const syllable = randomItem(syllablesWithInitial);
+    // Pick a syllable avoiding recent ones
+    const syllable = randomItemAvoiding(
+      syllablesWithInitial,
+      recentSyllables.slice(-RECENT_WINDOW_SIZE),
+      s => s.pinyin
+    );
+
+    if (!syllable) continue;
+
+    recentSyllables.push(syllable);
     const tone = randomItem(syllable.tones);
 
     const audioUrl = getAudioUrl(`${syllable.pinyin}${tone}`);
 
-    // Create options from the confusing group
-    const options: QuizOption[] = group.map(initial => ({
+    // Create options from the confusing group - only include valid combinations
+    const validGroupInitials = group.filter(initial =>
+      isValidInitialFinal(initial, syllable.final)
+    );
+
+    const options: QuizOption[] = validGroupInitials.map(initial => ({
       id: `initial-${initial}`,
       label: initial || '∅',
       value: initial,
       isCorrect: initial === correctInitial,
     }));
 
-    // Add more random initials if needed to reach optionCount
-    const additionalInitials = INITIALS.filter(i => !group.includes(i));
+    // Add more random initials if needed - only valid ones
+    const additionalInitials = INITIALS.filter(i =>
+      !validGroupInitials.includes(i) && isValidInitialFinal(i, syllable.final)
+    );
     while (options.length < level.optionCount && additionalInitials.length > 0) {
       const extraInitial = randomItem(additionalInitials);
       options.push({
@@ -158,11 +233,14 @@ export async function generateInitialQuestions(
       additionalInitials.splice(additionalInitials.indexOf(extraInitial), 1);
     }
 
+    // Skip if we don't have enough valid options
+    if (options.length < 2) continue;
+
     questions.push({
       id: `initial-${i}`,
       audioUrl,
       correctAnswer: correctInitial,
-      options: shuffle(options).slice(0, level.optionCount),
+      options: shuffleOptionsWithCorrect(options, Math.min(level.optionCount, options.length)),
       syllable: `${syllable.pinyin}${tone}`,
       explanation: `Correct answer: ${correctInitial || '∅'} (${addToneMarks(syllable.pinyin, tone)})`,
     });
@@ -175,11 +253,19 @@ export async function generateInitialQuestions(
 // 3. FINAL RECOGNITION
 // ============================================================================
 
+/**
+ * Check if a given initial + final combination forms a valid syllable
+ */
+function isValidSyllable(initial: string, final: string): boolean {
+  return PINYIN_SYLLABLES.some(s => s.initial === initial && s.final === final);
+}
+
 export async function generateFinalQuestions(
   level: LevelConfig,
   count: number
 ): Promise<Question[]> {
   const questions: Question[] = [];
+  const recentSyllables: PinyinSyllable[] = [];
 
   // Define confusing final groups
   const confusingGroups = [
@@ -204,21 +290,36 @@ export async function generateFinalQuestions(
 
     if (syllablesWithFinal.length === 0) continue;
 
-    const syllable = randomItem(syllablesWithFinal);
+    // Pick a syllable avoiding recent ones
+    const syllable = randomItemAvoiding(
+      syllablesWithFinal,
+      recentSyllables.slice(-RECENT_WINDOW_SIZE),
+      s => s.pinyin
+    );
+
+    if (!syllable) continue;
+
+    recentSyllables.push(syllable);
     const tone = randomItem(syllable.tones);
 
     const audioUrl = getAudioUrl(`${syllable.pinyin}${tone}`);
 
-    // Create options from the confusing group
-    const options: QuizOption[] = group.map(final => ({
+    // Create options from the confusing group - only include valid combinations
+    const validGroupFinals = group.filter(final =>
+      isValidSyllable(syllable.initial, final)
+    );
+
+    const options: QuizOption[] = validGroupFinals.map(final => ({
       id: `final-${final}`,
       label: final,
       value: final,
       isCorrect: final === correctFinal,
     }));
 
-    // Add more random finals if needed
-    const additionalFinals = FINALS.filter(f => !group.includes(f));
+    // Add more random finals if needed - only valid ones
+    const additionalFinals = FINALS.filter(f =>
+      !validGroupFinals.includes(f) && isValidSyllable(syllable.initial, f)
+    );
     while (options.length < level.optionCount && additionalFinals.length > 0) {
       const extraFinal = randomItem(additionalFinals);
       options.push({
@@ -230,11 +331,14 @@ export async function generateFinalQuestions(
       additionalFinals.splice(additionalFinals.indexOf(extraFinal), 1);
     }
 
+    // Skip if we don't have enough valid options
+    if (options.length < 2) continue;
+
     questions.push({
       id: `final-${i}`,
       audioUrl,
       correctAnswer: correctFinal,
-      options: shuffle(options).slice(0, level.optionCount),
+      options: shuffleOptionsWithCorrect(options, Math.min(level.optionCount, options.length)),
       syllable: `${syllable.pinyin}${tone}`,
       explanation: `Correct answer: ${correctFinal} (${addToneMarks(syllable.pinyin, tone)})`,
     });
@@ -252,11 +356,22 @@ export async function generateSyllableQuestions(
   count: number
 ): Promise<Question[]> {
   const questions: Question[] = [];
+  const recentSyllables: PinyinSyllable[] = [];
+
+  // Get all valid syllables upfront
+  const syllablesWithTones = PINYIN_SYLLABLES.filter(s => s.tones.length > 0);
 
   for (let i = 0; i < count; i++) {
-    // Pick a random syllable with tones
-    const syllablesWithTones = PINYIN_SYLLABLES.filter(s => s.tones.length > 0);
-    const correctSyllable = randomItem(syllablesWithTones);
+    // Pick a random syllable, avoiding recent ones
+    const correctSyllable = randomItemAvoiding(
+      syllablesWithTones,
+      recentSyllables.slice(-RECENT_WINDOW_SIZE),
+      s => s.pinyin
+    );
+
+    if (!correctSyllable) continue;
+
+    recentSyllables.push(correctSyllable);
     const tone = randomItem(correctSyllable.tones);
 
     const audioUrl = getAudioUrl(`${correctSyllable.pinyin}${tone}`);
@@ -277,25 +392,29 @@ export async function generateSyllableQuestions(
 
     const wrongOptions = randomItems(similarSyllables, level.optionCount - 1);
 
+    // For syllable quiz, include tone in value so we can play the correct audio
     const options: QuizOption[] = [
       {
         id: 'correct',
         label: correctDisplay,
-        value: correctSyllable.pinyin,
+        value: `${correctSyllable.pinyin}${tone}`,  // Include tone for audio playback
         isCorrect: true,
       },
-      ...wrongOptions.map((s, idx) => ({
-        id: `wrong-${idx}`,
-        label: addToneMarks(s.pinyin, randomItem(s.tones)),
-        value: s.pinyin,
-        isCorrect: false,
-      })),
+      ...wrongOptions.map((s, idx) => {
+        const wrongTone = randomItem(s.tones);
+        return {
+          id: `wrong-${idx}`,
+          label: addToneMarks(s.pinyin, wrongTone),
+          value: `${s.pinyin}${wrongTone}`,  // Include tone for audio playback
+          isCorrect: false,
+        };
+      }),
     ];
 
     questions.push({
       id: `syllable-${i}`,
       audioUrl,
-      correctAnswer: correctSyllable.pinyin,
+      correctAnswer: `${correctSyllable.pinyin}${tone}`,  // Include tone to match option values
       options: shuffle(options),
       syllable: `${correctSyllable.pinyin}${tone}`,
       explanation: `Correct answer: ${correctDisplay}`,
@@ -314,6 +433,7 @@ export async function generateMinimalPairQuestions(
   count: number
 ): Promise<Question[]> {
   const questions: Question[] = [];
+  const recentPinyin: string[] = [];
 
   // Import minimal pairs data (will be available after file creation)
   const { MINIMAL_PAIRS } = await import('../../data/minimalPairs');
@@ -327,8 +447,14 @@ export async function generateMinimalPairQuestions(
   const allPairs = pairSet.pairs;
 
   for (let i = 0; i < count; i++) {
-    const pair = randomItem(allPairs);
+    // Pick a pair, avoiding recent pinyin
+    const availablePairs = allPairs.filter(pair =>
+      !pair.some(p => recentPinyin.slice(-RECENT_WINDOW_SIZE).includes(p))
+    );
+    const pair = availablePairs.length > 0 ? randomItem(availablePairs) : randomItem(allPairs);
     const correctPinyin = randomItem(pair);
+
+    recentPinyin.push(correctPinyin);
 
     // Find syllable object
     const syllableObj = PINYIN_SYLLABLES.find(s => s.pinyin === correctPinyin);
@@ -337,11 +463,11 @@ export async function generateMinimalPairQuestions(
     const tone = randomItem(syllableObj.tones);
     const audioUrl = getAudioUrl(`${correctPinyin}${tone}`);
 
-    // Create options from the pair
+    // Create options from the pair - include tone in value for audio playback
     const options: QuizOption[] = pair.map(p => ({
       id: `pair-${p}`,
       label: addToneMarks(p, tone),
-      value: p,
+      value: `${p}${tone}`,  // Include tone for audio playback
       isCorrect: p === correctPinyin,
     }));
 
@@ -357,7 +483,7 @@ export async function generateMinimalPairQuestions(
       options.push({
         id: `extra-${extraSyllable.pinyin}`,
         label: addToneMarks(extraSyllable.pinyin, tone),
-        value: extraSyllable.pinyin,
+        value: `${extraSyllable.pinyin}${tone}`,  // Include tone for audio playback
         isCorrect: false,
       });
       confusingSyllables.splice(confusingSyllables.indexOf(extraSyllable), 1);
@@ -366,8 +492,8 @@ export async function generateMinimalPairQuestions(
     questions.push({
       id: `minimal-${i}`,
       audioUrl,
-      correctAnswer: correctPinyin,
-      options: shuffle(options).slice(0, level.optionCount),
+      correctAnswer: `${correctPinyin}${tone}`,  // Include tone to match option values
+      options: shuffleOptionsWithCorrect(options, level.optionCount),
       syllable: `${correctPinyin}${tone}`,
       explanation: `Correct answer: ${addToneMarks(correctPinyin, tone)} (${pairSet.description})`,
     });
@@ -385,42 +511,52 @@ export async function generateHSKWordQuestions(
   count: number
 ): Promise<Question[]> {
   const questions: Question[] = [];
+  const recentPinyin: string[] = [];
 
   // Import HSK words data
-  const { getRandomWords } = await import('../../data/hskWords');
+  const { getWordsByLevel } = await import('../../data/hskWords');
 
   // Map level ID to HSK level (0 -> HSK 1, 1 -> HSK 2, 2 -> HSK 3)
   const hskLevel = (level.id + 1) as 1 | 2 | 3;
 
-  // Get random words from this HSK level
-  const words = getRandomWords(hskLevel, count);
+  // Get all words for this level and shuffle them
+  const allWords = shuffle(getWordsByLevel(hskLevel));
 
-  for (let i = 0; i < words.length; i++) {
-    const word = words[i];
+  for (let i = 0; i < Math.min(count, allWords.length); i++) {
+    // Pick a word avoiding recent pinyin
+    const availableWords = allWords.filter(w =>
+      !recentPinyin.slice(-RECENT_WINDOW_SIZE).includes(w.pinyin)
+    );
+    const word = availableWords.length > 0 ? availableWords[0] : allWords[i];
+
+    recentPinyin.push(word.pinyin);
+    // Remove used word from allWords to avoid duplicates
+    const wordIndex = allWords.indexOf(word);
+    if (wordIndex > -1) allWords.splice(wordIndex, 1);
 
     // For single syllable words, use the syllable directly
     // For multi-syllable words, use the full pinyin
     const firstSyllable = word.syllables[0];
     const audioUrl = getAudioUrl(firstSyllable);
 
-    // Create wrong options by finding similar words
-    const allWordsForLevel = await import('../../data/hskWords').then(m => m.getWordsByLevel(hskLevel));
-    const wrongWords = allWordsForLevel
+    // Create wrong options by finding similar words from the shuffled pool
+    const wrongWords = allWords
       .filter(w => w.pinyin !== word.pinyin)
-      .sort(() => Math.random() - 0.5)
       .slice(0, level.optionCount - 1);
 
+    // Use hanzi|syllables format for vocabulary audio playback
+    // Format: "你好|ni3,hao3" - hanzi for CDN/TTS, syllables as fallback
     const options: QuizOption[] = [
       {
         id: 'correct',
         label: word.pinyinDisplay,
-        value: word.pinyin,
+        value: `${word.word}|${word.syllables.join(',')}`,  // hanzi|syllables for audio
         isCorrect: true,
       },
       ...wrongWords.map((w, idx) => ({
         id: `wrong-${idx}`,
         label: w.pinyinDisplay,
-        value: w.pinyin,
+        value: `${w.word}|${w.syllables.join(',')}`,  // hanzi|syllables for audio
         isCorrect: false,
       })),
     ];
@@ -428,9 +564,10 @@ export async function generateHSKWordQuestions(
     questions.push({
       id: `hsk-${i}`,
       audioUrl,
-      correctAnswer: word.pinyin,
+      correctAnswer: `${word.word}|${word.syllables.join(',')}`,  // Match option value format
       options: shuffle(options),
-      syllable: firstSyllable,
+      syllable: word.syllables.join(','),  // All syllables (for fallback)
+      hanzi: word.word,  // Chinese characters for vocabulary audio
       explanation: `Correct answer: ${word.pinyinDisplay} (${word.meaning})`,
     });
   }

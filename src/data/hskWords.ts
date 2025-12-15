@@ -36,7 +36,7 @@ export const HSK_WORDS: HSKWord[] = [
   { word: '什么', pinyin: 'shen2me5', pinyinDisplay: 'shén me', meaning: 'what', level: 1, syllables: ['shen2', 'me5'] },
   { word: '谁', pinyin: 'shei2', pinyinDisplay: 'shéi', meaning: 'who', level: 1, syllables: ['shei2'] },
   { word: '哪', pinyin: 'na3', pinyinDisplay: 'nǎ', meaning: 'which', level: 1, syllables: ['na3'] },
-  { word: '哪儿', pinyin: 'na3r5', pinyinDisplay: 'nǎr', meaning: 'where', level: 1, syllables: ['na3r5'] },
+  { word: '哪儿', pinyin: 'na3r5', pinyinDisplay: 'nǎr', meaning: 'where', level: 1, syllables: ['na3'] },  // erhua - use base syllable for audio
   { word: '几', pinyin: 'ji3', pinyinDisplay: 'jǐ', meaning: 'how many', level: 1, syllables: ['ji3'] },
   { word: '多少', pinyin: 'duo1shao5', pinyinDisplay: 'duō shao', meaning: 'how many/much', level: 1, syllables: ['duo1', 'shao5'] },
   { word: '怎么', pinyin: 'zen3me5', pinyinDisplay: 'zěn me', meaning: 'how', level: 1, syllables: ['zen3', 'me5'] },

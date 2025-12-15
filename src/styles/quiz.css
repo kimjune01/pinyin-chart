@@ -330,6 +330,21 @@
   cursor: not-allowed;
 }
 
+.answer-option.explorable {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.answer-option.explorable:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-sm);
+}
+
+.answer-option.explorable .option-hotkey {
+  background: var(--color-primary);
+  color: white;
+}
+
 /* ==================== Feedback Banner ==================== */
 
 .feedback-area {

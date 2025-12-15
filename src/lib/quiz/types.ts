@@ -36,6 +36,7 @@ export interface Question {
   options: QuizOption[];         // Multiple choice options
   explanation?: string;          // Optional explanation after answer
   syllable?: string;             // Original syllable for reference
+  hanzi?: string;                // Chinese characters for vocabulary audio (HSK words)
 }
 
 /**

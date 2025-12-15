@@ -5,7 +5,7 @@
  * Works with Service Worker for persistent browser caching.
  */
 
-import { getAudioUrl, AUDIO_CONFIG } from './audioConfig';
+import { getAudioUrl, getVocabAudioUrl, AUDIO_CONFIG } from './audioConfig';
 
 export type AudioLoadState = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -30,13 +30,29 @@ class AudioServiceClass {
   }
 
   /**
+   * Normalize pinyin for audio lookup
+   * Handles neutral tone (5) fallback to tone 4
+   */
+  private normalizePinyin(pinyin: string): string {
+    // If tone 5 (neutral tone), try tone 4 as fallback (common for particles)
+    if (pinyin.endsWith('5')) {
+      return pinyin.slice(0, -1) + '4';
+    }
+    return pinyin;
+  }
+
+  /**
    * Play a pinyin syllable audio
    * @param pinyin - Pinyin with tone number (e.g., "ma1")
+   * @param waitForEnd - If true, wait for audio to finish before resolving
    */
-  async play(pinyin: string): Promise<void> {
+  async play(pinyin: string, waitForEnd: boolean = false): Promise<void> {
+    // Normalize pinyin (handle neutral tone fallback)
+    const normalizedPinyin = this.normalizePinyin(pinyin);
+
     try {
       // Get or load audio
-      const audio = await this.getAudio(pinyin);
+      const audio = await this.getAudio(normalizedPinyin);
 
       // Stop currently playing audio
       if (this.currentlyPlaying && this.currentlyPlaying !== audio) {
@@ -47,19 +63,194 @@ class AudioServiceClass {
       // Set volume and play
       audio.volume = this.volume;
       audio.currentTime = 0;
-      await audio.play();
 
       this.currentlyPlaying = audio;
 
-      // Clear current playing when done
-      audio.onended = () => {
-        if (this.currentlyPlaying === audio) {
-          this.currentlyPlaying = null;
-        }
-      };
+      if (waitForEnd) {
+        // Wait for audio to finish playing
+        await new Promise<void>((resolve, reject) => {
+          audio.onended = () => {
+            if (this.currentlyPlaying === audio) {
+              this.currentlyPlaying = null;
+            }
+            resolve();
+          };
+          audio.onerror = () => reject(new Error(`Error playing ${pinyin}`));
+          audio.play().catch(reject);
+        });
+      } else {
+        await audio.play();
+        // Clear current playing when done
+        audio.onended = () => {
+          if (this.currentlyPlaying === audio) {
+            this.currentlyPlaying = null;
+          }
+        };
+      }
     } catch (error) {
       console.error(`[AudioService] Failed to play audio for "${pinyin}":`, error);
       throw error;
+    }
+  }
+
+  /**
+   * Play multiple syllables in sequence
+   * @param syllables - Array of pinyin with tone numbers (e.g., ["ni3", "hao3"])
+   * @param delayMs - Delay between syllables in milliseconds
+   */
+  async playSequence(syllables: string[], delayMs: number = 100): Promise<void> {
+    for (let i = 0; i < syllables.length; i++) {
+      await this.play(syllables[i], true);
+      // Add delay between syllables (but not after the last one)
+      if (i < syllables.length - 1 && delayMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+
+  /**
+   * Play vocabulary audio for a Chinese word (hanzi)
+   * Tries audio-cmn CDN first, falls back to Web Speech API
+   * @param hanzi - Chinese characters (e.g., "你好", "学生")
+   * @param waitForEnd - If true, wait for audio to finish before resolving
+   */
+  async playVocabulary(hanzi: string, waitForEnd: boolean = false): Promise<void> {
+    const cacheKey = `vocab:${hanzi}`;
+
+    // Check if we already know this word is missing from CDN
+    const cached = this.audioCache.get(cacheKey);
+    if (cached?.state === 'error') {
+      // Use Web Speech API fallback
+      await this.speakWithWebSpeech(hanzi, waitForEnd);
+      return;
+    }
+
+    // Try loading from CDN
+    try {
+      const audio = await this.loadVocabAudio(hanzi);
+
+      // Stop currently playing audio
+      if (this.currentlyPlaying && this.currentlyPlaying !== audio) {
+        this.currentlyPlaying.pause();
+        this.currentlyPlaying.currentTime = 0;
+      }
+
+      audio.volume = this.volume;
+      audio.currentTime = 0;
+      this.currentlyPlaying = audio;
+
+      if (waitForEnd) {
+        await new Promise<void>((resolve, reject) => {
+          audio.onended = () => {
+            if (this.currentlyPlaying === audio) {
+              this.currentlyPlaying = null;
+            }
+            resolve();
+          };
+          audio.onerror = () => reject(new Error(`Error playing ${hanzi}`));
+          audio.play().catch(reject);
+        });
+      } else {
+        await audio.play();
+        audio.onended = () => {
+          if (this.currentlyPlaying === audio) {
+            this.currentlyPlaying = null;
+          }
+        };
+      }
+    } catch {
+      // CDN failed, use Web Speech API fallback
+      console.log(`[AudioService] CDN audio not available for "${hanzi}", using Web Speech`);
+      await this.speakWithWebSpeech(hanzi, waitForEnd);
+    }
+  }
+
+  /**
+   * Load vocabulary audio from CDN
+   */
+  private async loadVocabAudio(hanzi: string): Promise<HTMLAudioElement> {
+    const cacheKey = `vocab:${hanzi}`;
+    const url = getVocabAudioUrl(hanzi);
+
+    // Check cache
+    const cached = this.audioCache.get(cacheKey);
+    if (cached?.audio && cached.state === 'loaded') {
+      return cached.audio;
+    }
+
+    // Create metadata entry
+    this.audioCache.set(cacheKey, {
+      url,
+      state: 'loading',
+      audio: null
+    });
+
+    try {
+      const audio = new Audio(url);
+
+      await new Promise<void>((resolve, reject) => {
+        audio.addEventListener('canplaythrough', () => resolve(), { once: true });
+        audio.addEventListener('error', () => reject(new Error(`Failed to load vocab audio: ${hanzi}`)), { once: true });
+        audio.load();
+        // Shorter timeout for vocab audio (3 seconds)
+        setTimeout(() => reject(new Error(`Timeout loading vocab audio: ${hanzi}`)), 3000);
+      });
+
+      this.audioCache.set(cacheKey, {
+        url,
+        state: 'loaded',
+        audio
+      });
+
+      this.trimCache();
+      return audio;
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.audioCache.set(cacheKey, {
+        url,
+        state: 'error',
+        audio: null,
+        error: err
+      });
+      throw err;
+    }
+  }
+
+  /**
+   * Use Web Speech API to speak Chinese text
+   * @param text - Chinese text to speak
+   * @param waitForEnd - If true, wait for speech to finish
+   */
+  private async speakWithWebSpeech(text: string, waitForEnd: boolean = false): Promise<void> {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      console.warn('[AudioService] Web Speech API not available');
+      return;
+    }
+
+    // Stop any currently playing audio
+    this.stop();
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    utterance.rate = 0.9; // Slightly slower for clarity
+    utterance.volume = this.volume;
+
+    // Try to find a Chinese voice
+    const voices = window.speechSynthesis.getVoices();
+    const chineseVoice = voices.find(v => v.lang.startsWith('zh'));
+    if (chineseVoice) {
+      utterance.voice = chineseVoice;
+    }
+
+    if (waitForEnd) {
+      await new Promise<void>((resolve) => {
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve(); // Don't throw, just continue
+        window.speechSynthesis.speak(utterance);
+      });
+    } else {
+      window.speechSynthesis.speak(utterance);
     }
   }
 

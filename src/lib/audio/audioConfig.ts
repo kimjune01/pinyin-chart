@@ -11,6 +11,10 @@ export const AUDIO_CDN_BASE = 'https://cdn.jsdelivr.net/gh/davinfifield/mp3-chin
 // Fallback CDN: GitHub raw (slower, may have rate limits)
 export const AUDIO_CDN_FALLBACK = 'https://raw.githubusercontent.com/davinfifield/mp3-chinese-pinyin-sound/master/mp3';
 
+// Vocabulary audio CDN: audio-cmn project (CC-BY-SA licensed HSK vocabulary)
+// Uses Chinese characters (hanzi) as filenames
+export const VOCAB_AUDIO_CDN = 'https://raw.githubusercontent.com/hugolpz/audio-cmn/master/64k/hsk';
+
 /**
  * Get the audio URL for a given pinyin syllable with tone
  * @param pinyin - Pinyin syllable with tone number (e.g., "ma1", "zhang4")
@@ -19,6 +23,15 @@ export const AUDIO_CDN_FALLBACK = 'https://raw.githubusercontent.com/davinfifiel
 export function getAudioUrl(pinyin: string, useFallback = false): string {
   const base = useFallback ? AUDIO_CDN_FALLBACK : AUDIO_CDN_BASE;
   return `${base}/${pinyin}.mp3`;
+}
+
+/**
+ * Get the vocabulary audio URL for a given Chinese word (hanzi)
+ * @param hanzi - Chinese characters (e.g., "你好", "学生")
+ * @returns Full URL to the audio file
+ */
+export function getVocabAudioUrl(hanzi: string): string {
+  return `${VOCAB_AUDIO_CDN}/cmn-${hanzi}.mp3`;
 }
 
 /**

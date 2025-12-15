@@ -258,8 +258,20 @@ export function useQuizEngine(config: QuizConfig): UseQuizEngineReturn {
    */
   const playQuestionAudio = async (question: Question) => {
     try {
-      const pinyin = extractPinyinFromUrl(question.audioUrl);
-      await audioService.play(pinyin);
+      // For HSK words with hanzi, use vocabulary audio (CDN with Web Speech fallback)
+      if (question.hanzi) {
+        await audioService.playVocabulary(question.hanzi);
+      }
+      // For multi-syllable words without hanzi, play syllables in sequence
+      else if (question.syllable?.includes(',')) {
+        const syllables = question.syllable.split(',');
+        await audioService.playSequence(syllables);
+      }
+      // For single syllable questions
+      else {
+        const pinyin = extractPinyinFromUrl(question.audioUrl);
+        await audioService.play(pinyin);
+      }
     } catch (error) {
       console.error('[quizEngine] Error playing question audio:', error);
     }
