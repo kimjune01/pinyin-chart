@@ -1,0 +1,665 @@
+/**
+ * Pinyin Sandwich Game Styles
+ */
+
+/* ============================================================================
+   Container & Layout
+   ============================================================================ */
+
+.sandwich-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: var(--spacing-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ============================================================================
+   Menu Screen
+   ============================================================================ */
+
+.sandwich-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 400px;
+}
+
+.sandwich-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.sandwich-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.sandwich-setting-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sandwich-setting-group h3 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sandwich-buttons-row {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.sandwich-option-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sandwich-option-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.sandwich-option-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.sandwich-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.sandwich-high-score {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+}
+
+.sandwich-high-score span {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.sandwich-start-btn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sandwich-start-btn:hover {
+  background: var(--color-primary-dark);
+  transform: scale(1.02);
+}
+
+/* ============================================================================
+   Game Screen
+   ============================================================================ */
+
+.sandwich-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.sandwich-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+
+.sandwich-score {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.sandwich-score span {
+  color: var(--color-primary);
+}
+
+.sandwich-progress {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-normal);
+}
+
+.sandwich-menu-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sandwich-menu-btn:hover {
+  background: var(--color-surface-hover);
+}
+
+/* ============================================================================
+   Conveyor Belt & Sandwich Stack
+   ============================================================================ */
+
+.conveyor-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  height: 280px;
+  margin: var(--spacing-md) 0;
+}
+
+.conveyor-belt {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: #5D4E37;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.conveyor-stripes {
+  width: 200%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #5D4E37 0px,
+    #5D4E37 18px,
+    #7D6E57 18px,
+    #7D6E57 36px
+  );
+  animation: conveyorMove 1s linear infinite;
+}
+
+.conveyor-belt.fast .conveyor-stripes {
+  animation-duration: 0.3s;
+}
+
+@keyframes conveyorMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-36px); }
+}
+
+.conveyor-rail {
+  position: absolute;
+  bottom: 35px;
+  width: 8px;
+  height: 60px;
+  background: linear-gradient(180deg, #8B8B8B 0%, #6B6B6B 100%);
+  border-radius: var(--radius-xs);
+}
+
+.conveyor-rail-left { left: 20px; }
+.conveyor-rail-right { right: 20px; }
+
+/* Sandwich Stack */
+.sandwich-stack {
+  position: absolute;
+  bottom: 45px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: -4px;
+  transition: transform 0.3s ease;
+}
+
+.sandwich-layer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.4s ease-out;
+}
+
+.sandwich-layer.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Base layer (always visible) */
+.layer-base {
+  width: 140px;
+  height: 35px;
+  background: linear-gradient(180deg, #F4A460 0%, #D2691E 100%);
+  border-radius: 8px 8px 50px 50px;
+  border: 3px solid #8B4513;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.layer-base .layer-icon {
+  font-size: 24px;
+}
+
+/* Initial layer (lettuce) */
+.layer-initial {
+  width: 130px;
+  height: 28px;
+  background: linear-gradient(180deg, #90EE90 0%, #32CD32 100%);
+  border-radius: 4px 4px 8px 8px;
+  border: 2px solid #228B22;
+  margin-bottom: -8px;
+  z-index: 1;
+}
+
+/* Final layer (patty) */
+.layer-final {
+  width: 125px;
+  height: 32px;
+  background: linear-gradient(180deg, #A0522D 0%, #654321 100%);
+  border-radius: 8px;
+  border: 3px solid #3E2723;
+  margin-bottom: -6px;
+  z-index: 2;
+}
+
+/* Tone layer (cheese) */
+.layer-tone {
+  width: 115px;
+  height: 20px;
+  background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 2px;
+  margin-bottom: -4px;
+  z-index: 3;
+}
+
+/* Top layer */
+.layer-top {
+  width: 140px;
+  height: 45px;
+  background: linear-gradient(180deg, #F4A460 0%, #CD853F 50%, #D2691E 100%);
+  border-radius: 50px 50px 8px 8px;
+  border: 3px solid #8B4513;
+  margin-bottom: 0;
+  z-index: 4;
+}
+
+.layer-top .layer-icon {
+  font-size: 24px;
+}
+
+/* Layer text */
+.layer-text {
+  position: absolute;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.layer-emoji {
+  position: absolute;
+  right: 8px;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* Sandwich label */
+.sandwich-label {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  background: var(--color-surface);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+/* Animation States */
+.sandwich-shipping {
+  animation: shipOff 0.8s ease-in forwards;
+}
+
+@keyframes shipOff {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(calc(100vw - 50%)); opacity: 0; }
+}
+
+.sandwich-falling .layer-initial,
+.sandwich-falling .layer-final,
+.sandwich-falling .layer-tone,
+.sandwich-falling .layer-top {
+  animation: fallDown 0.6s ease-in forwards;
+}
+
+.sandwich-falling .layer-initial { animation-delay: 0s; }
+.sandwich-falling .layer-final { animation-delay: 0.1s; }
+.sandwich-falling .layer-tone { animation-delay: 0.2s; }
+.sandwich-falling .layer-top { animation-delay: 0.3s; }
+
+@keyframes fallDown {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(200px) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+.sandwich-reset .sandwich-layer {
+  opacity: 0;
+  transform: translateX(100px);
+}
+
+/* ============================================================================
+   Audio Button
+   ============================================================================ */
+
+.sandwich-audio-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sandwich-audio-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.sandwich-audio-btn.playing {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.sandwich-audio-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   Ingredient Panels
+   ============================================================================ */
+
+.sandwich-panels {
+  display: flex;
+  gap: var(--spacing-md);
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ingredient-panel {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.ingredient-panel-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--spacing-sm) 0;
+  text-align: center;
+}
+
+.ingredient-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xs);
+}
+
+/* Panel-specific colors */
+.ingredient-panel-initial {
+  border-top: 4px solid #32CD32;
+}
+
+.ingredient-panel-final {
+  border-top: 4px solid #A0522D;
+}
+
+.ingredient-panel-tone {
+  border-top: 4px solid #FFD700;
+}
+
+/* Ingredient buttons */
+.ingredient-btn {
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 44px;
+}
+
+.ingredient-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.ingredient-btn.selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.ingredient-btn.correct {
+  border-color: #22C55E;
+  background: #22C55E;
+  color: white;
+  animation: correctPulse 0.5s ease;
+}
+
+.ingredient-btn.incorrect {
+  border-color: #EF4444;
+  background: #EF4444;
+  color: white;
+  animation: shake 0.5s ease;
+}
+
+.ingredient-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes correctPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Initial button specific styling */
+.ingredient-btn-initial.selected {
+  background: #32CD32;
+  border-color: #228B22;
+}
+
+/* Final button specific styling */
+.ingredient-btn-final.selected {
+  background: #A0522D;
+  border-color: #654321;
+}
+
+/* Tone button specific styling */
+.ingredient-btn-tone.selected {
+  background: #FFD700;
+  border-color: #FFA500;
+  color: #333;
+}
+
+/* ============================================================================
+   Actions & Status
+   ============================================================================ */
+
+.sandwich-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+.sandwich-submit-btn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sandwich-submit-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+  transform: scale(1.02);
+}
+
+.sandwich-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sandwich-retry-btn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: #F97316;
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sandwich-retry-btn:hover {
+  background: #EA580C;
+}
+
+.sandwich-complete-actions {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.sandwich-status {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sandwich-status.success {
+  color: #22C55E;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.sandwich-status.failure {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.sandwich-status.levelComplete {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  font-size: var(--font-size-lg);
+}
+
+/* ============================================================================
+   Responsive
+   ============================================================================ */
+
+@media (max-width: 600px) {
+  .sandwich-container {
+    padding: var(--spacing-md);
+  }
+
+  .sandwich-panels {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ingredient-panel {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .ingredient-options {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+
+  .conveyor-container {
+    height: 240px;
+  }
+}

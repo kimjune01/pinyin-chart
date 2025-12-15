@@ -1,0 +1,16 @@
+---
+/**
+ * Pinyin Sandwich Game Page
+ * Build sandwiches by identifying initial, final, and tone
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import PinyinSandwichGame from '../../components/games/pinyin-sandwich/PinyinSandwichGame';
+import '../../styles/pinyin-sandwich.css';
+
+const title = 'Pinyin Sandwich';
+---
+
+<AppLayout title={title} currentSection="games">
+  <PinyinSandwichGame client:load />
+</AppLayout>
