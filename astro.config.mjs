@@ -5,7 +5,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://kimjune01.github.io',
+  site: 'https://www.june.kim',
   base: '/pinyin-chart',
   integrations: [react()],
   vite: {
