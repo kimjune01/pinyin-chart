@@ -1,0 +1,16 @@
+---
+/**
+ * Pinyin Simon Game Page
+ * Memory sequence game for pinyin practice
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import PinyinSimonGame from '../../components/games/pinyin-simon/PinyinSimonGame';
+import '../../styles/pinyin-simon.css';
+
+const title = 'Pinyin Simon';
+---
+
+<AppLayout title={title} currentSection="pinyin-simon">
+  <PinyinSimonGame client:load />
+</AppLayout>
