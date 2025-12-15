@@ -5,6 +5,11 @@ import { SYLLABLE_COUNT, TOTAL_COMBINATIONS } from '../data/pinyinSyllables';
 
 <AppLayout title="Home" currentSection="home">
   <div class="hero">
+    <img
+      src="/pinyin-chart/pinyinpanda.jpg"
+      alt="Cute panda mascot with glasses reading a pinyin chart"
+      class="hero-mascot"
+    />
     <h1 class="hero-title">Master Mandarin Pinyin</h1>
     <p class="hero-subtitle">
       Learn Chinese pronunciation through interactive soundboards and scientifically-designed quizzes.
@@ -72,6 +77,18 @@ import { SYLLABLE_COUNT, TOTAL_COMBINATIONS } from '../data/pinyinSyllables';
     text-align: center;
     padding: var(--spacing-2xl) 0;
     margin-bottom: var(--spacing-2xl);
+  }
+
+  .hero-mascot {
+    width: 200px;
+    height: auto;
+    margin-bottom: var(--spacing-lg);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 
   .hero-title {
