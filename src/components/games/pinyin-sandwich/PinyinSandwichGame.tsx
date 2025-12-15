@@ -266,6 +266,11 @@ export default function PinyinSandwichGame() {
       {/* Menu Screen */}
       {gameState === 'menu' && (
         <div className="sandwich-menu">
+          <img
+            src="/pinyin-chart/pinyinsandwich.jpg"
+            alt="Panda chef making a pinyin sandwich"
+            className="sandwich-splash"
+          />
           <h2 className="sandwich-title">Pinyin Sandwich</h2>
           <p className="sandwich-subtitle">Build sandwiches by identifying Initial, Final, and Tone!</p>
 
