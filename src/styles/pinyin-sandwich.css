@@ -465,7 +465,7 @@
 .ingredient-options {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   flex: 1;
 }
 
@@ -538,12 +538,24 @@
 }
 
 /* Initial button specific styling */
+.ingredient-btn-initial {
+  font-size: var(--font-size-xl);
+  min-width: 50px;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
 .ingredient-btn-initial.selected {
   background: #32CD32;
   border-color: #228B22;
 }
 
 /* Final button specific styling */
+.ingredient-btn-final {
+  font-size: var(--font-size-xl);
+  min-width: 50px;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
 .ingredient-btn-final.selected {
   background: #A0522D;
   border-color: #654321;
