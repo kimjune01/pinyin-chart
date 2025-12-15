@@ -87,6 +87,18 @@ export default function PinyinSandwichGame() {
     }
   }, [currentQuestion, isPlaying]);
 
+  // Keyboard shortcut: space to replay audio
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && gameState === 'playing') {
+        e.preventDefault();
+        playAudio();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameState, playAudio]);
+
   // Start game
   const startGame = useCallback(() => {
     recentSyllables.current = [];
