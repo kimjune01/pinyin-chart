@@ -1,0 +1,17 @@
+---
+/**
+ * HSK Words Quiz Page
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import { HSK_QUIZ } from '../../data/quizConfigs';
+import '../../styles/quiz.css';
+
+const title = 'HSK Words Quiz';
+const description = 'Recognize pinyin for common HSK vocabulary words.';
+---
+
+<AppLayout title={title} currentSection="quiz">
+  <BaseQuiz config={HSK_QUIZ} client:load />
+</AppLayout>

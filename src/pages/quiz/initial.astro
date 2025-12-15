@@ -1,0 +1,17 @@
+---
+/**
+ * Initial Recognition Quiz Page
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import { INITIAL_QUIZ } from '../../data/quizConfigs';
+import '../../styles/quiz.css';
+
+const title = 'Initial Recognition Quiz';
+const description = 'Identify the initial consonant sound.';
+---
+
+<AppLayout title={title} currentSection="quiz">
+  <BaseQuiz config={INITIAL_QUIZ} client:load />
+</AppLayout>

@@ -1,0 +1,249 @@
+---
+/**
+ * Header - Mobile header with navigation toggle
+ * Shows on mobile devices (<768px)
+ */
+
+export interface Props {
+  title: string;
+  currentSection?: string;
+}
+
+const { title, currentSection = 'home' } = Astro.props;
+---
+
+<header class="mobile-header">
+  <button class="menu-toggle" aria-label="Toggle menu" id="menu-toggle">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </button>
+
+  <h1 class="header-title">{title}</h1>
+
+  <div class="header-spacer"></div>
+</header>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobile-menu-overlay">
+  <div class="mobile-menu">
+    <div class="mobile-menu-header">
+      <h2 class="mobile-menu-title">拼音 Pinyin Chart</h2>
+      <button class="menu-close" aria-label="Close menu" id="menu-close">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="mobile-nav">
+      <div class="mobile-nav-section">
+        <h3>📚 Learn</h3>
+        <ul>
+          <li><a href="/pinyin-chart/">Home</a></li>
+          <li><a href="/pinyin-chart/soundboard">Soundboard</a></li>
+        </ul>
+      </div>
+
+      <div class="mobile-nav-section">
+        <h3>🎮 Quizzes</h3>
+        <ul>
+          <li><a href="/pinyin-chart/quiz/tone">Tone Recognition</a></li>
+          <li><a href="/pinyin-chart/quiz/initial">Initial Recognition</a></li>
+          <li><a href="/pinyin-chart/quiz/final">Final Recognition</a></li>
+          <li><a href="/pinyin-chart/quiz/syllable">Complete Syllable</a></li>
+          <li><a href="/pinyin-chart/quiz/pairs">Minimal Pairs</a></li>
+          <li><a href="/pinyin-chart/quiz/hsk">HSK Words</a></li>
+        </ul>
+      </div>
+
+      <div class="mobile-nav-section">
+        <h3>📖 Reference</h3>
+        <ul>
+          <li><a href="/pinyin-chart/reference">Progress & Stats</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  // Mobile menu toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const menuClose = document.getElementById('menu-close');
+  const menuOverlay = document.getElementById('mobile-menu-overlay');
+
+  function openMenu() {
+    menuOverlay?.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    menuOverlay?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  menuToggle?.addEventListener('click', openMenu);
+  menuClose?.addEventListener('click', closeMenu);
+  menuOverlay?.addEventListener('click', (e) => {
+    if (e.target === menuOverlay) {
+      closeMenu();
+    }
+  });
+
+  // Close menu on navigation
+  menuOverlay?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMenu);
+  });
+</script>
+
+<style>
+  /* Mobile Header */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+  }
+
+  @media (min-width: 768px) {
+    .mobile-header {
+      display: none;
+    }
+  }
+
+  .menu-toggle {
+    padding: var(--spacing-sm);
+    background: none;
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+  }
+
+  .menu-toggle:hover {
+    background-color: var(--color-border-light);
+  }
+
+  .header-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+    flex: 1;
+  }
+
+  .header-spacer {
+    width: 40px; /* Balance the menu button */
+  }
+
+  /* Mobile Menu Overlay */
+  .mobile-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-modal);
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+
+  .mobile-menu-overlay.active {
+    display: block;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-xl);
+    overflow-y: auto;
+    animation: slideInLeft 0.3s ease;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .mobile-menu-title {
+    font-size: var(--font-size-xl);
+    margin: 0;
+  }
+
+  .menu-close {
+    padding: var(--spacing-sm);
+    background: none;
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+  }
+
+  .menu-close:hover {
+    background-color: var(--color-border-light);
+  }
+
+  /* Mobile Navigation */
+  .mobile-nav {
+    padding: var(--spacing-lg);
+  }
+
+  .mobile-nav-section {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .mobile-nav-section h3 {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .mobile-nav-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .mobile-nav-section li {
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .mobile-nav-section a {
+    display: block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-nav-section a:hover {
+    background-color: var(--color-border-light);
+    color: var(--color-primary);
+  }
+</style>

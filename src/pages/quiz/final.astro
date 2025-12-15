@@ -1,0 +1,17 @@
+---
+/**
+ * Final Recognition Quiz Page
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import { FINAL_QUIZ } from '../../data/quizConfigs';
+import '../../styles/quiz.css';
+
+const title = 'Final Recognition Quiz';
+const description = 'Identify the final vowel sound.';
+---
+
+<AppLayout title={title} currentSection="quiz">
+  <BaseQuiz config={FINAL_QUIZ} client:load />
+</AppLayout>

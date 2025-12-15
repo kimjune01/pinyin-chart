@@ -1,0 +1,149 @@
+---
+/**
+ * AppLayout - Main layout template
+ * Provides consistent structure across all pages:
+ * - Sidebar navigation (desktop)
+ * - Header with mobile menu
+ * - Main content area
+ */
+
+import Sidebar from './Sidebar.astro';
+import Header from './Header.astro';
+import '../../styles/global.css';
+
+export interface Props {
+  title: string;
+  currentSection?: 'home' | 'soundboard' | 'quiz' | 'reference';
+}
+
+const { title, currentSection = 'home' } = Astro.props;
+const fullTitle = `${title} | Pinyin Chart`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content="Learn Mandarin Chinese pinyin through interactive soundboards and quizzes. Master tones, initials, finals, and pronunciation." />
+
+    <title>{fullTitle}</title>
+
+    <link rel="icon" type="image/svg+xml" href="/pinyin-chart/favicon.svg" />
+
+    <!-- Preload fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Register Service Worker -->
+    <script>
+      // Register service worker for audio caching
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', async () => {
+          try {
+            const { registerServiceWorker } = await import('/src/lib/audio/registerSW.ts');
+            await registerServiceWorker();
+          } catch (error) {
+            console.error('Failed to register service worker:', error);
+          }
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- Desktop Sidebar -->
+      <aside class="desktop-sidebar">
+        <Sidebar currentSection={currentSection} />
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="main-wrapper">
+        <!-- Mobile Header -->
+        <Header title={title} currentSection={currentSection} />
+
+        <!-- Page Content -->
+        <main class="page-content">
+          <slot />
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+          <p>&copy; {new Date().getFullYear()} Pinyin Chart. Built for Mandarin learners.</p>
+        </footer>
+      </div>
+    </div>
+
+    <style>
+      .app-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Desktop Sidebar */
+      .desktop-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background-color: var(--color-surface);
+        border-right: 1px solid var(--color-border);
+        overflow-y: auto;
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .desktop-sidebar {
+          display: block;
+        }
+      }
+
+      /* Main Content Wrapper */
+      .main-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      @media (min-width: 768px) {
+        .main-wrapper {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Page Content */
+      .page-content {
+        flex: 1;
+        padding: var(--spacing-lg);
+        max-width: var(--max-content-width);
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      @media (min-width: 768px) {
+        .page-content {
+          padding: var(--spacing-2xl);
+        }
+      }
+
+      /* Footer */
+      .app-footer {
+        padding: var(--spacing-xl);
+        text-align: center;
+        border-top: 1px solid var(--color-border);
+        background-color: var(--color-surface);
+      }
+
+      .app-footer p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,381 @@
+---
+/**
+ * Reference & Progress Page
+ * Shows overall quiz progress and statistics
+ */
+
+import AppLayout from '../components/layout/AppLayout.astro';
+import { ALL_QUIZZES } from '../data/quizConfigs';
+
+const title = 'Progress & Reference';
+const description = 'Track your learning journey and view statistics';
+---
+
+<AppLayout title={title} currentSection="reference">
+  <div class="reference-page">
+    <header class="page-header">
+      <h1>Progress & Reference</h1>
+      <p>Track your learning journey across all quiz types</p>
+    </header>
+
+    <section class="quiz-overview">
+      <h2>Quiz Progress</h2>
+      <div class="quiz-grid">
+        {ALL_QUIZZES.map((quiz) => (
+          <div class="quiz-summary-card">
+            <div class="quiz-header">
+              <span class="quiz-icon">{quiz.icon}</span>
+              <h3>{quiz.name}</h3>
+            </div>
+            <p class="quiz-description">{quiz.description}</p>
+            <div class="quiz-stats">
+              <div class="stat">
+                <span class="stat-label">Levels:</span>
+                <span class="stat-value">{quiz.levels.length}</span>
+              </div>
+            </div>
+            <a href={`/pinyin-chart/quiz/${quiz.id.split('-')[0]}`} class="quiz-link">
+              Start Quiz →
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="pinyin-reference">
+      <h2>Pinyin Reference</h2>
+
+      <div class="reference-section">
+        <h3>The Four Tones</h3>
+        <div class="tone-grid">
+          <div class="tone-item">
+            <span class="tone-number" style="background: var(--tone-1-color)">1</span>
+            <div class="tone-details">
+              <strong>First Tone (mā)</strong>
+              <p>High, level pitch - like singing a high note</p>
+            </div>
+          </div>
+          <div class="tone-item">
+            <span class="tone-number" style="background: var(--tone-2-color)">2</span>
+            <div class="tone-details">
+              <strong>Second Tone (má)</strong>
+              <p>Rising pitch - like asking "What?"</p>
+            </div>
+          </div>
+          <div class="tone-item">
+            <span class="tone-number" style="background: var(--tone-3-color)">3</span>
+            <div class="tone-details">
+              <strong>Third Tone (mǎ)</strong>
+              <p>Falling-rising pitch - dip down then up</p>
+            </div>
+          </div>
+          <div class="tone-item">
+            <span class="tone-number" style="background: var(--tone-4-color)">4</span>
+            <div class="tone-details">
+              <strong>Fourth Tone (mà)</strong>
+              <p>Sharp falling pitch - like saying "No!"</p>
+            </div>
+          </div>
+          <div class="tone-item">
+            <span class="tone-number" style="background: var(--tone-5-color)">5</span>
+            <div class="tone-details">
+              <strong>Neutral Tone (ma)</strong>
+              <p>Light, unstressed - like "uh" in English</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reference-section">
+        <h3>Common Confusions</h3>
+        <div class="confusion-grid">
+          <div class="confusion-item">
+            <h4>zh/z/j Sounds</h4>
+            <p><strong>zh</strong> (retroflex): Tongue curled back<br>
+            <strong>z</strong> (dental): Tongue at teeth<br>
+            <strong>j</strong> (palatal): Tongue at hard palate</p>
+          </div>
+          <div class="confusion-item">
+            <h4>n vs ng Endings</h4>
+            <p><strong>n</strong>: Tongue touches roof of mouth<br>
+            <strong>ng</strong>: Back of tongue, nasal sound<br>
+            Example: an vs ang, en vs eng</p>
+          </div>
+          <div class="confusion-item">
+            <h4>ü (v) vs u</h4>
+            <p><strong>ü</strong>: Rounded lips, say "ee"<br>
+            <strong>u</strong>: Rounded lips, say "oo"<br>
+            Example: ju vs zhu, qu vs chu</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="reference-section">
+        <h3>Quick Tips</h3>
+        <div class="tips-list">
+          <div class="tip">
+            <span class="tip-icon">💡</span>
+            <p><strong>Practice daily:</strong> 10-15 minutes per day is more effective than long cramming sessions</p>
+          </div>
+          <div class="tip">
+            <span class="tip-icon">🎧</span>
+            <p><strong>Listen actively:</strong> Use headphones and focus on subtle differences between similar sounds</p>
+          </div>
+          <div class="tip">
+            <span class="tip-icon">🔁</span>
+            <p><strong>Repeat out loud:</strong> After hearing a syllable, try pronouncing it yourself</p>
+          </div>
+          <div class="tip">
+            <span class="tip-icon">📝</span>
+            <p><strong>Write pinyin:</strong> Practice writing tone marks to reinforce visual memory</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <style>
+    .reference-page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: var(--spacing-3xl);
+    }
+
+    .page-header h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    .page-header p {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    /* Quiz Overview */
+    .quiz-overview {
+      margin-bottom: var(--spacing-3xl);
+    }
+
+    .quiz-overview h2 {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    .quiz-summary-card {
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      transition: all var(--transition-fast);
+    }
+
+    .quiz-summary-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .quiz-icon {
+      font-size: var(--font-size-3xl);
+    }
+
+    .quiz-summary-card h3 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .quiz-description {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-md);
+      line-height: 1.5;
+    }
+
+    .quiz-stats {
+      display: flex;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+      padding: var(--spacing-sm) 0;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .stat {
+      display: flex;
+      gap: var(--spacing-xs);
+    }
+
+    .stat-label {
+      color: var(--color-text-secondary);
+    }
+
+    .stat-value {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+    }
+
+    .quiz-link {
+      display: inline-block;
+      color: var(--color-primary);
+      font-weight: var(--font-weight-semibold);
+      text-decoration: none;
+    }
+
+    .quiz-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Reference Section */
+    .pinyin-reference h2 {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .reference-section {
+      background: var(--color-surface);
+      padding: var(--spacing-xl);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .reference-section h3 {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin: 0 0 var(--spacing-lg) 0;
+    }
+
+    .tone-grid {
+      display: grid;
+      gap: var(--spacing-md);
+    }
+
+    .tone-item {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: center;
+      padding: var(--spacing-md);
+      background: var(--color-background);
+      border-radius: var(--radius-md);
+    }
+
+    .tone-number {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .tone-details strong {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      color: var(--color-text);
+    }
+
+    .tone-details p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    .confusion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    .confusion-item {
+      padding: var(--spacing-md);
+      background: var(--color-background);
+      border-radius: var(--radius-md);
+    }
+
+    .confusion-item h4 {
+      color: var(--color-primary);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    .confusion-item p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      line-height: 1.6;
+    }
+
+    .tips-list {
+      display: grid;
+      gap: var(--spacing-md);
+    }
+
+    .tip {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: flex-start;
+      padding: var(--spacing-md);
+      background: var(--color-background);
+      border-radius: var(--radius-md);
+    }
+
+    .tip-icon {
+      font-size: var(--font-size-2xl);
+      flex-shrink: 0;
+    }
+
+    .tip p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .tip strong {
+      color: var(--color-text);
+    }
+
+    @media (max-width: 768px) {
+      .reference-page {
+        padding: var(--spacing-lg);
+      }
+
+      .quiz-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .confusion-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</AppLayout>

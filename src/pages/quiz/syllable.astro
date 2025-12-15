@@ -1,0 +1,17 @@
+---
+/**
+ * Complete Syllable Quiz Page
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import { SYLLABLE_QUIZ } from '../../data/quizConfigs';
+import '../../styles/quiz.css';
+
+const title = 'Complete Syllable Quiz';
+const description = 'Recognize the entire pinyin syllable with tone marks.';
+---
+
+<AppLayout title={title} currentSection="quiz">
+  <BaseQuiz config={SYLLABLE_QUIZ} client:load />
+</AppLayout>

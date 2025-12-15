@@ -1,0 +1,415 @@
+/**
+ * Soundboard Component Styles
+ * Extracted from React components for compatibility with Astro
+ */
+
+/* ==================== ToneSelector Styles ==================== */
+
+.tone-selector-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-background);
+  border-bottom: 2px solid var(--color-border);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.tone-selector-container {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.tone-selector-label {
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+.tone-options {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.tone-option {
+  position: relative;
+  cursor: pointer;
+  flex: 1;
+  min-width: 120px;
+}
+
+.tone-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.tone-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border: 2px solid var(--tone-color);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  transition: all var(--transition-fast);
+  min-height: 80px;
+  justify-content: center;
+}
+
+.tone-option:hover .tone-button {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.tone-option.selected .tone-button {
+  background: var(--tone-color);
+  color: white;
+  border-color: var(--tone-color);
+  box-shadow: var(--shadow-md);
+}
+
+.tone-label {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.tone-option.selected .tone-label {
+  color: white;
+}
+
+.tone-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--tone-color);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--tone-color);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-mono);
+}
+
+.tone-option.selected .tone-key {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  color: white;
+}
+
+.tone-name {
+  display: block;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.tone-option.selected .tone-name {
+  color: var(--tone-color);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ==================== PinyinGrid Styles ==================== */
+
+.pinyin-grid-container {
+  width: 100%;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.pinyin-grid-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.pinyin-grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+}
+
+/* Corner cell */
+.corner-cell {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  background: var(--color-primary);
+  color: white;
+  padding: var(--spacing-md);
+  border-bottom: 2px solid var(--color-border);
+  border-right: 2px solid var(--color-border);
+  min-width: 100px;
+}
+
+.corner-labels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Header cells */
+.initial-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-border-light);
+  padding: var(--spacing-md);
+  border-bottom: 2px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  min-width: 80px;
+  transition: background-color var(--transition-fast);
+}
+
+.initial-header.highlighted {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.initial-label {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.final-header {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: var(--color-border-light);
+  padding: var(--spacing-md);
+  border-right: 2px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  min-width: 80px;
+  transition: background-color var(--transition-fast);
+}
+
+tr.highlighted .final-header {
+  background: rgba(74, 144, 226, 0.1);
+}
+
+.final-label {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+/* Syllable cells */
+.syllable-cell {
+  padding: var(--spacing-xs);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+.syllable-cell.highlighted {
+  background: rgba(74, 144, 226, 0.05);
+}
+
+.syllable-cell.empty {
+  background: var(--color-background);
+}
+
+.empty-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  min-height: 60px;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* ==================== SyllableButton Styles ==================== */
+
+.syllable-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  min-height: 60px;
+  padding: var(--spacing-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.syllable-button:hover {
+  background: var(--color-border-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary);
+}
+
+.syllable-button:active {
+  transform: translateY(0);
+}
+
+.syllable-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.syllable-button.playing {
+  background: rgba(74, 144, 226, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+  animation: pulse 0.5s ease;
+}
+
+.syllable-button.error {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: var(--color-error);
+}
+
+.syllable-text {
+  font-size: var(--font-size-xl);
+}
+
+.playing-indicator,
+.error-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: var(--font-size-xs);
+}
+
+/* Focus styles for accessibility */
+.syllable-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ==================== Animations ==================== */
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes tonePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.tone-option.selected .tone-button {
+  animation: tonePulse 0.3s ease;
+}
+
+/* ==================== Scrollbar Styling ==================== */
+
+.pinyin-grid-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.pinyin-grid-scroll::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+.pinyin-grid-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.pinyin-grid-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* ==================== Mobile Adjustments ==================== */
+
+@media (max-width: 768px) {
+  /* ToneSelector mobile */
+  .tone-selector-sticky {
+    padding: var(--spacing-md);
+  }
+
+  .tone-options {
+    gap: var(--spacing-sm);
+  }
+
+  .tone-option {
+    min-width: 90px;
+  }
+
+  .tone-button {
+    padding: var(--spacing-sm);
+    min-height: 70px;
+  }
+
+  .tone-label {
+    font-size: var(--font-size-xl);
+  }
+
+  /* Hide keyboard hints on mobile */
+  .tone-key {
+    display: none;
+  }
+
+  /* PinyinGrid mobile */
+  .pinyin-grid-scroll {
+    max-height: calc(100vh - 250px);
+  }
+
+  .corner-cell,
+  .initial-header,
+  .final-header {
+    min-width: 60px;
+    padding: var(--spacing-sm);
+  }
+
+  .corner-labels {
+    font-size: var(--font-size-xs);
+  }
+
+  .initial-label,
+  .final-label {
+    font-size: var(--font-size-base);
+  }
+
+  .empty-cell {
+    min-width: 50px;
+    min-height: 50px;
+  }
+
+  /* SyllableButton mobile */
+  .syllable-button {
+    min-width: 50px;
+    min-height: 50px;
+  }
+
+  .syllable-text {
+    font-size: var(--font-size-lg);
+  }
+}
