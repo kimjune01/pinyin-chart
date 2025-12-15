@@ -248,6 +248,19 @@ export default function PinyinSandwichGame() {
     }
   };
 
+  // Get score emoji based on percentage
+  const getScoreEmoji = (): string => {
+    const total = DIFFICULTY_CONFIGS[difficulty].questionsPerRound;
+    const percentage = (score / total) * 100;
+
+    if (percentage === 100) return '🤩'; // Perfect
+    if (percentage >= 80) return '😄';   // Great
+    if (percentage >= 60) return '🙂';   // Good
+    if (percentage >= 40) return '😐';   // Okay
+    if (percentage >= 20) return '😕';   // Needs work
+    return '😢';                          // Keep practicing
+  };
+
   return (
     <div className="sandwich-container">
       {/* Menu Screen */}
@@ -291,8 +304,39 @@ export default function PinyinSandwichGame() {
         </div>
       )}
 
+      {/* Level Complete Screen */}
+      {gameState === 'levelComplete' && (
+        <div className="sandwich-game">
+          {/* Stopped Conveyor Belt */}
+          <div className="conveyor-container">
+            <div className="conveyor-belt stopped">
+              <div className="conveyor-stripes" />
+            </div>
+            <div className="conveyor-rail conveyor-rail-left" />
+            <div className="conveyor-rail conveyor-rail-right" />
+          </div>
+
+          {/* Score Display */}
+          <div className="sandwich-complete-screen">
+            <div className="score-emoji">{getScoreEmoji()}</div>
+            <h2 className="complete-title">Round Complete!</h2>
+            <div className="complete-score">
+              {score} / {DIFFICULTY_CONFIGS[difficulty].questionsPerRound}
+            </div>
+            <div className="sandwich-complete-actions">
+              <button className="sandwich-start-btn" onClick={startGame}>
+                Play Again
+              </button>
+              <button className="sandwich-menu-btn" onClick={returnToMenu}>
+                Menu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Game Screen */}
-      {gameState !== 'menu' && currentQuestion && (
+      {gameState !== 'menu' && gameState !== 'levelComplete' && currentQuestion && (
         <div className="sandwich-game">
           {/* Header */}
           <div className="sandwich-header">
@@ -371,16 +415,6 @@ export default function PinyinSandwichGame() {
               <button className="sandwich-retry-btn" onClick={retry}>
                 Try Again
               </button>
-            )}
-            {gameState === 'levelComplete' && (
-              <div className="sandwich-complete-actions">
-                <button className="sandwich-start-btn" onClick={startGame}>
-                  Play Again
-                </button>
-                <button className="sandwich-menu-btn" onClick={returnToMenu}>
-                  Menu
-                </button>
-              </div>
             )}
           </div>
 
