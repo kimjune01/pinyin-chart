@@ -23,6 +23,8 @@ export interface FallingSyllable {
   isPlaying: boolean;       // currently playing audio (for glow effect)
   nextAudioTime: number;    // timestamp for next audio play
   createdAt: number;        // for unique ID generation
+  hueShift: number;         // random hue shift for color variance
+  saturation: number;       // random saturation multiplier (0.5 to 1.5)
 }
 
 // Target point for convergence (center bottom)
@@ -36,6 +38,8 @@ export interface Explosion {
   hanzi: string;
   pinyin: string;           // pinyin with tone marks for display
   tone: number;
+  hueShift: number;         // inherited from syllable for color consistency
+  saturation: number;       // inherited from syllable for color consistency
   wasHanzi: boolean;        // true = show pinyin in explosion, false = show hanzi
   phase: 'expanding' | 'showing' | 'fading';
   startTime: number;
@@ -280,6 +284,13 @@ function createSyllable(pinyin: string, tone: number, levelConfig: LevelConfig):
   const hanziProb = getHanziProbability(levelConfig.level);
   const displayAsHanzi = Math.random() < hanziProb;
 
+  // Random hue shift for color variance (-180 to +180 degrees) - full spectrum
+  // Uniform distribution for maximum variance
+  const hueShift = Math.random() * 360 - 180;
+
+  // Random saturation multiplier (0.4 to 1.6)
+  const saturation = 0.4 + Math.random() * 1.2;
+
   return {
     id: `${pinyin}${tone}-${now}-${Math.random().toString(36).substr(2, 5)}`,
     pinyin,
@@ -296,6 +307,8 @@ function createSyllable(pinyin: string, tone: number, levelConfig: LevelConfig):
     isPlaying: false,
     nextAudioTime: now + 500, // Small delay before first audio
     createdAt: now,
+    hueShift,
+    saturation,
   };
 }
 
@@ -323,6 +336,8 @@ export function createExplosion(syllable: FallingSyllable, pinyinDisplay: string
     hanzi: syllable.hanzi,
     pinyin: pinyinDisplay,
     tone: syllable.tone,
+    hueShift: syllable.hueShift,
+    saturation: syllable.saturation,
     wasHanzi: syllable.displayAsHanzi,
     phase: 'expanding',
     startTime: Date.now(),

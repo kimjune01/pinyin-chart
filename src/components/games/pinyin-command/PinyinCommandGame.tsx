@@ -83,7 +83,7 @@ export default function PinyinCommandGame() {
   const [domeHit, setDomeHit] = useState(false);
 
   // Laser pulse effect
-  const [laserTarget, setLaserTarget] = useState<{ x: number; y: number } | null>(null);
+  const [laserTarget, setLaserTarget] = useState<{ x: number; y: number; tone: number; hueShift: number; saturation: number } | null>(null);
 
   // Space bomb
   const [bombActive, setBombActive] = useState(false);
@@ -569,7 +569,7 @@ export default function PinyinCommandGame() {
       // SUCCESS - trigger laser effect and sound
       playLaserSound();
       const targetX = calculateSyllableX(syllable);
-      setLaserTarget({ x: targetX, y: syllable.y });
+      setLaserTarget({ x: targetX, y: syllable.y, tone: syllable.tone, hueShift: syllable.hueShift, saturation: syllable.saturation });
       setTimeout(() => setLaserTarget(null), 300);
 
       // Destroy syllable
@@ -732,6 +732,7 @@ export default function PinyinCommandGame() {
                   left: `${calculateSyllableX(s)}%`,
                   top: `${s.y}%`,
                   '--tone-color': `var(--tone-${s.tone}-color)`,
+                  filter: `hue-rotate(${s.hueShift}deg) saturate(${s.saturation})`,
                 } as React.CSSProperties}
               >
                 <span className="syllable-text">
@@ -751,6 +752,7 @@ export default function PinyinCommandGame() {
                   top: `${e.y}%`,
                   '--progress': e.progress,
                   '--tone-color': `var(--tone-${e.tone}-color)`,
+                  filter: `hue-rotate(${e.hueShift}deg) saturate(${e.saturation})`,
                 } as React.CSSProperties}
               >
                 <div className="explosion-ring" />
@@ -769,6 +771,8 @@ export default function PinyinCommandGame() {
                 style={{
                   '--target-x': `${laserTarget.x}%`,
                   '--target-y': `${laserTarget.y}%`,
+                  '--tone-color': `var(--tone-${laserTarget.tone}-color)`,
+                  filter: `hue-rotate(${laserTarget.hueShift}deg) saturate(${laserTarget.saturation})`,
                 } as React.CSSProperties}
               />
             )}
