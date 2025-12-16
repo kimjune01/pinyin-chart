@@ -1,0 +1,16 @@
+---
+/**
+ * Pinyin Command Game Page
+ * Missile Command style typing game for pinyin practice
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import PinyinCommandGame from '../../components/games/pinyin-command/PinyinCommandGame';
+import '../../styles/pinyin-command.css';
+
+const title = 'Pinyin Command';
+---
+
+<AppLayout title={title} currentSection="pinyin-command">
+  <PinyinCommandGame client:load />
+</AppLayout>

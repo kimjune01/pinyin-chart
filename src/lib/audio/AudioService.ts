@@ -45,8 +45,9 @@ class AudioServiceClass {
    * Play a pinyin syllable audio
    * @param pinyin - Pinyin with tone number (e.g., "ma1")
    * @param waitForEnd - If true, wait for audio to finish before resolving
+   * @param allowOverlap - If true, don't stop currently playing audio (for parallel playback)
    */
-  async play(pinyin: string, waitForEnd: boolean = false): Promise<void> {
+  async play(pinyin: string, waitForEnd: boolean = false, allowOverlap: boolean = false): Promise<void> {
     // Normalize pinyin (handle neutral tone fallback)
     const normalizedPinyin = this.normalizePinyin(pinyin);
 
@@ -60,35 +61,40 @@ class AudioServiceClass {
       // Get or load audio
       const audio = await this.getAudio(normalizedPinyin);
 
-      // Stop currently playing audio
-      if (this.currentlyPlaying && this.currentlyPlaying !== audio) {
+      // Stop currently playing audio (unless overlap is allowed)
+      if (!allowOverlap && this.currentlyPlaying && this.currentlyPlaying !== audio) {
         this.currentlyPlaying.pause();
         this.currentlyPlaying.currentTime = 0;
       }
 
-      // Set volume and play
-      audio.volume = this.volume;
-      audio.currentTime = 0;
+      // For overlapping playback, clone the audio element so multiple instances can play
+      const playableAudio = allowOverlap ? audio.cloneNode() as HTMLAudioElement : audio;
 
-      this.currentlyPlaying = audio;
+      // Set volume and play
+      playableAudio.volume = this.volume;
+      playableAudio.currentTime = 0;
+
+      if (!allowOverlap) {
+        this.currentlyPlaying = playableAudio;
+      }
 
       if (waitForEnd) {
         // Wait for audio to finish playing
         await new Promise<void>((resolve, reject) => {
-          audio.onended = () => {
-            if (this.currentlyPlaying === audio) {
+          playableAudio.onended = () => {
+            if (this.currentlyPlaying === playableAudio) {
               this.currentlyPlaying = null;
             }
             resolve();
           };
-          audio.onerror = () => reject(new Error(`Error playing ${pinyin}`));
-          audio.play().catch(reject);
+          playableAudio.onerror = () => reject(new Error(`Error playing ${pinyin}`));
+          playableAudio.play().catch(reject);
         });
       } else {
-        await audio.play();
+        await playableAudio.play();
         // Clear current playing when done
-        audio.onended = () => {
-          if (this.currentlyPlaying === audio) {
+        playableAudio.onended = () => {
+          if (this.currentlyPlaying === playableAudio) {
             this.currentlyPlaying = null;
           }
         };

@@ -1,0 +1,971 @@
+/**
+ * Pinyin Command - Retro Arcade Styling
+ * Missile Command inspired typing game with neon aesthetic
+ */
+
+/* Arcade Color Palette */
+:root {
+  --arcade-bg: #0a0a1a;
+  --arcade-surface: #1a1a2e;
+  --arcade-neon-green: #00ff88;
+  --arcade-neon-pink: #ff0088;
+  --arcade-neon-cyan: #00ffff;
+  --arcade-neon-yellow: #ffff00;
+  --arcade-neon-orange: #ff8800;
+}
+
+/* Disable scrolling on the page */
+body:has(.command-container) {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Make the game full-bleed within the layout */
+.page-content:has(.command-container) {
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Container */
+.command-container {
+  height: 100vh;
+  max-height: 100vh;
+  background: var(--arcade-bg);
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  position: relative;
+  overflow: hidden;
+}
+
+/* CRT Scanlines Effect */
+.command-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Vignette */
+.command-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 99;
+}
+
+/* ==================== MENU ==================== */
+.command-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.command-title {
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--spacing-sm);
+  color: var(--arcade-neon-green);
+  text-shadow:
+    0 0 10px var(--arcade-neon-green),
+    0 0 20px var(--arcade-neon-green),
+    0 0 40px var(--arcade-neon-green);
+  animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+  from { text-shadow: 0 0 10px var(--arcade-neon-green), 0 0 20px var(--arcade-neon-green); }
+  to { text-shadow: 0 0 20px var(--arcade-neon-green), 0 0 40px var(--arcade-neon-green), 0 0 60px var(--arcade-neon-green); }
+}
+
+.command-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--arcade-neon-cyan);
+  margin-bottom: var(--spacing-2xl);
+  opacity: 0.8;
+}
+
+.command-setting-group {
+  margin-bottom: var(--spacing-xl);
+  width: 100%;
+  max-width: 600px;
+}
+
+.command-setting-group h3 {
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--arcade-neon-yellow);
+  margin-bottom: var(--spacing-md);
+}
+
+.command-difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.command-difficulty-btn {
+  background: var(--arcade-surface);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.command-difficulty-btn:hover {
+  border-color: var(--arcade-neon-green);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.command-difficulty-btn.active {
+  border-color: var(--arcade-neon-green);
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+}
+
+.difficulty-name {
+  display: block;
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: var(--spacing-xs);
+}
+
+.difficulty-desc {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.command-high-score {
+  font-size: var(--font-size-lg);
+  color: var(--arcade-neon-yellow);
+  margin-bottom: var(--spacing-lg);
+  text-shadow: 0 0 10px var(--arcade-neon-yellow);
+}
+
+.command-high-score span {
+  font-weight: bold;
+  font-size: var(--font-size-2xl);
+}
+
+.command-instructions {
+  margin-bottom: var(--spacing-xl);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.command-instructions kbd {
+  background: var(--arcade-surface);
+  border: 1px solid var(--arcade-neon-cyan);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: inherit;
+  color: var(--arcade-neon-cyan);
+}
+
+.command-start-btn {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  padding: var(--spacing-md) var(--spacing-2xl);
+  background: transparent;
+  border: 3px solid var(--arcade-neon-green);
+  color: var(--arcade-neon-green);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-shadow: 0 0 10px var(--arcade-neon-green);
+}
+
+.command-start-btn:hover {
+  background: var(--arcade-neon-green);
+  color: var(--arcade-bg);
+  box-shadow: 0 0 30px var(--arcade-neon-green);
+  text-shadow: none;
+}
+
+/* ==================== GAME ==================== */
+.command-game {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HUD */
+.command-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+  z-index: 10;
+}
+
+.command-hud-left,
+.command-hud-right {
+  flex: 1;
+}
+
+.command-hud-center {
+  flex: 1;
+  text-align: center;
+}
+
+.command-score {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  color: var(--arcade-neon-yellow);
+  text-shadow: 0 0 10px var(--arcade-neon-yellow);
+}
+
+.command-level {
+  font-size: var(--font-size-sm);
+  color: var(--arcade-neon-cyan);
+  margin-top: var(--spacing-xs);
+}
+
+.command-combo {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  color: var(--arcade-neon-orange);
+  text-shadow: 0 0 15px var(--arcade-neon-orange);
+  animation: combo-pulse 0.3s ease;
+}
+
+@keyframes combo-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Bomb ready indicator */
+.command-combo.bomb-ready {
+  color: var(--arcade-neon-pink);
+  text-shadow: 0 0 15px var(--arcade-neon-pink), 0 0 30px var(--arcade-neon-pink);
+  animation: bomb-ready-pulse 0.5s ease infinite;
+}
+
+.bomb-indicator {
+  color: var(--arcade-neon-cyan);
+  text-shadow: 0 0 10px var(--arcade-neon-cyan);
+  font-size: var(--font-size-sm);
+  animation: bomb-indicator-flash 0.3s ease infinite;
+}
+
+@keyframes bomb-ready-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes bomb-indicator-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Bomb active animation */
+.command-arena.bomb-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 90%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(0, 255, 255, 0.5) 30%,
+    rgba(255, 0, 136, 0.3) 60%,
+    transparent 80%
+  );
+  animation: bomb-flash 0.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 20;
+}
+
+@keyframes bomb-flash {
+  0% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.8;
+    transform: scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.command-health-container {
+  text-align: right;
+}
+
+.command-health-label {
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: 0.1em;
+}
+
+.command-health-bar {
+  width: 150px;
+  height: 16px;
+  background: var(--arcade-surface);
+  border: 2px solid var(--arcade-neon-green);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-left: auto;
+}
+
+.command-health-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--arcade-neon-pink), var(--arcade-neon-orange));
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--arcade-neon-pink);
+}
+
+.command-health-fill.critical {
+  animation: health-critical 0.5s ease infinite;
+}
+
+@keyframes health-critical {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Game Arena */
+.command-arena {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Falling Syllables */
+.command-syllable {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  transition: transform 0.1s ease;
+  z-index: 5;
+}
+
+.command-syllable .syllable-text {
+  display: block;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: bold;
+  color: var(--tone-color, #fff);
+  text-shadow:
+    0 0 10px var(--tone-color, #fff),
+    0 0 20px var(--tone-color, #fff);
+}
+
+.command-syllable .syllable-tone {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.command-syllable.targeted {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.command-syllable.targeted .syllable-text {
+  color: #fff;
+  text-shadow:
+    0 0 15px var(--arcade-neon-cyan),
+    0 0 30px var(--arcade-neon-cyan);
+}
+
+.command-syllable.matched {
+  animation: matched-pulse 0.4s ease infinite;
+}
+
+.command-syllable.matched .syllable-text {
+  color: var(--arcade-neon-green);
+  text-shadow:
+    0 0 15px var(--arcade-neon-green),
+    0 0 30px var(--arcade-neon-green);
+}
+
+@keyframes matched-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1.1); }
+  50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Playing state - brighter glow when audio is playing */
+.command-syllable.playing {
+  animation: playing-glow 0.6s ease-out;
+}
+
+.command-syllable.playing .syllable-text {
+  text-shadow:
+    0 0 20px var(--tone-color, #fff),
+    0 0 40px var(--tone-color, #fff),
+    0 0 60px var(--tone-color, #fff),
+    0 0 80px rgba(255, 255, 255, 0.5);
+}
+
+.command-syllable.playing .syllable-tone {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes playing-glow {
+  0% {
+    transform: translate(-50%, -50%) scale(1.15);
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Hanzi mode - larger text for Chinese characters */
+.command-syllable.hanzi-mode .syllable-text {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+/* Explosions */
+.command-explosion {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.explosion-ring {
+  width: 100px;
+  height: 100px;
+  border: 4px solid var(--tone-color, var(--arcade-neon-green));
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  box-shadow:
+    0 0 20px var(--tone-color, var(--arcade-neon-green)),
+    inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.command-explosion.expanding .explosion-ring {
+  animation: explosion-expand 150ms ease-out forwards;
+}
+
+.command-explosion.showing .explosion-ring,
+.command-explosion.fading .explosion-ring {
+  transform: translate(-50%, -50%) scale(1.5);
+}
+
+.command-explosion.fading .explosion-ring {
+  opacity: calc(1 - var(--progress, 0));
+}
+
+@keyframes explosion-expand {
+  from { transform: translate(-50%, -50%) scale(0); }
+  to { transform: translate(-50%, -50%) scale(1.5); }
+}
+
+/* Explosion reveal text (hanzi or pinyin) */
+.explosion-reveal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow:
+    0 0 20px var(--tone-color, #fff),
+    0 0 40px var(--tone-color, #fff);
+  animation: reveal-pop 350ms ease-out;
+  white-space: nowrap;
+}
+
+.explosion-reveal.is-hanzi {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+.explosion-reveal.is-pinyin {
+  font-size: 2rem;
+  letter-spacing: 0.05em;
+  animation: pinyin-reveal 350ms ease-out;
+}
+
+@keyframes reveal-pop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Special animation for pinyin reveal - slides up with bounce */
+@keyframes pinyin-reveal {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.5);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -60%) scale(1.15);
+  }
+  70% {
+    transform: translate(-50%, -45%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Laser Pulse Effect - originates from city base */
+.command-laser {
+  position: absolute;
+  left: var(--target-x);
+  top: var(--target-y);
+  width: 4px;
+  /* Extend from target to base (92% is TARGET_Y from commandEngine) */
+  height: calc(92% - var(--target-y));
+  transform: translateX(-50%);
+  /* Gradient points upward - bright core at bottom (base), fading toward target */
+  background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(0, 255, 255, 1) 5%,
+    rgba(0, 255, 255, 0.8) 20%,
+    rgba(0, 255, 255, 0.4) 60%,
+    rgba(0, 255, 255, 0) 100%
+  );
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.8),
+    0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 40px rgba(0, 255, 255, 0.4);
+  animation: laser-fire 0.3s ease-out forwards;
+  pointer-events: none;
+  z-index: 15;
+}
+
+@keyframes laser-fire {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(3);
+    clip-path: inset(100% 0 0 0);
+  }
+  15% {
+    clip-path: inset(0 0 0 0);
+    transform: translateX(-50%) scaleX(1.5);
+  }
+  30% {
+    transform: translateX(-50%) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0.5);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Level Up */
+.command-level-up {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: bold;
+  color: var(--arcade-neon-yellow);
+  text-shadow:
+    0 0 20px var(--arcade-neon-yellow),
+    0 0 40px var(--arcade-neon-yellow),
+    0 0 60px var(--arcade-neon-yellow);
+  animation: level-up 1.5s ease-out forwards;
+  z-index: 20;
+}
+
+@keyframes level-up {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Base with Dome and City */
+.command-base {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 100px;
+}
+
+/* Dome Shield */
+.command-dome {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 90px;
+  pointer-events: none;
+}
+
+.dome-shield {
+  width: 100%;
+  height: 100%;
+  border-radius: 90px 90px 0 0;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(0, 255, 255, 0.1) 0%,
+    rgba(0, 255, 255, 0.05) 50%,
+    transparent 70%
+  );
+  border: 2px solid rgba(0, 255, 255, 0.6);
+  border-bottom: none;
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.3),
+    0 0 40px rgba(0, 255, 255, 0.2),
+    inset 0 0 30px rgba(0, 255, 255, 0.1);
+  transition: opacity 0.3s ease;
+}
+
+/* Dome damage animation */
+.command-base.hit .dome-shield {
+  animation: dome-hit 0.4s ease-out;
+}
+
+@keyframes dome-hit {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 40px rgba(255, 0, 100, 0.8), 0 0 80px rgba(255, 0, 100, 0.5);
+    border-color: rgba(255, 0, 100, 0.9);
+  }
+  25% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+  75% { opacity: 0.5; }
+  100% {
+    opacity: inherit;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.6);
+  }
+}
+
+/* City Skyline */
+.command-city {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  height: 50px;
+}
+
+.building {
+  background: linear-gradient(180deg, #2a4a6a 0%, #1a2a3a 100%);
+  border-radius: 2px 2px 0 0;
+  position: relative;
+}
+
+/* Building windows */
+.building::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 2px;
+  right: 2px;
+  bottom: 4px;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 150, 0.6) 0px,
+    rgba(255, 255, 150, 0.6) 3px,
+    transparent 3px,
+    transparent 6px
+  );
+}
+
+.building.b1 { width: 16px; height: 35px; }
+.building.b2 { width: 20px; height: 45px; }
+.building.b3 { width: 24px; height: 50px; }
+.building.b4 { width: 18px; height: 40px; }
+.building.b5 { width: 14px; height: 30px; }
+
+/* Destroyed buildings */
+.building.destroyed {
+  background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+  clip-path: polygon(0 30%, 20% 0, 50% 20%, 80% 0, 100% 25%, 100% 100%, 0 100%);
+}
+
+.building.destroyed::before {
+  background: none;
+}
+
+.building.destroyed.b1 { height: 20px; }
+.building.destroyed.b2 { height: 25px; }
+.building.destroyed.b3 { height: 30px; }
+
+/* Smoke from destroyed city */
+.smoke {
+  position: absolute;
+  bottom: 20px;
+  width: 30px;
+  height: 60px;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(100, 100, 100, 0.6) 0%,
+    rgba(80, 80, 80, 0.3) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: smoke-rise 3s ease-out infinite;
+}
+
+.smoke.s1 { left: 30%; animation-delay: 0s; }
+.smoke.s2 { left: 50%; animation-delay: 1s; }
+.smoke.s3 { left: 70%; animation-delay: 0.5s; }
+
+@keyframes smoke-rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-80px) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Destroyed state */
+.command-base.destroyed .dome-shield {
+  opacity: 0.1 !important;
+  border-color: rgba(255, 100, 100, 0.3);
+  box-shadow: none;
+}
+
+/* Ground line */
+.command-base::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100vw;
+  right: -100vw;
+  height: 20px;
+  background: linear-gradient(
+    180deg,
+    var(--arcade-surface) 0%,
+    var(--arcade-bg) 100%
+  );
+  border-top: 2px solid rgba(0, 255, 255, 0.3);
+}
+
+/* Input Area */
+.command-input-area {
+  padding: var(--spacing-xs) var(--spacing-lg);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  z-index: 10;
+  position: relative;
+}
+
+.command-input-display {
+  display: inline-block;
+  min-width: 100px;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--arcade-surface);
+  border: 2px solid var(--arcade-neon-cyan);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  color: var(--arcade-neon-cyan);
+  text-shadow: 0 0 10px var(--arcade-neon-cyan);
+}
+
+.input-text {
+  min-width: 1ch;
+}
+
+.input-cursor {
+  animation: cursor-blink 1s ease infinite;
+  color: var(--arcade-neon-green);
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.command-tone-prompt {
+  position: absolute;
+  left: calc(50% + 80px);
+  color: var(--arcade-neon-green);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.command-tone-prompt.visible {
+  opacity: 1;
+  animation: prompt-pulse 0.5s ease infinite;
+}
+
+.command-tone-prompt kbd {
+  background: var(--arcade-surface);
+  border: 1px solid var(--arcade-neon-green);
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin: 0 2px;
+  color: var(--arcade-neon-green);
+}
+
+@keyframes prompt-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Overlays */
+.command-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.command-pause-menu {
+  text-align: center;
+}
+
+.command-pause-menu h2 {
+  font-size: var(--font-size-4xl);
+  color: var(--arcade-neon-yellow);
+  margin-bottom: var(--spacing-xl);
+  text-shadow: 0 0 20px var(--arcade-neon-yellow);
+}
+
+.command-btn {
+  display: block;
+  width: 200px;
+  margin: var(--spacing-md) auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  font-family: inherit;
+  background: transparent;
+  border: 2px solid var(--arcade-neon-green);
+  color: var(--arcade-neon-green);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.command-btn:hover {
+  background: var(--arcade-neon-green);
+  color: var(--arcade-bg);
+  box-shadow: 0 0 20px var(--arcade-neon-green);
+}
+
+.command-btn.secondary {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.command-btn.secondary:hover {
+  border-color: #fff;
+  background: transparent;
+  color: #fff;
+  box-shadow: none;
+}
+
+/* ==================== GAME OVER ==================== */
+.command-gameover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.command-gameover-title {
+  font-size: clamp(2rem, 8vw, 4rem);
+  color: var(--arcade-neon-pink);
+  text-shadow:
+    0 0 20px var(--arcade-neon-pink),
+    0 0 40px var(--arcade-neon-pink);
+  margin-bottom: var(--spacing-xl);
+  animation: gameover-flash 1s ease infinite;
+}
+
+@keyframes gameover-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.command-final-score {
+  margin-bottom: var(--spacing-xl);
+}
+
+.score-label {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.1em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.score-value {
+  font-size: clamp(3rem, 10vw, 5rem);
+  font-weight: bold;
+  color: var(--arcade-neon-yellow);
+  text-shadow: 0 0 20px var(--arcade-neon-yellow);
+}
+
+.new-record {
+  font-size: var(--font-size-lg);
+  color: var(--arcade-neon-green);
+  text-shadow: 0 0 10px var(--arcade-neon-green);
+  margin-top: var(--spacing-sm);
+  animation: record-pulse 0.5s ease infinite;
+}
+
+@keyframes record-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.command-stats {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--spacing-xl);
+}
+
+.command-stats div {
+  margin: var(--spacing-xs) 0;
+}
+
+.command-gameover-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+}
