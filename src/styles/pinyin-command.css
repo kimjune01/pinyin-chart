@@ -381,6 +381,67 @@ body:has(.command-container) {
   flex: 1;
   position: relative;
   overflow: hidden;
+  /* Vaporwave sunset background */
+  background:
+    /* Sun glow at horizon */
+    radial-gradient(
+      ellipse 80% 30% at 50% 95%,
+      rgba(255, 100, 50, 0.15) 0%,
+      rgba(255, 50, 100, 0.08) 40%,
+      transparent 70%
+    ),
+    /* Horizon gradient */
+    linear-gradient(
+      to top,
+      rgba(255, 50, 100, 0.12) 0%,
+      rgba(180, 50, 150, 0.08) 15%,
+      rgba(100, 50, 150, 0.05) 30%,
+      rgba(50, 30, 80, 0.03) 50%,
+      transparent 70%
+    ),
+    /* Base dark */
+    var(--arcade-bg);
+}
+
+/* Horizontal lines overlay - only over sunset gradient, behind city */
+.command-arena .sunset-lines {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  pointer-events: none;
+  z-index: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 4px,
+    rgba(0, 0, 0, 0.7) 4px,
+    rgba(0, 0, 0, 0.7) 12px
+  );
+  /* Fade out at top to match sunset gradient fade */
+  -webkit-mask-image: linear-gradient(
+    to top,
+    black 0%,
+    black 60%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    black 0%,
+    black 60%,
+    transparent 100%
+  );
+  animation: sunset-lines-blur 8s ease-in-out infinite;
+}
+
+@keyframes sunset-lines-blur {
+  0%, 100% {
+    filter: blur(0px);
+  }
+  50% {
+    filter: blur(5px);
+  }
 }
 
 /* Falling Syllables */
@@ -785,6 +846,182 @@ body:has(.command-container) {
   }
 }
 
+/* Vaporwave Palm Trees */
+.palm-tree {
+  position: absolute;
+  bottom: 15px;
+  z-index: 2;
+}
+
+.palm-trunk {
+  width: 3px;
+  height: 22px;
+  background: linear-gradient(180deg, #ff6b9d 0%, #c44569 50%, #8b2a4a 100%);
+  margin: 0 auto;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 107, 157, 0.5);
+}
+
+.palm-fronds {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 15px;
+  background:
+    radial-gradient(ellipse 100% 50% at 50% 100%, transparent 40%, #00ffaa 41%, #00ffaa 45%, transparent 46%),
+    radial-gradient(ellipse 80% 40% at 30% 80%, transparent 40%, #00ff88 41%, #00ff88 45%, transparent 46%),
+    radial-gradient(ellipse 80% 40% at 70% 80%, transparent 40%, #00ff88 41%, #00ff88 45%, transparent 46%),
+    radial-gradient(ellipse 60% 35% at 20% 70%, transparent 40%, #00ffcc 41%, #00ffcc 45%, transparent 46%),
+    radial-gradient(ellipse 60% 35% at 80% 70%, transparent 40%, #00ffcc 41%, #00ffcc 45%, transparent 46%);
+  filter: drop-shadow(0 0 6px rgba(0, 255, 136, 0.6));
+  animation: palm-sway 4s ease-in-out infinite;
+}
+
+.palm-tree.p1 { left: -100px; transform: scale(0.7); }
+.palm-tree.p2 { left: -55px; transform: scale(0.9); }
+.palm-tree.p3 { right: -55px; left: auto; transform: scale(0.85) scaleX(-1); }
+.palm-tree.p4 { right: -100px; left: auto; transform: scale(0.65) scaleX(-1); }
+
+@keyframes palm-sway {
+  0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+  50% { transform: translateX(-50%) rotate(2deg); }
+}
+
+.palm-tree.p1 .palm-fronds { animation-delay: 0s; }
+.palm-tree.p2 .palm-fronds { animation-delay: 0.5s; }
+.palm-tree.p3 .palm-fronds { animation-delay: 1s; }
+.palm-tree.p4 .palm-fronds { animation-delay: 1.5s; }
+
+/* Wilted palm trees for game over */
+.palm-tree.wilted .palm-trunk {
+  background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+  box-shadow: none;
+  transform: rotate(5deg);
+}
+
+.palm-tree.wilted .palm-fronds {
+  background:
+    radial-gradient(ellipse 100% 50% at 50% 100%, transparent 40%, #3a3a3a 41%, #3a3a3a 45%, transparent 46%),
+    radial-gradient(ellipse 80% 40% at 30% 80%, transparent 40%, #4a4a4a 41%, #4a4a4a 45%, transparent 46%),
+    radial-gradient(ellipse 80% 40% at 70% 80%, transparent 40%, #4a4a4a 41%, #4a4a4a 45%, transparent 46%);
+  filter: grayscale(1) brightness(0.4);
+  transform: translateX(-50%) rotate(15deg) scaleY(0.6);
+  animation: none;
+}
+
+.palm-tree.wilted.p3 .palm-fronds,
+.palm-tree.wilted.p4 .palm-fronds {
+  transform: translateX(-50%) rotate(-15deg) scaleY(0.6);
+}
+
+/* Large edge palm trees for game over screen */
+.edge-palm {
+  position: absolute;
+  z-index: 5;
+}
+
+.edge-palm .palm-trunk {
+  width: 20px;
+  height: 200px;
+  background: linear-gradient(180deg, #ff6b9d 0%, #c44569 50%, #8b2a4a 100%);
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+}
+
+.edge-palm .palm-fronds {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 80px;
+}
+
+.edge-palm .palm-fronds::before,
+.edge-palm .palm-fronds::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 70px;
+  height: 60px;
+  background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
+  border-radius: 0 80% 0 80%;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.6));
+}
+
+.edge-palm .palm-fronds::before {
+  left: 10px;
+  transform: rotate(-30deg);
+}
+
+.edge-palm .palm-fronds::after {
+  right: 10px;
+  transform: rotate(30deg) scaleX(-1);
+}
+
+/* Wilted edge palms */
+.edge-palm.wilted .palm-trunk {
+  background: linear-gradient(180deg, #6a5a5a 0%, #4a3a3a 100%);
+  box-shadow: 0 0 15px rgba(80, 60, 60, 0.5);
+}
+
+.edge-palm.wilted .palm-fronds::before,
+.edge-palm.wilted .palm-fronds::after {
+  background: linear-gradient(135deg, #5a6a5a 0%, #3a4a3a 100%);
+  filter: grayscale(0.5) brightness(0.6) drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+.edge-palm.wilted .palm-fronds::before {
+  transform: rotate(-50deg);
+}
+
+.edge-palm.wilted .palm-fronds::after {
+  transform: rotate(50deg) scaleX(-1);
+}
+
+/* Left side positioning */
+.edge-palm.left.e1 { left: 20%; bottom: 0; transform: scale(1); }
+.edge-palm.left.e2 { left: 8%; bottom: 15%; transform: scale(0.8); }
+.edge-palm.left.e3 { left: 25%; bottom: 30%; transform: scale(0.6); }
+
+/* Right side positioning */
+.edge-palm.right {
+  left: auto;
+}
+
+.edge-palm.right.e1 { right: 20%; bottom: 0; transform: scale(1) scaleX(-1); }
+.edge-palm.right.e2 { right: 8%; bottom: 15%; transform: scale(0.8) scaleX(-1); }
+.edge-palm.right.e3 { right: 25%; bottom: 30%; transform: scale(0.6) scaleX(-1); }
+
+/* Palm tree flames */
+.palm-flames {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 80px;
+  background:
+    radial-gradient(ellipse 50% 70% at 50% 90%, #ff4400 0%, #ff6600 30%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 40% 80%, #ff8800 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 60% 80%, #ffaa00 0%, transparent 60%);
+  filter: blur(3px);
+  animation: palm-fire 0.4s ease-in-out infinite alternate;
+  opacity: 0.95;
+}
+
+@keyframes palm-fire {
+  0% {
+    transform: translateX(-50%) scaleY(1) scaleX(1);
+  }
+  100% {
+    transform: translateX(-50%) scaleY(1.15) scaleX(0.9);
+  }
+}
+
 /* Destroyed state */
 .command-base.destroyed .dome-shield {
   opacity: 0.1 !important;
@@ -939,6 +1176,17 @@ body:has(.command-container) {
   justify-content: center;
   padding: var(--spacing-xl);
   text-align: center;
+  position: relative;
+}
+
+.command-gameover-card {
+  background: rgba(10, 10, 26, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .command-gameover-title {
@@ -1004,7 +1252,37 @@ body:has(.command-container) {
 /* Destroyed city on game over screen */
 .command-gameover .gameover-city {
   position: fixed;
-  bottom: 0;
+  bottom: 10%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(1.5);
+  z-index: 1;
+}
+
+.command-gameover .gameover-city .smoke {
+  animation-duration: 2s;
+  opacity: 0.9;
+}
+
+.command-gameover .gameover-city .building.destroyed {
+  filter: brightness(0.3);
+  box-shadow:
+    0 0 30px rgba(255, 100, 0, 0.6),
+    0 0 60px rgba(255, 50, 0, 0.4),
+    inset 0 0 20px rgba(255, 100, 0, 0.3);
+}
+
+.command-gameover .gameover-city::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -100%;
+  right: -100%;
+  height: 150px;
+  background: linear-gradient(to top, rgba(255, 50, 0, 0.3), transparent);
+  animation: fire-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes fire-glow {
+  0% { opacity: 0.5; }
+  100% { opacity: 0.8; }
 }

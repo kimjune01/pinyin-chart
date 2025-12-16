@@ -688,6 +688,15 @@ export default function PinyinCommandGame() {
           <button className="command-start-btn" onClick={handleStart}>
             START GAME
           </button>
+
+          {/* Debug button */}
+          <button
+            className="command-btn secondary"
+            style={{ marginTop: '1rem', opacity: 0.5, fontSize: '0.75rem' }}
+            onClick={() => setGameState('gameOver')}
+          >
+            DEBUG: Game Over
+          </button>
         </div>
       )}
 
@@ -723,6 +732,9 @@ export default function PinyinCommandGame() {
 
           {/* Game Area */}
           <div className={`command-arena ${bombActive ? 'bomb-active' : ''}`}>
+            {/* Sunset lines overlay */}
+            <div className="sunset-lines" />
+
             {/* Falling Syllables */}
             {syllables.map(s => (
               <div
@@ -790,6 +802,11 @@ export default function PinyinCommandGame() {
               <div className="command-dome">
                 <div className="dome-shield" style={{ opacity: health / 100 * 0.8 + 0.2 }} />
               </div>
+              {/* Palm trees */}
+              <div className="palm-tree p1"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+              <div className="palm-tree p2"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+              <div className="palm-tree p3"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+              <div className="palm-tree p4"><div className="palm-trunk" /><div className="palm-fronds" /></div>
               {/* City skyline */}
               <div className="command-city">
                 {health > 0 ? (
@@ -841,26 +858,25 @@ export default function PinyinCommandGame() {
       {/* Game Over Screen */}
       {gameState === 'gameOver' && (
         <div className="command-gameover">
-          <h2 className="command-gameover-title">GAME OVER</h2>
-          <div className="command-final-score">
-            <div className="score-label">FINAL SCORE</div>
-            <div className="score-value">{score}</div>
-            {score > highScore && <div className="new-record">NEW RECORD!</div>}
-          </div>
-          <div className="command-stats">
-            <div>Level reached: {level}</div>
-            <div>Difficulty: {difficulty.name}</div>
-          </div>
-          <div className="command-gameover-buttons">
-            <button className="command-btn" onClick={handleRetry}>RETRY</button>
-            <button className="command-btn secondary" onClick={handleMenu}>MENU</button>
-          </div>
+          {/* Edge palm trees - left side */}
+          <div className="edge-palm wilted left e1"><div className="palm-trunk" /><div className="palm-fronds" /><div className="palm-flames" /></div>
+          <div className="edge-palm wilted left e2"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+          <div className="edge-palm wilted left e3"><div className="palm-trunk" /><div className="palm-fronds" /><div className="palm-flames" /></div>
+          {/* Edge palm trees - right side */}
+          <div className="edge-palm wilted right e1"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+          <div className="edge-palm wilted right e2"><div className="palm-trunk" /><div className="palm-fronds" /><div className="palm-flames" /></div>
+          <div className="edge-palm wilted right e3"><div className="palm-trunk" /><div className="palm-fronds" /></div>
 
-          {/* Destroyed city with smoke */}
+          {/* Destroyed city with smoke - behind the card */}
           <div className="command-base destroyed gameover-city">
             <div className="command-dome">
               <div className="dome-shield" />
             </div>
+            {/* Wilted palm trees around city */}
+            <div className="palm-tree wilted p1"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+            <div className="palm-tree wilted p2"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+            <div className="palm-tree wilted p3"><div className="palm-trunk" /><div className="palm-fronds" /></div>
+            <div className="palm-tree wilted p4"><div className="palm-trunk" /><div className="palm-fronds" /></div>
             <div className="command-city">
               <div className="building destroyed b1" />
               <div className="building destroyed b2" />
@@ -868,6 +884,24 @@ export default function PinyinCommandGame() {
               <div className="smoke s1" />
               <div className="smoke s2" />
               <div className="smoke s3" />
+            </div>
+          </div>
+
+          {/* Game over content card */}
+          <div className="command-gameover-card">
+            <h2 className="command-gameover-title">GAME OVER</h2>
+            <div className="command-final-score">
+              <div className="score-label">FINAL SCORE</div>
+              <div className="score-value">{score}</div>
+              {score > highScore && <div className="new-record">NEW RECORD!</div>}
+            </div>
+            <div className="command-stats">
+              <div>Level reached: {level}</div>
+              <div>Difficulty: {difficulty.name}</div>
+            </div>
+            <div className="command-gameover-buttons">
+              <button className="command-btn" onClick={handleRetry}>RETRY</button>
+              <button className="command-btn secondary" onClick={handleMenu}>MENU</button>
             </div>
           </div>
         </div>

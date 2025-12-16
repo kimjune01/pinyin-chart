@@ -56,12 +56,17 @@ const fullTitle = `${title} | Pinyin Chart`;
   <body>
     <div class="app-container">
       <!-- Desktop Sidebar -->
-      <aside class="desktop-sidebar">
+      <aside class="desktop-sidebar" id="desktop-sidebar">
+        <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Collapse sidebar">
+          <svg class="collapse-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
         <Sidebar currentSection={currentSection} />
       </aside>
 
       <!-- Main Content Area -->
-      <div class="main-wrapper">
+      <div class="main-wrapper" id="main-wrapper">
         <!-- Mobile Header -->
         <Header title={title} currentSection={currentSection} />
 
@@ -71,6 +76,27 @@ const fullTitle = `${title} | Pinyin Chart`;
         </main>
       </div>
     </div>
+
+    <script>
+      // Sidebar collapse functionality
+      const sidebar = document.getElementById('desktop-sidebar');
+      const mainWrapper = document.getElementById('main-wrapper');
+      const collapseBtn = document.getElementById('sidebar-collapse-btn');
+
+      // Check localStorage for saved state
+      const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+      if (isCollapsed) {
+        sidebar?.classList.add('collapsed');
+        mainWrapper?.classList.add('sidebar-collapsed');
+      }
+
+      collapseBtn?.addEventListener('click', () => {
+        const willCollapse = !sidebar?.classList.contains('collapsed');
+        sidebar?.classList.toggle('collapsed');
+        mainWrapper?.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebar-collapsed', String(willCollapse));
+      });
+    </script>
 
     <style>
       .app-container {
@@ -89,6 +115,7 @@ const fullTitle = `${title} | Pinyin Chart`;
         border-right: 1px solid var(--color-border);
         overflow-y: auto;
         display: none;
+        transition: width 0.2s ease, transform 0.2s ease;
       }
 
       @media (min-width: 768px) {
@@ -97,17 +124,74 @@ const fullTitle = `${title} | Pinyin Chart`;
         }
       }
 
+      /* Collapse button */
+      .sidebar-collapse-btn {
+        position: absolute;
+        top: 50%;
+        right: -12px;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        z-index: 10;
+        transition: background-color 0.15s ease, transform 0.2s ease;
+      }
+
+      .sidebar-collapse-btn:hover {
+        background-color: var(--color-border-light);
+      }
+
+      @media (min-width: 768px) {
+        .sidebar-collapse-btn {
+          display: flex;
+        }
+      }
+
+      .collapse-icon {
+        width: 14px;
+        height: 14px;
+        color: var(--color-text-secondary);
+        transition: transform 0.2s ease;
+      }
+
+      /* Collapsed state */
+      .desktop-sidebar.collapsed {
+        width: 0;
+        overflow: hidden;
+        border-right: none;
+      }
+
+      .desktop-sidebar.collapsed .sidebar-collapse-btn {
+        right: -36px;
+      }
+
+      .desktop-sidebar.collapsed .collapse-icon {
+        transform: rotate(180deg);
+      }
+
       /* Main Content Wrapper */
       .main-wrapper {
         flex: 1;
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        transition: margin-left 0.2s ease;
       }
 
       @media (min-width: 768px) {
         .main-wrapper {
           margin-left: var(--sidebar-width);
+        }
+
+        .main-wrapper.sidebar-collapsed {
+          margin-left: 0;
         }
       }
 
