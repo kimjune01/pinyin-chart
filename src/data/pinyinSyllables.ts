@@ -65,7 +65,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('beng', 'b', 'eng', T1234),
   syllable('bi', 'b', 'i', T1234),
   syllable('bie', 'b', 'ie', T1234),
-  syllable('biao', 'b', 'iao', T234),
+  syllable('biao', 'b', 'iao', T1234), // biao1: 标/镖
   syllable('bian', 'b', 'ian', T1234),
   syllable('bin', 'b', 'in', T1234),
   syllable('bing', 'b', 'ing', T1234),
@@ -94,7 +94,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('mai', 'm', 'ai', T1234),
   syllable('mei', 'm', 'ei', T1234),
   syllable('mao', 'm', 'ao', T1234),
-  syllable('mou', 'm', 'ou', [1, 2, 4]),
+  syllable('mou', 'm', 'ou', T1234), // mou3: 某
   syllable('man', 'm', 'an', T1234),
   syllable('men', 'm', 'en', T1234),
   syllable('mang', 'm', 'ang', T1234),
@@ -130,7 +130,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('deng', 'd', 'eng', T1234),
   syllable('di', 'd', 'i', T1234),
   syllable('die', 'd', 'ie', T1234),
-  syllable('diao', 'd', 'iao', T234),
+  syllable('diao', 'd', 'iao', T1234), // diao1: 雕/凋
   syllable('diu', 'd', 'iu', T1234),
   syllable('dian', 'd', 'ian', T1234),
   syllable('ding', 'd', 'ing', T1234),
@@ -200,13 +200,13 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('liao', 'l', 'iao', T1234),
   syllable('liu', 'l', 'iu', T1234),
   syllable('lian', 'l', 'ian', T1234),
-  syllable('lin', 'l', 'in', T234),
+  syllable('lin', 'l', 'in', T1234), // lin1: 林/临
   syllable('liang', 'l', 'iang', T1234),
   syllable('ling', 'l', 'ing', T1234),
   syllable('lu', 'l', 'u', T1234),
   syllable('luo', 'l', 'uo', T1234),
   syllable('luan', 'l', 'uan', T1234),
-  syllable('lun', 'l', 'un', T234),
+  syllable('lun', 'l', 'un', T1234), // lun1: 抡
   syllable('long', 'l', 'ong', T1234),
   // Note: lü/lüe audio not available (uses ü character)
 
@@ -279,7 +279,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('jian', 'j', 'ian', T1234),
   syllable('jin', 'j', 'in', T1234),
   syllable('jiang', 'j', 'iang', T1234),
-  syllable('jing', 'j', 'ing', [1, 3, 4]),
+  syllable('jing', 'j', 'ing', T1234), // jing2: 颈/茎
   syllable('jiong', 'j', 'iong', T1234),
   syllable('ju', 'j', 'ü', T1234),
   syllable('jue', 'j', 'üe', T1234),
@@ -305,10 +305,10 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('xia', 'x', 'ia', T1234),
   syllable('xie', 'x', 'ie', T1234),
   syllable('xiao', 'x', 'iao', T1234),
-  syllable('xiu', 'x', 'iu', T234),
+  syllable('xiu', 'x', 'iu', T1234), // xiu1: 修/休
   syllable('xian', 'x', 'ian', T1234),
   syllable('xin', 'x', 'in', [1, 2, 4]),
-  syllable('xiang', 'x', 'iang', [1, 3, 4]),
+  syllable('xiang', 'x', 'iang', T1234), // xiang2: 详/翔
   syllable('xing', 'x', 'ing', T1234),
   syllable('xiong', 'x', 'iong', T1234),
   syllable('xu', 'x', 'ü', T1234),
@@ -319,11 +319,11 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   // Retroflexes: zh, ch, sh, r
   syllable('zha', 'zh', 'a', T1234),
   syllable('zhe', 'zh', 'e', T1234),
-  syllable('zhai', 'zh', 'ai', T123),
+  syllable('zhai', 'zh', 'ai', T1234),
   syllable('zhei', 'zh', 'ei', T1234),
   syllable('zhao', 'zh', 'ao', T1234),
   syllable('zhou', 'zh', 'ou', T1234),
-  syllable('zhan', 'zh', 'an', T234),
+  syllable('zhan', 'zh', 'an', T1234), // zhan1: 沾/粘
   syllable('zhen', 'zh', 'en', T1234),
   syllable('zhang', 'zh', 'ang', T1234),
   syllable('zheng', 'zh', 'eng', T1234),
@@ -423,7 +423,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('ceng', 'c', 'eng', T1234),
   syllable('ci', 'c', 'i', T1234),
   syllable('cu', 'c', 'u', T1234),
-  syllable('cuo', 'c', 'uo', [1, 3, 4]),
+  syllable('cuo', 'c', 'uo', T1234), // cuo2: 嵯/蹉
   syllable('cui', 'c', 'ui', T1234),
   syllable('cuan', 'c', 'uan', T1234),
   syllable('cun', 'c', 'un', T1234),
@@ -436,7 +436,7 @@ export const PINYIN_SYLLABLES: PinyinSyllable[] = [
   syllable('sou', 's', 'ou', T1234),
   syllable('san', 's', 'an', T1234),
   syllable('sen', 's', 'en', T1234),
-  syllable('sang', 's', 'ang', [1, 2, 4]),
+  syllable('sang', 's', 'ang', T1234), // sang3: 嗓
   syllable('seng', 's', 'eng', T1234),
   syllable('si', 's', 'i', T1234),
   syllable('su', 's', 'u', T1234),

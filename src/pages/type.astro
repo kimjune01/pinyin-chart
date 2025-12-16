@@ -1,0 +1,26 @@
+---
+/**
+ * Type & Listen Page - Type pinyin and hear pronunciation
+ */
+
+import AppLayout from '../components/layout/AppLayout.astro';
+import PinyinTyper from '../components/soundboard/PinyinTyper';
+import '../styles/soundboard.css';
+
+const title = 'Type & Listen';
+const description = 'Type any pinyin syllable and select a tone to hear its pronunciation.';
+---
+
+<AppLayout title={title} currentSection="type">
+  <div class="type-page">
+    <PinyinTyper client:load />
+  </div>
+
+  <style>
+    .type-page {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+    }
+  </style>
+</AppLayout>

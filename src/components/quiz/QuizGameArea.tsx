@@ -7,6 +7,7 @@ import type { Question } from '../../lib/quiz/types';
 import { audioService } from '../../lib/audio/AudioService';
 import { addToneMarks } from '../../lib/utils/pinyinUtils';
 import { PINYIN_SYLLABLES } from '../../data/pinyinSyllables';
+import ToneIcon from '../shared/ToneIcon';
 
 interface QuizGameAreaProps {
   question: Question;
@@ -260,6 +261,9 @@ export default function QuizGameArea({
               }
             };
 
+            // Check if this is a tone quiz (option value is 1-4)
+            const isToneOption = /^[1-4]$/.test(option.value);
+
             return (
               <button
                 key={option.id}
@@ -268,7 +272,11 @@ export default function QuizGameArea({
                 disabled={isAnswered && isCorrect === true}
               >
                 <span className="option-hotkey">{index + 1}</span>
-                {option.label}
+                {isToneOption ? (
+                  <ToneIcon tone={parseInt(option.value)} size={28} />
+                ) : (
+                  option.label
+                )}
               </button>
             );
           })}

@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { audioService } from '../../../lib/audio/AudioService';
 import { addToneMarks } from '../../../lib/utils/pinyinUtils';
 import { PINYIN_SYLLABLES } from '../../../data/pinyinSyllables';
+import ToneIcon from '../../shared/ToneIcon';
 
 // Types
 type GameState = 'menu' | 'playing' | 'listening' | 'success' | 'failed';
@@ -23,6 +24,7 @@ interface SyllableItem {
   display: string;
   audio: string;  // pinyin with tone for audio playback
   hanzi?: string; // for HSK words
+  tone?: number;  // tone number (1-4) for displaying ToneIcon
 }
 
 // Button colors - classic Simon style
@@ -76,6 +78,7 @@ function generateSyllableSet(difficulty: DifficultyMode): SyllableSet {
           id: `${syllable.pinyin}${tone}`,
           display: addToneMarks(syllable.pinyin, tone),
           audio: `${syllable.pinyin}${tone}`,
+          tone,
         })),
       };
     }
@@ -579,6 +582,7 @@ export default function PinyinSimonGame() {
                 onClick={() => handleButtonClick(index)}
                 disabled={gameState !== 'listening'}
               >
+                {item.tone && <ToneIcon tone={item.tone} size={28} className="simon-tone-icon" />}
                 <span className="simon-button-text">{item.display}</span>
                 {item.hanzi && <span className="simon-button-hanzi">{item.hanzi}</span>}
                 <span className="simon-button-hotkey">{index + 1}</span>

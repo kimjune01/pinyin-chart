@@ -199,6 +199,11 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.simon-tone-icon {
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 .simon-button-hanzi {
   font-size: var(--font-size-lg);
   color: rgba(255, 255, 255, 0.9);

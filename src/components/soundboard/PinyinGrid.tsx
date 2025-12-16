@@ -182,10 +182,43 @@ export default function PinyinGrid({ selectedTone, onSyllableSelect, selectedSyl
           onSyllableSelect?.(syllable);
           audioService.play(`${syllable}${selectedTone}`);
 
-          // Scroll cell into view
+          // Scroll cell into view, accounting for sticky headers
           setTimeout(() => {
-            const cell = gridRef.current?.querySelector(`[data-syllable="${syllable}"]`);
-            cell?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            const cell = gridRef.current?.querySelector(`[data-syllable="${syllable}"]`) as HTMLElement;
+            const scrollContainer = gridRef.current;
+            if (cell && scrollContainer) {
+              const cellRect = cell.getBoundingClientRect();
+              const containerRect = scrollContainer.getBoundingClientRect();
+
+              // Get sticky header dimensions
+              const rowHeader = scrollContainer.querySelector('.final-header') as HTMLElement;
+              const colHeader = scrollContainer.querySelector('.initial-header') as HTMLElement;
+              const rowHeaderWidth = rowHeader?.offsetWidth || 80;
+              const colHeaderHeight = colHeader?.offsetHeight || 50;
+
+              // Calculate visible area (excluding sticky headers)
+              const visibleLeft = containerRect.left + rowHeaderWidth;
+              const visibleTop = containerRect.top + colHeaderHeight;
+              const visibleRight = containerRect.right;
+              const visibleBottom = containerRect.bottom;
+
+              // Check if cell is outside visible area and scroll if needed
+              if (cellRect.left < visibleLeft) {
+                // Cell is hidden behind row header - scroll left
+                scrollContainer.scrollLeft -= (visibleLeft - cellRect.left + 10);
+              } else if (cellRect.right > visibleRight) {
+                // Cell is beyond right edge - scroll right
+                scrollContainer.scrollLeft += (cellRect.right - visibleRight + 10);
+              }
+
+              if (cellRect.top < visibleTop) {
+                // Cell is hidden behind column header - scroll up
+                scrollContainer.scrollTop -= (visibleTop - cellRect.top + 10);
+              } else if (cellRect.bottom > visibleBottom) {
+                // Cell is beyond bottom edge - scroll down
+                scrollContainer.scrollTop += (cellRect.bottom - visibleBottom + 10);
+              }
+            }
           }, 0);
         }
       }

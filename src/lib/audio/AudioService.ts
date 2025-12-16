@@ -5,7 +5,7 @@
  * Works with Service Worker for persistent browser caching.
  */
 
-import { getAudioUrl, getVocabAudioUrl, AUDIO_CONFIG } from './audioConfig';
+import { getAudioUrl, getVocabAudioUrl, AUDIO_CONFIG, TTS_OVERRIDE_SYLLABLES, PINYIN_TO_HANZI } from './audioConfig';
 
 export type AudioLoadState = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -50,6 +50,12 @@ class AudioServiceClass {
     // Normalize pinyin (handle neutral tone fallback)
     const normalizedPinyin = this.normalizePinyin(pinyin);
 
+    // Check if this syllable should use TTS instead of CDN
+    if (TTS_OVERRIDE_SYLLABLES.has(normalizedPinyin)) {
+      await this.playPinyinWithTTS(normalizedPinyin, waitForEnd);
+      return;
+    }
+
     try {
       // Get or load audio
       const audio = await this.getAudio(normalizedPinyin);
@@ -88,8 +94,14 @@ class AudioServiceClass {
         };
       }
     } catch (error) {
-      console.error(`[AudioService] Failed to play audio for "${pinyin}":`, error);
-      throw error;
+      // CDN file missing or failed - fall back to TTS
+      console.log(`[AudioService] CDN audio failed for "${pinyin}", falling back to TTS`);
+      try {
+        await this.playPinyinWithTTS(normalizedPinyin, waitForEnd);
+      } catch (ttsError) {
+        console.error(`[AudioService] TTS fallback also failed for "${pinyin}":`, ttsError);
+        throw error;
+      }
     }
   }
 
@@ -252,6 +264,36 @@ class AudioServiceClass {
     } else {
       window.speechSynthesis.speak(utterance);
     }
+  }
+
+  /**
+   * Play pinyin using TTS with representative Chinese character
+   * @param pinyin - Pinyin with tone number (e.g., "sheng4")
+   * @param waitForEnd - If true, wait for speech to finish
+   */
+  private async playPinyinWithTTS(pinyin: string, waitForEnd: boolean = false): Promise<void> {
+    // Extract base and tone from pinyin (e.g., "sheng4" -> "sheng", 4)
+    const match = pinyin.match(/^([a-zü]+)(\d)$/i);
+    if (!match) {
+      console.warn(`[AudioService] Invalid pinyin format for TTS: ${pinyin}`);
+      return;
+    }
+
+    const [, base, toneStr] = match;
+    const tone = parseInt(toneStr);
+
+    // Look up the representative hanzi for this pinyin+tone
+    const hanziMap = PINYIN_TO_HANZI[base.toLowerCase()];
+    if (!hanziMap) {
+      console.warn(`[AudioService] No hanzi mapping for pinyin: ${base}`);
+      // Fall back to speaking the pinyin directly
+      await this.speakWithWebSpeech(pinyin, waitForEnd);
+      return;
+    }
+
+    const hanzi = hanziMap[tone - 1]; // tones are 1-indexed
+    console.log(`[AudioService] Using TTS for ${pinyin} -> ${hanzi}`);
+    await this.speakWithWebSpeech(hanzi, waitForEnd);
   }
 
   /**
