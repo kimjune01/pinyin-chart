@@ -544,7 +544,7 @@ export default function PinyinCommandGame() {
     // Find ANY syllable matching the typed pinyin + selected tone (not just the targeted one)
     // This allows destroying syllables in any order, not just closest-to-base first
     const syllable = syllablesRef.current.find(s =>
-      s.pinyin === targetedSyllable.pinyin && s.tone === tone && !s.isMatched
+      s.pinyin === targetedSyllable.pinyin && s.tone === tone
     );
 
     if (syllable) {
