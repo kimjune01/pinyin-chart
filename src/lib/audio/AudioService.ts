@@ -46,8 +46,9 @@ class AudioServiceClass {
    * @param pinyin - Pinyin with tone number (e.g., "ma1")
    * @param waitForEnd - If true, wait for audio to finish before resolving
    * @param allowOverlap - If true, don't stop currently playing audio (for parallel playback)
+   * @param pan - Stereo pan position (-1 = full left, 0 = center, 1 = full right)
    */
-  async play(pinyin: string, waitForEnd: boolean = false, allowOverlap: boolean = false): Promise<void> {
+  async play(pinyin: string, waitForEnd: boolean = false, allowOverlap: boolean = false, pan?: number): Promise<void> {
     // Normalize pinyin (handle neutral tone fallback)
     const normalizedPinyin = this.normalizePinyin(pinyin);
 
@@ -76,6 +77,12 @@ class AudioServiceClass {
 
       if (!allowOverlap) {
         this.currentlyPlaying = playableAudio;
+      }
+
+      // Use Web Audio API for panning if pan is specified
+      if (pan !== undefined && typeof AudioContext !== 'undefined') {
+        await this.playWithPan(playableAudio, pan, waitForEnd);
+        return;
       }
 
       if (waitForEnd) {
@@ -108,6 +115,68 @@ class AudioServiceClass {
         console.error(`[AudioService] TTS fallback also failed for "${pinyin}":`, ttsError);
         throw error;
       }
+    }
+  }
+
+  /**
+   * Play audio with stereo panning using Web Audio API
+   * Uses fetch + decodeAudioData for reliable panned playback
+   */
+  private async playWithPan(audio: HTMLAudioElement, pan: number, waitForEnd: boolean): Promise<void> {
+    try {
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const audioCtx = new AudioContextClass();
+
+      // Resume context if suspended (browser autoplay policy)
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+
+      // Fetch the audio file as ArrayBuffer
+      const response = await fetch(audio.src);
+      if (!response.ok) {
+        throw new Error(`Fetch failed: ${response.status}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+      // Create buffer source
+      const source = audioCtx.createBufferSource();
+      source.buffer = audioBuffer;
+
+      // Create stereo panner with dramatic effect (amplify the pan value)
+      const panner = audioCtx.createStereoPanner();
+      // Clamp and amplify for dramatic effect
+      const panValue = Math.max(-1, Math.min(1, pan * 1.5));
+      panner.pan.value = panValue;
+
+      // Create gain node for volume control
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = this.volume;
+
+      // Connect: source -> panner -> gain -> destination
+      source.connect(panner);
+      panner.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      if (waitForEnd) {
+        await new Promise<void>((resolve) => {
+          source.onended = () => {
+            audioCtx.close();
+            resolve();
+          };
+          source.start(0);
+        });
+      } else {
+        source.start(0);
+        source.onended = () => {
+          audioCtx.close();
+        };
+      }
+    } catch (error) {
+      // Fallback to regular playback without panning
+      console.warn('[AudioService] Panned playback failed, falling back to regular:', error);
+      await audio.play();
     }
   }
 

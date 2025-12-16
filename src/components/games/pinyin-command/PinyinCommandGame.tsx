@@ -89,6 +89,9 @@ export default function PinyinCommandGame() {
   const [bombActive, setBombActive] = useState(false);
   const spawnCooldownRef = useRef<number>(0);
 
+  // Title animation - swap PINYIN with 拼音
+  const [showHanziTitle, setShowHanziTitle] = useState(false);
+
   // Refs for game loop
   const gameLoopRef = useRef<number | null>(null);
   const lastTimestampRef = useRef<number>(0);
@@ -110,6 +113,17 @@ export default function PinyinCommandGame() {
     }
   }, []);
 
+  // Title animation - swap PINYIN/拼音 periodically on menu
+  useEffect(() => {
+    if (gameState !== 'menu') return;
+
+    const interval = setInterval(() => {
+      setShowHanziTitle(prev => !prev);
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [gameState]);
+
   // Preload audio for current difficulty
   useEffect(() => {
     if (gameState === 'playing') {
@@ -128,12 +142,15 @@ export default function PinyinCommandGame() {
   const playingUntilRef = useRef<Map<string, number>>(new Map());
 
   // Audio scheduling - allow overlapping audio for multiple falling syllables
-  const playAudioForSyllable = useCallback((syllableId: string, pinyinWithTone: string) => {
+  const playAudioForSyllable = useCallback((syllableId: string, pinyinWithTone: string, xPosition: number) => {
     // Mark as playing until 600ms from now
     playingUntilRef.current.set(syllableId, Date.now() + 600);
 
-    // Play audio (non-blocking, with overlap)
-    audioService.play(pinyinWithTone, false, true).catch(error => {
+    // Calculate pan from x position: 0% = -1 (left), 50% = 0 (center), 100% = +1 (right)
+    const pan = (xPosition / 50) - 1;
+
+    // Play audio (non-blocking, with overlap, with stereo pan)
+    audioService.play(pinyinWithTone, false, true, pan).catch(error => {
       console.error('Error playing audio:', error);
     });
   }, []);
@@ -162,8 +179,9 @@ export default function PinyinCommandGame() {
       // Check for audio scheduling
       let nextAudioTime = s.nextAudioTime;
       if (now >= s.nextAudioTime && s.y < TIMING.BASE_Y) {
-        // Play audio (non-blocking)
-        playAudioForSyllable(s.id, s.pinyinWithTone);
+        // Play audio (non-blocking) with stereo pan based on current x position
+        const currentX = calculateSyllableX(s);
+        playAudioForSyllable(s.id, s.pinyinWithTone, currentX);
         // Schedule next play
         nextAudioTime = now + getAudioInterval(s.y);
       }
@@ -566,9 +584,6 @@ export default function PinyinCommandGame() {
       setScore(prev => prev + 10 + comboBonus + hanziBonus);
       setCombo(prev => prev + 1);
       setDestroyedCount(prev => prev + 1);
-
-      // Play success sound (the syllable audio)
-      audioService.play(syllable.pinyinWithTone, false, true);
     } else {
       // WRONG TONE - no syllable with this pinyin+tone exists
       playWrongToneSound();
@@ -632,12 +647,17 @@ export default function PinyinCommandGame() {
       {/* Menu Screen */}
       {gameState === 'menu' && (
         <div className="command-menu">
-          <h2 className="command-title">PINYIN COMMAND</h2>
-          <p className="command-subtitle">Defend your base from falling syllables!</p>
+          <h2 className="command-title">
+            <span className="title-swap">
+              <span className={`title-text ${showHanziTitle ? 'hidden' : ''}`}>PINYIN</span>
+              <span className={`title-text hanzi ${showHanziTitle ? '' : 'hidden'}`}>拼音</span>
+            </span>
+            {' COMMAND'}
+          </h2>
+          <p className="command-subtitle">Defend your base!</p>
 
           {/* Difficulty Selection */}
           <div className="command-setting-group">
-            <h3>Select Difficulty</h3>
             <div className="command-difficulty-grid">
               {DIFFICULTY_PRESETS.map(preset => (
                 <button
@@ -830,6 +850,21 @@ export default function PinyinCommandGame() {
           <div className="command-gameover-buttons">
             <button className="command-btn" onClick={handleRetry}>RETRY</button>
             <button className="command-btn secondary" onClick={handleMenu}>MENU</button>
+          </div>
+
+          {/* Destroyed city with smoke */}
+          <div className="command-base destroyed gameover-city">
+            <div className="command-dome">
+              <div className="dome-shield" />
+            </div>
+            <div className="command-city">
+              <div className="building destroyed b1" />
+              <div className="building destroyed b2" />
+              <div className="building destroyed b3" />
+              <div className="smoke s1" />
+              <div className="smoke s2" />
+              <div className="smoke s3" />
+            </div>
           </div>
         </div>
       )}

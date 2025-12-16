@@ -95,6 +95,32 @@ body:has(.command-container) {
   to { text-shadow: 0 0 20px var(--arcade-neon-green), 0 0 40px var(--arcade-neon-green), 0 0 60px var(--arcade-neon-green); }
 }
 
+/* Title swap animation - PINYIN / 拼音 */
+.title-swap {
+  display: inline-block;
+  position: relative;
+  width: 4.5em;
+  text-align: right;
+}
+
+.title-swap .title-text {
+  transition: opacity 0.4s ease;
+}
+
+.title-swap .title-text.hanzi {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(-10%) scaleX(1.15);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 1.2em;
+  letter-spacing: 0.15em;
+}
+
+.title-swap .title-text.hidden {
+  opacity: 0;
+}
+
 .command-subtitle {
   font-size: var(--font-size-lg);
   color: var(--arcade-neon-cyan);
@@ -968,4 +994,12 @@ body:has(.command-container) {
 .command-gameover-buttons {
   display: flex;
   gap: var(--spacing-md);
+}
+
+/* Destroyed city on game over screen */
+.command-gameover .gameover-city {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
