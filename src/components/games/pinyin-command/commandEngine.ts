@@ -14,6 +14,7 @@ export interface FallingSyllable {
   pinyinWithTone: string;   // e.g., "ma1"
   hanzi: string;            // Chinese character for explosion reveal
   displayAsHanzi: boolean;  // true = show hanzi, false = show pinyin
+  hideAccent: boolean;      // true = show pinyin without tone mark
   x: number;                // horizontal position (0-100%)
   y: number;                // vertical position (0 = top, 100 = base)
   startX: number;           // starting x position for trajectory
@@ -274,6 +275,16 @@ export function getHanziProbability(level: number): number {
   return Math.max(0, Math.min(1, 0.05 * level - 0.25));
 }
 
+/**
+ * Calculate probability of hiding accent marks based on level
+ * Linear ramp: starts at level 2 (0%), reaches 100% at level 12
+ * Forces players to rely on audio cues for tone identification
+ */
+export function getNoAccentProbability(level: number): number {
+  // p = 0.1 * (level - 2), clamped to [0, 1]
+  return Math.max(0, Math.min(1, 0.1 * level - 0.2));
+}
+
 function createSyllable(pinyin: string, tone: number, levelConfig: LevelConfig): FallingSyllable {
   const now = Date.now();
 
@@ -283,6 +294,10 @@ function createSyllable(pinyin: string, tone: number, levelConfig: LevelConfig):
   // Determine if this syllable should display as hanzi based on level
   const hanziProb = getHanziProbability(levelConfig.level);
   const displayAsHanzi = Math.random() < hanziProb;
+
+  // Determine if accent marks should be hidden (only applies when not showing hanzi)
+  const noAccentProb = getNoAccentProbability(levelConfig.level);
+  const hideAccent = !displayAsHanzi && Math.random() < noAccentProb;
 
   // Random hue shift for color variance (-180 to +180 degrees) - full spectrum
   // Uniform distribution for maximum variance
@@ -298,6 +313,7 @@ function createSyllable(pinyin: string, tone: number, levelConfig: LevelConfig):
     pinyinWithTone: `${pinyin}${tone}`,
     hanzi: getHanzi(pinyin, tone),
     displayAsHanzi,
+    hideAccent,
     x: startX,
     y: 0,
     startX,

@@ -748,7 +748,7 @@ export default function PinyinCommandGame() {
                 } as React.CSSProperties}
               >
                 <span className="syllable-text">
-                  {s.displayAsHanzi ? s.hanzi : addToneMarks(s.pinyin, s.tone)}
+                  {s.displayAsHanzi ? s.hanzi : (s.hideAccent ? s.pinyin : addToneMarks(s.pinyin, s.tone))}
                 </span>
                 {level === 1 && <span className="syllable-tone">{s.tone}</span>}
               </div>
