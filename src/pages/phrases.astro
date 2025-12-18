@@ -1,0 +1,61 @@
+---
+/**
+ * Phrases - Phrase Explorer page
+ * Beginner-friendly introduction to Chinese phrases
+ */
+
+import AppLayout from '../components/layout/AppLayout.astro';
+import SentenceExplorer from '../components/sentences/SentenceExplorer';
+---
+
+<AppLayout title="Phrase Explorer" currentSection="phrases">
+  <div class="sentences-page">
+    <header class="page-header">
+      <h1>Phrase Explorer</h1>
+      <p class="subtitle">
+        Learn essential Chinese phrases by exploring them word by word.
+        Click to hear syllables, or use the play button for the full phrase.
+      </p>
+    </header>
+
+    <SentenceExplorer client:load />
+  </div>
+</AppLayout>
+
+<style>
+  .sentences-page {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .page-header h1 {
+    font-size: var(--font-size-3xl);
+    background: linear-gradient(135deg, var(--tone-1-color), var(--tone-3-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 480px) {
+    .page-header h1 {
+      font-size: var(--font-size-2xl);
+    }
+
+    .subtitle {
+      font-size: var(--font-size-base);
+    }
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+/**
+ * Sentence Builder - Interactive sentence construction page
+ * Learn Chinese grammar by building sentences with patterns
+ */
+
+import AppLayout from '../components/layout/AppLayout.astro';
+import SentenceBuilder from '../components/sentences/SentenceBuilder';
+---
+
+<AppLayout title="Sentence Builder" currentSection="builder">
+  <div class="builder-page">
+    <header class="page-header">
+      <h1>Sentence Builder</h1>
+      <p class="subtitle">
+        Learn Chinese grammar by building sentences.
+        Select a pattern and choose words to construct your sentence.
+      </p>
+    </header>
+
+    <SentenceBuilder client:load />
+  </div>
+</AppLayout>
+
+<style>
+  .builder-page {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .page-header h1 {
+    font-size: var(--font-size-3xl);
+    background: linear-gradient(135deg, var(--tone-1-color), var(--tone-3-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 480px) {
+    .page-header h1 {
+      font-size: var(--font-size-2xl);
+    }
+
+    .subtitle {
+      font-size: var(--font-size-base);
+    }
+  }
+</style>
