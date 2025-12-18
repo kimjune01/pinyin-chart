@@ -1,0 +1,16 @@
+---
+/**
+ * Hanzi Visual Association Game Page
+ * Match Hanzi characters to their visual/emoji representations
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import HanziVisualGame from '../../components/games/hanzi-visual/HanziVisualGame';
+import '../../styles/hanzi-visual.css';
+
+const title = 'Hanzi Visual';
+---
+
+<AppLayout title={title} currentSection="hanzi-visual">
+  <HanziVisualGame client:load />
+</AppLayout>
