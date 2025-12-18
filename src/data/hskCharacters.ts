@@ -2320,11 +2320,15 @@ export function searchCharacters(query: string): HSKCharacter[] {
 export function getRandomCharacters(
   level: 1 | 2 | 3 | 4 | 5 | 6,
   count: number,
-  exclude?: string[]
+  exclude?: string[],
+  syllableCount?: number
 ): HSKCharacter[] {
   let chars = getCharactersByLevel(level);
   if (exclude) {
     chars = chars.filter(c => !exclude.includes(c.hanzi));
+  }
+  if (syllableCount !== undefined) {
+    chars = chars.filter(c => c.hanzi.length === syllableCount);
   }
   const shuffled = [...chars].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);

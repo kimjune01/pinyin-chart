@@ -107,8 +107,8 @@ export function useQuizEngine(config: QuizConfig): UseQuizEngineReturn {
       setIsCorrect(null);
       setTimeElapsed(0);
 
-      // Auto-play first question audio
-      if (questions[0]) {
+      // Auto-play first question audio (skip for visual-silent quizzes)
+      if (questions[0] && questions[0].displayType !== 'visual-silent') {
         await playQuestionAudio(questions[0]);
       }
     } catch (error) {
@@ -188,9 +188,9 @@ export function useQuizEngine(config: QuizConfig): UseQuizEngineReturn {
         audioService.preload([extractPinyinFromUrl(nextQuestion.audioUrl)]);
       }
 
-      // Auto-play current question audio
+      // Auto-play current question audio (skip for visual-silent quizzes)
       const currentQuestion = session.questions[nextIndex];
-      if (currentQuestion) {
+      if (currentQuestion && currentQuestion.displayType !== 'visual-silent') {
         playQuestionAudio(currentQuestion);
       }
     }

@@ -201,9 +201,13 @@ export default function QuizGameArea({
   // Keyboard shortcuts for answer selection (1-9) and replay (space)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Space to replay audio
+      // Space to replay audio (but not for visual-silent before answering)
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
+        // Only allow spacebar audio for visual-silent after answering
+        if (question.displayType === 'visual-silent' && !isAnswered) {
+          return;
+        }
         playAudio();
         return;
       }
@@ -225,7 +229,7 @@ export default function QuizGameArea({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isAnswered, isCorrect, question.options, onSubmitAnswer, playAudio, playOptionAudio]);
+  }, [isAnswered, isCorrect, question.options, question.displayType, onSubmitAnswer, playAudio, playOptionAudio]);
 
   const timerProgress = questionTimeLimit ? (timeRemaining / questionTimeLimit) * 100 : 100;
   const isLowTime = questionTimeLimit && timeRemaining < questionTimeLimit * 0.3;
@@ -244,7 +248,12 @@ export default function QuizGameArea({
         )}
 
         <div className="question-prompt">
-          {question.displayType === 'visual' && question.visualPrompt ? (
+          {question.displayType === 'visual-silent' && question.visualPrompt ? (
+            // Visual-silent quiz: show character without audio (audio only in feedback)
+            <div className="visual-prompt-container">
+              <span className="visual-prompt-character">{question.visualPrompt}</span>
+            </div>
+          ) : question.displayType === 'visual' && question.visualPrompt ? (
             // Visual-first quiz: show character prominently with audio as secondary
             <div className="visual-prompt-container">
               <span className="visual-prompt-character">{question.visualPrompt}</span>
@@ -280,7 +289,10 @@ export default function QuizGameArea({
             let className = 'answer-option';
             if (showCorrect) className += ' correct';
             if (showIncorrect) className += ' incorrect';
-            if (isSelected && !isAnswered) className += ' selected';
+            // Don't show selected state for visual quizzes (causes flash on auto-advance)
+            if (isSelected && !isAnswered && question.displayType !== 'visual' && question.displayType !== 'visual-silent') {
+              className += ' selected';
+            }
             if (canExplore) className += ' explorable';
 
             const handleClick = () => {
@@ -317,9 +329,16 @@ export default function QuizGameArea({
           {isAnswered ? (
             <div className={`feedback-banner ${isCorrect ? 'correct' : 'incorrect'}`}>
               <div className="feedback-content">
-                <span className="feedback-icon">
-                  {isCorrect ? '✅' : selectedAnswer === '__timeout__' ? '⏱️' : '❌'}
-                </span>
+                {(question.displayType === 'visual-silent' || question.displayType === 'visual') && (
+                  <button
+                    className="feedback-audio-button"
+                    onClick={playAudio}
+                    disabled={isPlaying}
+                    title="Play pronunciation"
+                  >
+                    🔊 Listen
+                  </button>
+                )}
                 {question.hanzi && (
                   <span className="feedback-hanzi">{question.hanzi}</span>
                 )}
@@ -335,8 +354,12 @@ export default function QuizGameArea({
                           return addToneMarks(base, parseInt(tone));
                         }
                       }
+                      // For hanzi quizzes, syllable contains formatted pinyin (e.g., "nǐ")
+                      if (question.hanzi) {
+                        return question.syllable;
+                      }
                     }
-                    // For HSK quizzes, don't show the raw value format
+                    // For HSK audio quizzes without syllable, don't show the raw value format
                     if (question.hanzi) {
                       return null;
                     }

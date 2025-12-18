@@ -40,7 +40,7 @@ export interface Question {
   syllable?: string;             // Original syllable for reference
   hanzi?: string;                // Chinese characters for vocabulary audio (HSK words)
   meaning?: string;              // English meaning (for HSK vocabulary)
-  displayType?: 'audio' | 'visual'; // Whether to show visual prompt or play audio first
+  displayType?: 'audio' | 'visual' | 'visual-silent'; // audio: play first, visual: show with audio btn, visual-silent: no audio until feedback
   visualPrompt?: string;         // Character/text to display for visual-first questions
 }
 

@@ -621,11 +621,13 @@ export async function generateAudioToHanziQuestions(
     // Audio URL for the character
     const audioUrl = getAudioUrl(character.pinyin);
 
-    // Get distractors: same HSK level, preferably similar pinyin or tone
+    // Get distractors: same HSK level and same syllable count
+    const syllableCount = character.hanzi.length;
     const distractors = getRandomCharacters(
       hskLevel,
       level.optionCount - 1,
-      [character.hanzi, ...recentHanzi.slice(-3)]
+      [character.hanzi, ...recentHanzi.slice(-3)],
+      syllableCount
     );
 
     // Create options
@@ -704,10 +706,12 @@ export async function generateHanziToPinyinQuestions(
     // Audio URL for the character (plays after showing visual)
     const audioUrl = getAudioUrl(character.pinyin);
 
-    // Get distractors: different pinyin, preferably same tone or similar sound
+    // Get distractors: same syllable count, different pinyin, preferably same tone
+    const syllableCount = character.hanzi.length;
     const distractorPool = allCharacters.filter(c =>
       c.hanzi !== character.hanzi &&
-      c.pinyinDisplay !== character.pinyinDisplay
+      c.pinyinDisplay !== character.pinyinDisplay &&
+      c.hanzi.length === syllableCount
     );
 
     // Prefer characters with same tone for harder distractors
@@ -741,7 +745,8 @@ export async function generateHanziToPinyinQuestions(
       correctAnswer: character.pinyinDisplay,
       options: shuffle(options),
       hanzi: character.hanzi,
-      displayType: 'visual', // Visual-first quiz
+      meaning: character.meaning,
+      displayType: 'visual-silent', // No audio until feedback
       visualPrompt: character.hanzi, // Show this character
       explanation: `${character.hanzi} = ${character.pinyinDisplay} (${character.meaning})`,
     });
@@ -821,7 +826,9 @@ export async function generateHanziToMeaningQuestions(
       correctAnswer: character.meaning,
       options: shuffle(options),
       hanzi: character.hanzi,
-      displayType: 'visual', // Visual-first quiz
+      syllable: character.pinyinDisplay, // For feedback display
+      meaning: character.meaning,
+      displayType: 'visual', // Visual-first quiz with audio button
       visualPrompt: character.hanzi, // Show this character
       explanation: `${character.hanzi} (${character.pinyinDisplay}) = ${character.meaning}`,
     });

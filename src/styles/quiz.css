@@ -395,11 +395,11 @@
 
 .feedback-area {
   margin-top: var(--spacing-lg);
-  min-height: 100px;
+  min-height: 180px;
 }
 
 .feedback-spacer {
-  height: 100px;
+  height: 180px;
 }
 
 .feedback-banner {
@@ -433,6 +433,25 @@
 .feedback-icon {
   font-size: 1.5rem;
   line-height: 1;
+}
+
+.feedback-audio-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-surface);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  opacity: 0.8;
+}
+
+.feedback-audio-button:hover {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 .feedback-hanzi {
