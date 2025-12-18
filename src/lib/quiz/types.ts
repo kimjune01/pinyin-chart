@@ -24,6 +24,8 @@ export interface QuizOption {
   label: string;      // Display text (e.g., "mā", "1st Tone", "ma")
   value: string;      // Actual value for comparison
   isCorrect: boolean;
+  meaning?: string;   // English meaning (for HSK vocabulary options)
+  hanzi?: string;     // Chinese characters (for HSK vocabulary options)
 }
 
 /**
@@ -37,6 +39,9 @@ export interface Question {
   explanation?: string;          // Optional explanation after answer
   syllable?: string;             // Original syllable for reference
   hanzi?: string;                // Chinese characters for vocabulary audio (HSK words)
+  meaning?: string;              // English meaning (for HSK vocabulary)
+  displayType?: 'audio' | 'visual'; // Whether to show visual prompt or play audio first
+  visualPrompt?: string;         // Character/text to display for visual-first questions
 }
 
 /**

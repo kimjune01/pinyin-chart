@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { Question } from '../../lib/quiz/types';
+import type { Question, QuizOption } from '../../lib/quiz/types';
 import { audioService } from '../../lib/audio/AudioService';
 import { addToneMarks } from '../../lib/utils/pinyinUtils';
 import { PINYIN_SYLLABLES } from '../../data/pinyinSyllables';
@@ -33,8 +33,14 @@ export default function QuizGameArea({
 }: QuizGameAreaProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(questionTimeLimit ?? 0);
+  const [exploredOption, setExploredOption] = useState<QuizOption | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(Date.now());
+
+  // Reset explored option when question changes
+  useEffect(() => {
+    setExploredOption(null);
+  }, [question.id]);
 
   // Reset timer when question changes
   useEffect(() => {
@@ -108,8 +114,6 @@ export default function QuizGameArea({
   const playOptionAudio = useCallback(async (optionValue: string) => {
     if (isPlaying) return;
 
-    if (!question.syllable) return;
-
     setIsPlaying(true);
     try {
       // For HSK quizzes, option value is "hanzi|syllables" format (e.g., "你好|ni3,hao3")
@@ -119,12 +123,22 @@ export default function QuizGameArea({
         return;
       }
 
+      // For Audio to Hanzi quiz, option value is a Chinese character
+      // Check if it contains Chinese characters (Unicode range for CJK)
+      if (/[\u4e00-\u9fff]/.test(optionValue)) {
+        await audioService.playVocabulary(optionValue);
+        return;
+      }
+
       // Legacy: comma-separated syllables without hanzi
       if (optionValue.includes(',')) {
         const syllables = optionValue.split(',');
         await audioService.playSequence(syllables);
         return;
       }
+
+      // Early return if no syllable info for other quiz types
+      if (!question.syllable) return;
 
       // For tone quizzes, option value is a tone number (1-4)
       if (/^[1-4]$/.test(optionValue)) {
@@ -230,13 +244,29 @@ export default function QuizGameArea({
         )}
 
         <div className="question-prompt">
-          <button
-            className="question-audio-button"
-            onClick={playAudio}
-            disabled={isPlaying}
-          >
-🔊 Play
-          </button>
+          {question.displayType === 'visual' && question.visualPrompt ? (
+            // Visual-first quiz: show character prominently with audio as secondary
+            <div className="visual-prompt-container">
+              <span className="visual-prompt-character">{question.visualPrompt}</span>
+              <button
+                className="visual-prompt-audio"
+                onClick={playAudio}
+                disabled={isPlaying}
+                title="Play pronunciation"
+              >
+                🔊
+              </button>
+            </div>
+          ) : (
+            // Audio-first quiz: show play button prominently
+            <button
+              className="question-audio-button"
+              onClick={playAudio}
+              disabled={isPlaying}
+            >
+              🔊 Play
+            </button>
+          )}
           <span className="question-title">Select the correct answer</span>
         </div>
 
@@ -245,7 +275,7 @@ export default function QuizGameArea({
             const isSelected = selectedAnswer === option.value;
             const showCorrect = isAnswered && option.isCorrect;
             const showIncorrect = isAnswered && isSelected && !option.isCorrect;
-            const canExplore = isAnswered && !isCorrect;
+            const canExplore = isAnswered;
 
             let className = 'answer-option';
             if (showCorrect) className += ' correct';
@@ -257,6 +287,7 @@ export default function QuizGameArea({
               if (!isAnswered) {
                 onSubmitAnswer(option.value);
               } else if (canExplore) {
+                setExploredOption(option);
                 playOptionAudio(option.value);
               }
             };
@@ -269,7 +300,7 @@ export default function QuizGameArea({
                 key={option.id}
                 className={className}
                 onClick={handleClick}
-                disabled={isAnswered && isCorrect === true}
+                disabled={false}
               >
                 <span className="option-hotkey">{index + 1}</span>
                 {isToneOption ? (
@@ -285,8 +316,13 @@ export default function QuizGameArea({
         <div className="feedback-area">
           {isAnswered ? (
             <div className={`feedback-banner ${isCorrect ? 'correct' : 'incorrect'}`}>
-              <div>
-                {isCorrect ? '✅ Correct!' : selectedAnswer === '__timeout__' ? '⏱️ Time\'s up!' : '❌ Incorrect'}
+              <div className="feedback-content">
+                <span className="feedback-icon">
+                  {isCorrect ? '✅' : selectedAnswer === '__timeout__' ? '⏱️' : '❌'}
+                </span>
+                {question.hanzi && (
+                  <span className="feedback-hanzi">{question.hanzi}</span>
+                )}
                 <span className="feedback-pinyin">
                   {(() => {
                     // For tone quizzes, show syllable with tone marks
@@ -300,11 +336,28 @@ export default function QuizGameArea({
                         }
                       }
                     }
+                    // For HSK quizzes, don't show the raw value format
+                    if (question.hanzi) {
+                      return null;
+                    }
                     // For other quizzes, show the correct answer directly
                     return question.correctAnswer;
                   })()}
                 </span>
+                {question.meaning && (
+                  <div className="feedback-meaning">{question.meaning}</div>
+                )}
               </div>
+
+              {exploredOption && exploredOption.hanzi && (
+                <div className="explored-option">
+                  <span className="explored-hanzi">{exploredOption.hanzi}</span>
+                  <span className="explored-pinyin">{exploredOption.label}</span>
+                  {exploredOption.meaning && (
+                    <span className="explored-meaning">{exploredOption.meaning}</span>
+                  )}
+                </div>
+              )}
 
               {!isCorrect && (
                 <button

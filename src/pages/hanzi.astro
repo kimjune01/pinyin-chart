@@ -1,0 +1,41 @@
+---
+/**
+ * Hanzi Page - Interactive Chinese Character Chart
+ *
+ * Features:
+ * - HSK 1-6 level tabs
+ * - Click characters to hear audio
+ * - Search by character, pinyin, or meaning
+ * - Keyboard navigation
+ */
+
+import AppLayout from '../components/layout/AppLayout.astro';
+import HanziChart from '../components/hanzi/HanziChart';
+
+const title = 'Hanzi Chart';
+const description = 'Interactive Chinese character chart organized by HSK level. Click any character to hear its pronunciation.';
+---
+
+<AppLayout title={title} currentSection="hanzi">
+  <div class="hanzi-page">
+    <div class="hanzi-content">
+      <HanziChart client:load />
+    </div>
+  </div>
+
+  <style>
+    .hanzi-page {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hanzi-content {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</AppLayout>

@@ -1,0 +1,17 @@
+---
+/**
+ * Audio to Hanzi Quiz Page
+ * Hear pronunciation, select the correct Chinese character
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import '../../styles/quiz.css';
+
+const title = 'Audio to Character Quiz';
+const description = 'Hear the pronunciation and select the correct Chinese character.';
+---
+
+<AppLayout title={title} currentSection="quiz-hanzi-audio">
+  <BaseQuiz quizId="audio-to-hanzi" client:load />
+</AppLayout>

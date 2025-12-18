@@ -13,6 +13,9 @@ import {
   generateSyllableQuestions,
   generateMinimalPairQuestions,
   generateHSKWordQuestions,
+  generateAudioToHanziQuestions,
+  generateHanziToPinyinQuestions,
+  generateHanziToMeaningQuestions,
 } from '../lib/quiz/questionGenerator';
 
 // ============================================================================
@@ -273,7 +276,7 @@ export const MINIMAL_PAIRS_QUIZ: QuizConfig = {
 
 export const HSK_QUIZ: QuizConfig = {
   id: 'hsk-words',
-  name: 'HSK Words',
+  name: 'HSK Audio → Pinyin',
   description: 'Recognize pinyin for common HSK vocabulary words.',
   icon: '📚',
   levels: [
@@ -309,6 +312,210 @@ export const HSK_QUIZ: QuizConfig = {
 };
 
 // ============================================================================
+// 7. AUDIO TO HANZI QUIZ
+// ============================================================================
+
+export const AUDIO_TO_HANZI_QUIZ: QuizConfig = {
+  id: 'audio-to-hanzi',
+  name: 'Audio to Character',
+  description: 'Hear the pronunciation and select the correct Chinese character.',
+  icon: '👂',
+  levels: [
+    {
+      id: 0,
+      name: 'HSK 1',
+      description: '150 basic characters',
+      questionCount: 10,
+      optionCount: 4,
+      difficulty: 'easy',
+      unlockThreshold: 80,
+    },
+    {
+      id: 1,
+      name: 'HSK 2',
+      description: '150 elementary characters',
+      questionCount: 12,
+      optionCount: 4,
+      difficulty: 'easy',
+      unlockThreshold: 80,
+    },
+    {
+      id: 2,
+      name: 'HSK 3',
+      description: '300 intermediate characters',
+      questionCount: 15,
+      optionCount: 5,
+      difficulty: 'medium',
+      unlockThreshold: 80,
+    },
+    {
+      id: 3,
+      name: 'HSK 4',
+      description: '300 upper-intermediate characters',
+      questionCount: 15,
+      optionCount: 5,
+      difficulty: 'medium',
+      unlockThreshold: 85,
+    },
+    {
+      id: 4,
+      name: 'HSK 5',
+      description: '400 advanced characters',
+      questionCount: 20,
+      optionCount: 6,
+      difficulty: 'hard',
+      unlockThreshold: 85,
+    },
+    {
+      id: 5,
+      name: 'HSK 6',
+      description: '500 proficient characters',
+      questionCount: 20,
+      optionCount: 6,
+      difficulty: 'hard',
+      unlockThreshold: 90,
+    },
+  ],
+  generateQuestions: generateAudioToHanziQuestions,
+};
+
+// ============================================================================
+// 8. HANZI TO PINYIN QUIZ
+// ============================================================================
+
+export const HANZI_TO_PINYIN_QUIZ: QuizConfig = {
+  id: 'hanzi-to-pinyin',
+  name: 'Character to Pinyin',
+  description: 'See a Chinese character and select the correct pinyin pronunciation.',
+  icon: '📖',
+  levels: [
+    {
+      id: 0,
+      name: 'HSK 1',
+      description: '150 basic characters',
+      questionCount: 10,
+      optionCount: 4,
+      difficulty: 'easy',
+      unlockThreshold: 80,
+    },
+    {
+      id: 1,
+      name: 'HSK 2',
+      description: '150 elementary characters',
+      questionCount: 12,
+      optionCount: 4,
+      difficulty: 'easy',
+      unlockThreshold: 80,
+    },
+    {
+      id: 2,
+      name: 'HSK 3',
+      description: '300 intermediate characters',
+      questionCount: 15,
+      optionCount: 5,
+      difficulty: 'medium',
+      unlockThreshold: 80,
+    },
+    {
+      id: 3,
+      name: 'HSK 4',
+      description: '300 upper-intermediate characters',
+      questionCount: 15,
+      optionCount: 5,
+      difficulty: 'medium',
+      unlockThreshold: 85,
+    },
+    {
+      id: 4,
+      name: 'HSK 5',
+      description: '400 advanced characters',
+      questionCount: 20,
+      optionCount: 6,
+      difficulty: 'hard',
+      unlockThreshold: 85,
+    },
+    {
+      id: 5,
+      name: 'HSK 6',
+      description: '500 proficient characters',
+      questionCount: 20,
+      optionCount: 6,
+      difficulty: 'hard',
+      unlockThreshold: 90,
+    },
+  ],
+  generateQuestions: generateHanziToPinyinQuestions,
+};
+
+// ============================================================================
+// 9. HANZI TO MEANING QUIZ
+// ============================================================================
+
+export const HANZI_TO_MEANING_QUIZ: QuizConfig = {
+  id: 'hanzi-to-meaning',
+  name: 'Character to Meaning',
+  description: 'See a Chinese character and select the correct English meaning.',
+  icon: '🔤',
+  levels: [
+    {
+      id: 0,
+      name: 'HSK 1',
+      description: '150 basic characters',
+      questionCount: 10,
+      optionCount: 4,
+      difficulty: 'easy',
+      unlockThreshold: 80,
+    },
+    {
+      id: 1,
+      name: 'HSK 2',
+      description: '150 elementary characters',
+      questionCount: 12,
+      optionCount: 4,
+      difficulty: 'easy',
+      unlockThreshold: 80,
+    },
+    {
+      id: 2,
+      name: 'HSK 3',
+      description: '300 intermediate characters',
+      questionCount: 15,
+      optionCount: 5,
+      difficulty: 'medium',
+      unlockThreshold: 80,
+    },
+    {
+      id: 3,
+      name: 'HSK 4',
+      description: '300 upper-intermediate characters',
+      questionCount: 15,
+      optionCount: 5,
+      difficulty: 'medium',
+      unlockThreshold: 85,
+    },
+    {
+      id: 4,
+      name: 'HSK 5',
+      description: '400 advanced characters',
+      questionCount: 20,
+      optionCount: 6,
+      difficulty: 'hard',
+      unlockThreshold: 85,
+    },
+    {
+      id: 5,
+      name: 'HSK 6',
+      description: '500 proficient characters',
+      questionCount: 20,
+      optionCount: 6,
+      difficulty: 'hard',
+      unlockThreshold: 90,
+    },
+  ],
+  generateQuestions: generateHanziToMeaningQuestions,
+};
+
+// ============================================================================
 // QUIZ REGISTRY
 // ============================================================================
 
@@ -319,6 +526,9 @@ export const ALL_QUIZZES: QuizConfig[] = [
   SYLLABLE_QUIZ,
   MINIMAL_PAIRS_QUIZ,
   HSK_QUIZ,
+  AUDIO_TO_HANZI_QUIZ,
+  HANZI_TO_PINYIN_QUIZ,
+  HANZI_TO_MEANING_QUIZ,
 ];
 
 export function getQuizById(id: string): QuizConfig | undefined {

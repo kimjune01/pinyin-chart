@@ -552,12 +552,16 @@ export async function generateHSKWordQuestions(
         label: word.pinyinDisplay,
         value: `${word.word}|${word.syllables.join(',')}`,  // hanzi|syllables for audio
         isCorrect: true,
+        hanzi: word.word,
+        meaning: word.meaning,
       },
       ...wrongWords.map((w, idx) => ({
         id: `wrong-${idx}`,
         label: w.pinyinDisplay,
         value: `${w.word}|${w.syllables.join(',')}`,  // hanzi|syllables for audio
         isCorrect: false,
+        hanzi: w.word,
+        meaning: w.meaning,
       })),
     ];
 
@@ -568,7 +572,258 @@ export async function generateHSKWordQuestions(
       options: shuffle(options),
       syllable: word.syllables.join(','),  // All syllables (for fallback)
       hanzi: word.word,  // Chinese characters for vocabulary audio
+      meaning: word.meaning,  // English meaning for feedback
       explanation: `Correct answer: ${word.pinyinDisplay} (${word.meaning})`,
+    });
+  }
+
+  return questions;
+}
+
+// ============================================================================
+// 7. AUDIO TO HANZI (Hear pronunciation, select character)
+// ============================================================================
+
+export async function generateAudioToHanziQuestions(
+  level: LevelConfig,
+  count: number
+): Promise<Question[]> {
+  const questions: Question[] = [];
+  const recentHanzi: string[] = [];
+
+  // Import HSK characters data
+  const { getCharactersByLevel, getRandomCharacters } = await import('../../data/hskCharacters');
+
+  // Map level ID to HSK level (0 -> HSK 1, 1 -> HSK 2, etc.)
+  const hskLevel = Math.min(level.id + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6;
+
+  // Get all characters for this level and shuffle them
+  const allCharacters = shuffle(getCharactersByLevel(hskLevel));
+
+  if (allCharacters.length === 0) {
+    console.warn(`No characters found for HSK level ${hskLevel}`);
+    return [];
+  }
+
+  for (let i = 0; i < Math.min(count, allCharacters.length); i++) {
+    // Pick a character avoiding recent ones
+    const availableCharacters = allCharacters.filter(c =>
+      !recentHanzi.slice(-RECENT_WINDOW_SIZE).includes(c.hanzi)
+    );
+    const character = availableCharacters.length > 0 ? availableCharacters[0] : allCharacters[i];
+
+    recentHanzi.push(character.hanzi);
+
+    // Remove used character to avoid duplicates
+    const charIndex = allCharacters.indexOf(character);
+    if (charIndex > -1) allCharacters.splice(charIndex, 1);
+
+    // Audio URL for the character
+    const audioUrl = getAudioUrl(character.pinyin);
+
+    // Get distractors: same HSK level, preferably similar pinyin or tone
+    const distractors = getRandomCharacters(
+      hskLevel,
+      level.optionCount - 1,
+      [character.hanzi, ...recentHanzi.slice(-3)]
+    );
+
+    // Create options
+    const options: QuizOption[] = [
+      {
+        id: 'correct',
+        label: character.hanzi,
+        value: character.hanzi,
+        isCorrect: true,
+        hanzi: character.hanzi,
+        meaning: character.meaning,
+      },
+      ...distractors.map((d, idx) => ({
+        id: `wrong-${idx}`,
+        label: d.hanzi,
+        value: d.hanzi,
+        isCorrect: false,
+        hanzi: d.hanzi,
+        meaning: d.meaning,
+      })),
+    ];
+
+    questions.push({
+      id: `audio-hanzi-${i}`,
+      audioUrl,
+      correctAnswer: character.hanzi,
+      options: shuffle(options),
+      hanzi: character.hanzi,
+      meaning: character.meaning,
+      displayType: 'audio', // Audio-first quiz
+      explanation: `Correct answer: ${character.hanzi} (${character.pinyinDisplay} - ${character.meaning})`,
+    });
+  }
+
+  return questions;
+}
+
+// ============================================================================
+// 8. HANZI TO PINYIN (See character, select pinyin)
+// ============================================================================
+
+export async function generateHanziToPinyinQuestions(
+  level: LevelConfig,
+  count: number
+): Promise<Question[]> {
+  const questions: Question[] = [];
+  const recentHanzi: string[] = [];
+
+  // Import HSK characters data
+  const { getCharactersByLevel } = await import('../../data/hskCharacters');
+
+  // Map level ID to HSK level
+  const hskLevel = Math.min(level.id + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6;
+
+  // Get all characters for this level and shuffle them
+  const allCharacters = shuffle(getCharactersByLevel(hskLevel));
+
+  if (allCharacters.length === 0) {
+    console.warn(`No characters found for HSK level ${hskLevel}`);
+    return [];
+  }
+
+  for (let i = 0; i < Math.min(count, allCharacters.length); i++) {
+    // Pick a character avoiding recent ones
+    const availableCharacters = allCharacters.filter(c =>
+      !recentHanzi.slice(-RECENT_WINDOW_SIZE).includes(c.hanzi)
+    );
+    const character = availableCharacters.length > 0 ? availableCharacters[0] : allCharacters[i];
+
+    recentHanzi.push(character.hanzi);
+
+    // Remove used character to avoid duplicates
+    const charIndex = allCharacters.indexOf(character);
+    if (charIndex > -1) allCharacters.splice(charIndex, 1);
+
+    // Audio URL for the character (plays after showing visual)
+    const audioUrl = getAudioUrl(character.pinyin);
+
+    // Get distractors: different pinyin, preferably same tone or similar sound
+    const distractorPool = allCharacters.filter(c =>
+      c.hanzi !== character.hanzi &&
+      c.pinyinDisplay !== character.pinyinDisplay
+    );
+
+    // Prefer characters with same tone for harder distractors
+    const sameToneDistractors = distractorPool.filter(c => c.tone === character.tone);
+    const otherDistractors = distractorPool.filter(c => c.tone !== character.tone);
+
+    const distractors = [
+      ...sameToneDistractors.slice(0, Math.floor((level.optionCount - 1) / 2)),
+      ...otherDistractors.slice(0, level.optionCount - 1 - Math.floor((level.optionCount - 1) / 2)),
+    ].slice(0, level.optionCount - 1);
+
+    // Create options with pinyin display
+    const options: QuizOption[] = [
+      {
+        id: 'correct',
+        label: character.pinyinDisplay,
+        value: character.pinyinDisplay,
+        isCorrect: true,
+      },
+      ...distractors.map((d, idx) => ({
+        id: `wrong-${idx}`,
+        label: d.pinyinDisplay,
+        value: d.pinyinDisplay,
+        isCorrect: false,
+      })),
+    ];
+
+    questions.push({
+      id: `hanzi-pinyin-${i}`,
+      audioUrl,
+      correctAnswer: character.pinyinDisplay,
+      options: shuffle(options),
+      hanzi: character.hanzi,
+      displayType: 'visual', // Visual-first quiz
+      visualPrompt: character.hanzi, // Show this character
+      explanation: `${character.hanzi} = ${character.pinyinDisplay} (${character.meaning})`,
+    });
+  }
+
+  return questions;
+}
+
+// ============================================================================
+// 9. HANZI TO MEANING (See character, select English meaning)
+// ============================================================================
+
+export async function generateHanziToMeaningQuestions(
+  level: LevelConfig,
+  count: number
+): Promise<Question[]> {
+  const questions: Question[] = [];
+  const recentHanzi: string[] = [];
+
+  // Import HSK characters data
+  const { getCharactersByLevel } = await import('../../data/hskCharacters');
+
+  // Map level ID to HSK level
+  const hskLevel = Math.min(level.id + 1, 6) as 1 | 2 | 3 | 4 | 5 | 6;
+
+  // Get all characters for this level and shuffle them
+  const allCharacters = shuffle(getCharactersByLevel(hskLevel));
+
+  if (allCharacters.length === 0) {
+    console.warn(`No characters found for HSK level ${hskLevel}`);
+    return [];
+  }
+
+  for (let i = 0; i < Math.min(count, allCharacters.length); i++) {
+    // Pick a character avoiding recent ones
+    const availableCharacters = allCharacters.filter(c =>
+      !recentHanzi.slice(-RECENT_WINDOW_SIZE).includes(c.hanzi)
+    );
+    const character = availableCharacters.length > 0 ? availableCharacters[0] : allCharacters[i];
+
+    recentHanzi.push(character.hanzi);
+
+    // Remove used character to avoid duplicates
+    const charIndex = allCharacters.indexOf(character);
+    if (charIndex > -1) allCharacters.splice(charIndex, 1);
+
+    // Audio URL for the character
+    const audioUrl = getAudioUrl(character.pinyin);
+
+    // Get distractors: different meanings from the same level
+    const distractorPool = allCharacters.filter(c =>
+      c.hanzi !== character.hanzi &&
+      c.meaning !== character.meaning
+    );
+
+    const distractors = shuffle(distractorPool).slice(0, level.optionCount - 1);
+
+    // Create options with English meanings
+    const options: QuizOption[] = [
+      {
+        id: 'correct',
+        label: character.meaning,
+        value: character.meaning,
+        isCorrect: true,
+      },
+      ...distractors.map((d, idx) => ({
+        id: `wrong-${idx}`,
+        label: d.meaning,
+        value: d.meaning,
+        isCorrect: false,
+      })),
+    ];
+
+    questions.push({
+      id: `hanzi-meaning-${i}`,
+      audioUrl,
+      correctAnswer: character.meaning,
+      options: shuffle(options),
+      hanzi: character.hanzi,
+      displayType: 'visual', // Visual-first quiz
+      visualPrompt: character.hanzi, // Show this character
+      explanation: `${character.hanzi} (${character.pinyinDisplay}) = ${character.meaning}`,
     });
   }
 

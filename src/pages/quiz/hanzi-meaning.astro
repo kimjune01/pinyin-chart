@@ -1,0 +1,17 @@
+---
+/**
+ * Hanzi to Meaning Quiz Page
+ * See a Chinese character, select the correct English meaning
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import '../../styles/quiz.css';
+
+const title = 'Character to Meaning Quiz';
+const description = 'See a Chinese character and select the correct English meaning.';
+---
+
+<AppLayout title={title} currentSection="quiz-hanzi-meaning">
+  <BaseQuiz quizId="hanzi-to-meaning" client:load />
+</AppLayout>

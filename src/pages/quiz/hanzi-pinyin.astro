@@ -1,0 +1,17 @@
+---
+/**
+ * Hanzi to Pinyin Quiz Page
+ * See a Chinese character, select the correct pinyin
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import BaseQuiz from '../../components/quiz/BaseQuiz';
+import '../../styles/quiz.css';
+
+const title = 'Character to Pinyin Quiz';
+const description = 'See a Chinese character and select the correct pinyin pronunciation.';
+---
+
+<AppLayout title={title} currentSection="quiz-hanzi-pinyin">
+  <BaseQuiz quizId="hanzi-to-pinyin" client:load />
+</AppLayout>
