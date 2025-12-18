@@ -25,5 +25,6 @@ export const numbersTopic: Topic = {
     { hanzi: '八', pinyin: 'ba1', meaning: 'eight', emoji: '8️⃣', position: 7 },
     { hanzi: '九', pinyin: 'jiu3', meaning: 'nine', emoji: '9️⃣', position: 8 },
     { hanzi: '十', pinyin: 'shi2', meaning: 'ten', emoji: '🔟', position: 9 },
+    { hanzi: '百', pinyin: 'bai3', meaning: 'hundred', emoji: '💯', position: 10 },
   ],
 };

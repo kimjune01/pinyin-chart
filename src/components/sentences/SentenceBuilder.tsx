@@ -122,6 +122,24 @@ export default function SentenceBuilder() {
     }
   }, [isComplete, isPlaying, sentenceParts]);
 
+  // Play sentence syllable by syllable
+  const playSyllables = useCallback(async () => {
+    if (!isComplete || isPlaying) return;
+
+    setIsPlaying(true);
+    try {
+      for (const part of sentenceParts) {
+        await audioService.playVocabulary(part.hanzi, true);
+        // Small pause between syllables
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    } catch (error) {
+      console.error('Error playing syllables:', error);
+    } finally {
+      setIsPlaying(false);
+    }
+  }, [isComplete, isPlaying, sentenceParts]);
+
   // Play individual word
   const playWord = useCallback(async (word: Word) => {
     try {
@@ -263,13 +281,22 @@ export default function SentenceBuilder() {
         </div>
 
         {isComplete && (
-          <button
-            className="play-sentence-btn"
-            onClick={playSentence}
-            disabled={isPlaying}
-          >
-            {isPlaying ? '🔊 Playing...' : '▶ Play Sentence'}
-          </button>
+          <div className="play-buttons">
+            <button
+              className="play-btn play-syllables-btn"
+              onClick={playSyllables}
+              disabled={isPlaying}
+            >
+              ▶ Syllables
+            </button>
+            <button
+              className="play-btn play-sentence-btn"
+              onClick={playSentence}
+              disabled={isPlaying}
+            >
+              ▶ Sentence
+            </button>
+          </div>
         )}
       </div>
 
@@ -566,24 +593,37 @@ export default function SentenceBuilder() {
           font-style: italic;
         }
 
-        .play-sentence-btn {
-          padding: var(--spacing-md) var(--spacing-xl);
-          background: var(--color-primary);
+        .play-buttons {
+          display: flex;
+          gap: var(--spacing-sm);
+          justify-content: center;
+        }
+
+        .play-btn {
+          padding: var(--spacing-md) var(--spacing-lg);
           color: white;
           border: none;
           border-radius: var(--radius-lg);
-          font-size: var(--font-size-lg);
+          font-size: var(--font-size-base);
           font-weight: var(--font-weight-semibold);
           cursor: pointer;
           transition: all var(--transition-fast);
         }
 
-        .play-sentence-btn:hover:not(:disabled) {
-          background: var(--color-primary-hover);
-          transform: translateY(-2px);
+        .play-syllables-btn {
+          background: var(--color-text-secondary);
         }
 
-        .play-sentence-btn:disabled {
+        .play-sentence-btn {
+          background: var(--color-primary);
+        }
+
+        .play-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          filter: brightness(1.1);
+        }
+
+        .play-btn:disabled {
           opacity: 0.7;
           cursor: not-allowed;
         }
