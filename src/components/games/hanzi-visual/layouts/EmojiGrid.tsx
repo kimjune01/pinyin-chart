@@ -30,6 +30,7 @@ export default function EmojiGrid({
         <ClickableRegion
           key={item.position}
           emoji={item.emoji}
+          meaning={item.meaning}
           position={item.position}
           onClick={onSelect}
           feedback={feedback}

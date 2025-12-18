@@ -9,6 +9,7 @@ export const transportTopic: Topic = {
   name: 'Transport',
   nameZh: '交通',
   description: 'Match Chinese vehicles to emojis',
+  category: 'objects',
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 3,

@@ -12,12 +12,37 @@ export interface TopicItem {
   isSelf?: boolean; // For family tree - marks the "me" position
 }
 
+// Topic categories for organization
+export type TopicCategory =
+  | 'living-things'
+  | 'food-drink'
+  | 'people'
+  | 'places'
+  | 'nature'
+  | 'objects'
+  | 'language'
+  | 'activities'
+  | 'other';
+
+export const CATEGORY_LABELS: Record<TopicCategory, { name: string; nameZh: string; emoji: string }> = {
+  'living-things': { name: 'Living Things', nameZh: '生物', emoji: '🐾' },
+  'food-drink': { name: 'Food & Drink', nameZh: '饮食', emoji: '🍽️' },
+  'people': { name: 'People', nameZh: '人物', emoji: '👥' },
+  'places': { name: 'Places', nameZh: '地点', emoji: '🏠' },
+  'nature': { name: 'Nature', nameZh: '自然', emoji: '🌿' },
+  'objects': { name: 'Objects', nameZh: '物品', emoji: '📦' },
+  'language': { name: 'Language', nameZh: '语言', emoji: '📝' },
+  'activities': { name: 'Activities', nameZh: '活动', emoji: '⚽' },
+  'other': { name: 'Other', nameZh: '其他', emoji: '✨' },
+};
+
 // Topic configuration
 export interface Topic {
   id: string;
   name: string;
   nameZh: string;
   description: string;
+  category: TopicCategory;
   difficulty: 1 | 2 | 3;
   layoutType: 'emoji-grid' | 'family-tree' | 'direction-diagram';
   gridColumns?: number;

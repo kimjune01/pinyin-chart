@@ -9,6 +9,7 @@ export const colorsTopic: Topic = {
   name: 'Colors',
   nameZh: '颜色',
   description: 'Match Chinese colors to colored objects',
+  category: 'language',
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 3,

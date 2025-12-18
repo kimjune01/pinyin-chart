@@ -34,9 +34,8 @@
 
 .topics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
 }
 
 .topic-card {
@@ -60,17 +59,25 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.topic-card .topic-name {
-  font-size: var(--font-size-lg);
+.topic-card .topic-name-zh {
+  font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   margin-bottom: var(--spacing-xs);
 }
 
-.topic-card .topic-name-zh {
-  font-size: var(--font-size-xl);
-  color: var(--color-text-secondary);
+.topic-card .topic-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
   margin-bottom: var(--spacing-sm);
+}
+
+.topic-card .topic-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
 }
 
 .topic-card .difficulty {
@@ -78,11 +85,51 @@
   font-size: var(--font-size-sm);
 }
 
+.topic-card .item-count {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* Category Sections */
+.categories-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.category-section {
+  margin-bottom: var(--spacing-md);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.category-header .category-emoji {
+  font-size: var(--font-size-xl);
+}
+
+.category-header .category-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.category-header .category-name-zh {
+  font-size: var(--font-size-base);
+  color: var(--color-text-tertiary);
+}
+
 .endless-mode-btn {
   display: block;
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  margin: 0 auto var(--spacing-xl);
   padding: var(--spacing-md) var(--spacing-xl);
   background: linear-gradient(135deg, var(--color-primary), var(--color-info));
   color: white;
@@ -253,6 +300,20 @@
   color: var(--color-text-secondary);
 }
 
+.clickable-region .meaning {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.clickable-region {
+  position: relative;
+}
+
 /* Direction Diagram Layout */
 .direction-diagram {
   display: grid;
@@ -316,6 +377,7 @@
 }
 
 .family-tree .family-member {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -378,6 +440,16 @@
 .family-tree .family-member .icon {
   font-size: 2rem;
   margin-bottom: var(--spacing-xs);
+}
+
+.family-tree .family-member .meaning {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 
 .family-tree .family-member .relation {
@@ -528,7 +600,6 @@
 
   .topics-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
   }
 
   .topic-card {

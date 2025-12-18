@@ -5,7 +5,7 @@
  * Works with Service Worker for persistent browser caching.
  */
 
-import { getAudioUrl, getVocabAudioUrl, AUDIO_CONFIG, TTS_OVERRIDE_SYLLABLES, PINYIN_TO_HANZI } from './audioConfig';
+import { getAudioUrl, getVocabAudioUrl, AUDIO_CONFIG, TTS_OVERRIDE_SYLLABLES, TTS_OVERRIDE_VOCAB, PINYIN_TO_HANZI } from './audioConfig';
 
 export type AudioLoadState = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -202,6 +202,12 @@ class AudioServiceClass {
    * @param waitForEnd - If true, wait for audio to finish before resolving
    */
   async playVocabulary(hanzi: string, waitForEnd: boolean = false): Promise<void> {
+    // Check if this word should use TTS override
+    if (TTS_OVERRIDE_VOCAB.has(hanzi)) {
+      await this.speakWithWebSpeech(hanzi, waitForEnd);
+      return;
+    }
+
     const cacheKey = `vocab:${hanzi}`;
 
     // Check if we already know this word is missing from CDN

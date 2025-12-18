@@ -16,6 +16,17 @@ export const TTS_OVERRIDE_SYLLABLES = new Set([
   'sheng4', // CDN file sounds like tone 1
   'lian4',  // CDN file incorrect
   'ao4',    // CDN file incorrect
+  'lv1',    // CDN missing lü syllables
+  'lv2',
+  'lv3',
+  'lv4',
+  'nv3',    // CDN missing nü syllables
+  'nv4',
+]);
+
+// Use TTS for these vocabulary words (known CDN issues)
+export const TTS_OVERRIDE_VOCAB = new Set([
+  '工人',   // CDN pronunciation incorrect
 ]);
 
 /**

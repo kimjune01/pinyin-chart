@@ -9,6 +9,7 @@ export const natureTopic: Topic = {
   name: 'Nature',
   nameZh: '自然',
   description: 'Match Chinese nature words to emojis',
+  category: 'nature',
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 3,

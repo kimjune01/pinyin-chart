@@ -9,6 +9,7 @@ export const directionsTopic: Topic = {
   name: 'Directions',
   nameZh: '方向',
   description: 'Click the correct direction on the compass',
+  category: 'language',
   difficulty: 2,
   layoutType: 'direction-diagram',
   previewEmojis: ['⬆️', '⬇️', '⬅️'],

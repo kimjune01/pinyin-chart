@@ -36,6 +36,7 @@ export default function DirectionDiagram({
           <ClickableRegion
             key={pos}
             emoji={item?.emoji || ''}
+            meaning={item?.meaning}
             position={pos}
             onClick={onSelect}
             feedback={feedback}

@@ -9,6 +9,7 @@ export const numbersTopic: Topic = {
   name: 'Numbers',
   nameZh: '数字',
   description: 'Match Chinese numbers to digits',
+  category: 'language',
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 5,

@@ -9,6 +9,7 @@ export const weatherTopic: Topic = {
   name: 'Weather & Nature',
   nameZh: '天气',
   description: 'Match weather and nature words to their emoji',
+  category: 'nature',
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 3,

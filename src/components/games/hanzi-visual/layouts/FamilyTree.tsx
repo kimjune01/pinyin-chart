@@ -87,6 +87,7 @@ function FamilyMember({ item, onClick, feedback, selectedPosition, isCompleted }
       aria-label={item.meaning || item.hanzi}
     >
       <span className="icon">{item.emoji}</span>
+      {isCompleted && item.meaning && <span className="meaning">{item.meaning}</span>}
     </button>
   );
 }

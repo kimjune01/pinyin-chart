@@ -9,6 +9,7 @@ export const bodyTopic: Topic = {
   name: 'Body',
   nameZh: '身体',
   description: 'Match Chinese body parts to emojis',
+  category: 'people',
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 3,

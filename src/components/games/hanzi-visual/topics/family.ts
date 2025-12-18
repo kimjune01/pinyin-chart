@@ -9,6 +9,7 @@ export const familyTopic: Topic = {
   name: 'Family',
   nameZh: '家庭',
   description: 'Find family members on the family tree',
+  category: 'people',
   difficulty: 2,
   layoutType: 'family-tree',
   previewEmojis: ['👴', '👨', '👶'],

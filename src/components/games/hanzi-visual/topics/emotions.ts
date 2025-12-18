@@ -9,6 +9,7 @@ export const emotionsTopic: Topic = {
   name: 'Emotions',
   nameZh: '情绪',
   description: 'Match Chinese emotions to face emojis',
+  category: 'language',
   difficulty: 2,
   layoutType: 'emoji-grid',
   gridColumns: 3,

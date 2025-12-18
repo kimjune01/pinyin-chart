@@ -9,6 +9,7 @@ export const sportsTopic: Topic = {
   name: 'Sports',
   nameZh: '运动',
   description: 'Match Chinese sports to emojis',
+  category: 'activities',
   difficulty: 2,
   layoutType: 'emoji-grid',
   gridColumns: 3,
