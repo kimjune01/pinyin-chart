@@ -8,14 +8,32 @@ import { weatherTopic } from './weather';
 import { fruitsTopic } from './fruits';
 import { directionsTopic } from './directions';
 import { familyTopic } from './family';
+import { numbersTopic } from './numbers';
+import { colorsTopic } from './colors';
+import { bodyTopic } from './body';
+import { transportTopic } from './transport';
+import { sportsTopic } from './sports';
+import { natureTopic } from './nature';
+import { emotionsTopic } from './emotions';
+import { timeTopic } from './time';
 
 // All available topics
 export const topics: Topic[] = [
+  // Difficulty 1 (easiest)
   animalsTopic,
+  numbersTopic,
+  colorsTopic,
   weatherTopic,
   fruitsTopic,
+  bodyTopic,
+  transportTopic,
+  natureTopic,
+  // Difficulty 2
   directionsTopic,
   familyTopic,
+  sportsTopic,
+  emotionsTopic,
+  timeTopic,
 ];
 
 // Get topic by ID
