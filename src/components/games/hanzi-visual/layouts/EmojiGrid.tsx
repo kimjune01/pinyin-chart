@@ -39,9 +39,16 @@ export default function EmojiGrid({
 }: EmojiGridProps) {
   const colsClass = `cols-${Math.min(columns, 4)}`;
 
+  // Sort by position so shuffled positions affect visual order
+  const sortedItems = [...items].sort((a, b) => {
+    const posA = typeof a.position === 'number' ? a.position : 0;
+    const posB = typeof b.position === 'number' ? b.position : 0;
+    return posA - posB;
+  });
+
   return (
     <div className={`emoji-grid ${colsClass}`}>
-      {items.map((item) => (
+      {sortedItems.map((item) => (
         <ClickableRegion
           key={item.position}
           emoji={item.emoji}

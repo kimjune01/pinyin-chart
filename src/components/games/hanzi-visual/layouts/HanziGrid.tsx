@@ -78,9 +78,16 @@ export default function HanziGrid({
 }: HanziGridProps) {
   const colsClass = `cols-${Math.min(columns, 4)}`;
 
+  // Sort by position so shuffled positions affect visual order
+  const sortedItems = [...items].sort((a, b) => {
+    const posA = typeof a.position === 'number' ? a.position : 0;
+    const posB = typeof b.position === 'number' ? b.position : 0;
+    return posA - posB;
+  });
+
   return (
     <div className={`hanzi-grid ${colsClass}`}>
-      {items.map((item) => (
+      {sortedItems.map((item) => (
         <HanziOption
           key={item.hanzi}
           item={item}
