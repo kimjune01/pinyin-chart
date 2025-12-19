@@ -2,15 +2,18 @@
  * TopicSelector - Topic selection UI with endless mode option and direction toggle
  */
 
+import { useState } from 'react';
 import type { Topic, TopicCategory, GameDirection } from './visualGameEngine';
 import { CATEGORY_LABELS } from './visualGameEngine';
+
+type DifficultyFilter = 'all' | 1 | 2 | 3;
 
 interface TopicSelectorProps {
   topics: Topic[];
   direction: GameDirection;
   onDirectionChange: (direction: GameDirection) => void;
   onSelectTopic: (topic: Topic, direction: GameDirection) => void;
-  onStartEndless: () => void;
+  onStartEndless: (filteredTopics: Topic[]) => void;
 }
 
 function DifficultyStars({ level }: { level: 1 | 2 | 3 }) {
@@ -123,15 +126,24 @@ export default function TopicSelector({
   onSelectTopic,
   onStartEndless,
 }: TopicSelectorProps) {
-  const groupedTopics = groupByCategory(topics);
+  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyFilter>('all');
+
+  // Filter topics by difficulty
+  const filteredTopics = difficultyFilter === 'all'
+    ? topics
+    : topics.filter(t => t.difficulty === difficultyFilter);
+
+  const groupedTopics = groupByCategory(filteredTopics);
 
   return (
     <div className="topic-selector">
       <h1>Hanzi Visual</h1>
       <p className="subtitle">Match Chinese characters to their visual representations</p>
 
-      {/* Direction Toggle */}
-      <div className="direction-toggle">
+      {/* Controls Row */}
+      <div className="controls-row">
+        {/* Direction Toggle */}
+        <div className="direction-toggle">
         <button
           type="button"
           className={`toggle-btn ${direction === 'hanzi-to-emoji' ? 'active' : ''}`}
@@ -150,12 +162,25 @@ export default function TopicSelector({
           <span className="toggle-arrow">→</span>
           <span className="toggle-icon">字</span>
         </button>
+        </div>
+
+        {/* Difficulty Filter */}
+        <select
+          className="difficulty-filter"
+          value={difficultyFilter}
+          onChange={(e) => setDifficultyFilter(e.target.value === 'all' ? 'all' : Number(e.target.value) as 1 | 2 | 3)}
+        >
+          <option value="all">All Levels</option>
+          <option value="1">⭐ Easy</option>
+          <option value="2">⭐⭐ Medium</option>
+          <option value="3">⭐⭐⭐ Hard</option>
+        </select>
       </div>
 
       <button
         type="button"
         className="endless-mode-btn"
-        onClick={onStartEndless}
+        onClick={() => onStartEndless(filteredTopics)}
       >
         🔀 Endless Mode
       </button>

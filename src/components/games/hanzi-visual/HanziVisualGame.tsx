@@ -37,6 +37,7 @@ export default function HanziVisualGame() {
   const [direction, setDirection] = useState<GameDirection>('hanzi-to-emoji');
   const [currentTopic, setCurrentTopic] = useState<Topic | null>(null);
   const [topicQueue, setTopicQueue] = useState<Topic[]>([]); // For endless mode
+  const [endlessTopicPool, setEndlessTopicPool] = useState<Topic[]>([]); // Topics used for endless restart
   const [currentItem, setCurrentItem] = useState<TopicItem | null>(null);
   const [itemQueue, setItemQueue] = useState<TopicItem[]>([]);
   const [selectedHanzi, setSelectedHanzi] = useState<string | null>(null);
@@ -147,13 +148,16 @@ export default function HanziVisualGame() {
     lastPlayedItemRef.current = null; // Reset to allow auto-play
   }, [direction]);
 
-  // Start endless mode
-  const startEndless = useCallback(() => {
-    const shuffledTopics = generateEndlessTopicQueue(topics);
+  // Start endless mode with filtered topics
+  const startEndless = useCallback((filteredTopics: Topic[]) => {
+    if (filteredTopics.length === 0) return;
+
+    const shuffledTopics = generateEndlessTopicQueue(filteredTopics);
     const firstTopic = shuffledTopics[0];
     const itemsQueue = generateTopicQueue(firstTopic);
     const randomDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
 
+    setEndlessTopicPool(filteredTopics); // Store for restart
     setTopicQueue(shuffledTopics.slice(1));
     setCurrentTopic(firstTopic);
     setItemQueue(itemsQueue.slice(1));
@@ -323,11 +327,11 @@ export default function HanziVisualGame() {
   // Reset current game
   const resetGame = useCallback(() => {
     if (mode === 'endless') {
-      startEndless();
+      startEndless(endlessTopicPool);
     } else if (currentTopic) {
       startTopic(currentTopic, direction);
     }
-  }, [currentTopic, mode, direction, startTopic, startEndless]);
+  }, [currentTopic, mode, direction, startTopic, startEndless, endlessTopicPool]);
 
   // Render visual area based on topic layout type and direction
   const renderVisualArea = () => {
@@ -415,7 +419,7 @@ export default function HanziVisualGame() {
               className="btn btn-primary"
               onClick={() => {
                 if (mode === 'endless') {
-                  startEndless();
+                  startEndless(endlessTopicPool);
                 } else if (currentTopic) {
                   startTopic(currentTopic, direction);
                 }
