@@ -1,13 +1,15 @@
 /**
- * TopicSelector - Topic selection UI with endless mode option
+ * TopicSelector - Topic selection UI with endless mode option and direction toggle
  */
 
-import type { Topic, TopicCategory } from './visualGameEngine';
+import type { Topic, TopicCategory, GameDirection } from './visualGameEngine';
 import { CATEGORY_LABELS } from './visualGameEngine';
 
 interface TopicSelectorProps {
   topics: Topic[];
-  onSelectTopic: (topic: Topic) => void;
+  direction: GameDirection;
+  onDirectionChange: (direction: GameDirection) => void;
+  onSelectTopic: (topic: Topic, direction: GameDirection) => void;
   onStartEndless: () => void;
 }
 
@@ -116,6 +118,8 @@ function CategorySection({ category, topics, onSelectTopic }: CategorySectionPro
 
 export default function TopicSelector({
   topics,
+  direction,
+  onDirectionChange,
   onSelectTopic,
   onStartEndless,
 }: TopicSelectorProps) {
@@ -125,6 +129,28 @@ export default function TopicSelector({
     <div className="topic-selector">
       <h1>Hanzi Visual</h1>
       <p className="subtitle">Match Chinese characters to their visual representations</p>
+
+      {/* Direction Toggle */}
+      <div className="direction-toggle">
+        <button
+          type="button"
+          className={`toggle-btn ${direction === 'hanzi-to-emoji' ? 'active' : ''}`}
+          onClick={() => onDirectionChange('hanzi-to-emoji')}
+        >
+          <span className="toggle-icon">字</span>
+          <span className="toggle-arrow">→</span>
+          <span className="toggle-icon">🎯</span>
+        </button>
+        <button
+          type="button"
+          className={`toggle-btn ${direction === 'emoji-to-hanzi' ? 'active' : ''}`}
+          onClick={() => onDirectionChange('emoji-to-hanzi')}
+        >
+          <span className="toggle-icon">🎯</span>
+          <span className="toggle-arrow">→</span>
+          <span className="toggle-icon">字</span>
+        </button>
+      </div>
 
       <button
         type="button"
@@ -140,7 +166,7 @@ export default function TopicSelector({
             key={category}
             category={category}
             topics={categoryTopics}
-            onSelectTopic={onSelectTopic}
+            onSelectTopic={(topic) => onSelectTopic(topic, direction)}
           />
         ))}
       </div>

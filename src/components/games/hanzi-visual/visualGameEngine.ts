@@ -53,6 +53,7 @@ export interface Topic {
 // Game state types
 export type GamePhase = 'topic-select' | 'playing' | 'feedback' | 'complete';
 export type GameMode = 'single-topic' | 'endless';
+export type GameDirection = 'hanzi-to-emoji' | 'emoji-to-hanzi';
 export type FeedbackType = 'correct' | 'incorrect' | null;
 
 export interface GameState {
@@ -99,22 +100,34 @@ export function generateTopicQueue(topic: Topic): TopicItem[] {
   return shuffleArray([...topic.items]);
 }
 
-// Generate endless mode queue from multiple topics
-export function generateEndlessQueue(topics: Topic[], itemsPerTopic: number = 3): TopicItem[] {
-  const queue: TopicItem[] = [];
-  const shuffledTopics = shuffleArray(topics);
-
-  for (const topic of shuffledTopics) {
-    const shuffledItems = shuffleArray([...topic.items]);
-    queue.push(...shuffledItems.slice(0, itemsPerTopic));
-  }
-
-  return shuffleArray(queue);
+// Generate shuffled topic queue for endless mode
+export function generateEndlessTopicQueue(topics: Topic[]): Topic[] {
+  return shuffleArray([...topics]);
 }
 
 // Check if answer is correct
 export function checkAnswer(item: TopicItem, selectedPosition: string | number): boolean {
   return item.position === selectedPosition;
+}
+
+// Check if answer is correct in reverse mode (matching by hanzi)
+export function checkReverseAnswer(correctItem: TopicItem, selectedHanzi: string): boolean {
+  return correctItem.hanzi === selectedHanzi;
+}
+
+// Generate Hanzi options for reverse mode (1 correct + distractors)
+export function generateHanziOptions(
+  correctItem: TopicItem,
+  allItems: TopicItem[],
+  numOptions: number = 4
+): TopicItem[] {
+  // Filter out the correct item and shuffle remaining items
+  const distractors = shuffleArray(
+    allItems.filter(item => item.hanzi !== correctItem.hanzi)
+  ).slice(0, numOptions - 1);
+
+  // Combine correct item with distractors and shuffle
+  return shuffleArray([correctItem, ...distractors]);
 }
 
 // Calculate score for correct answer

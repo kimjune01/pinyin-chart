@@ -11,10 +11,12 @@ import {
   type TopicItem,
   type GamePhase,
   type GameMode,
+  type GameDirection,
   type FeedbackType,
   generateTopicQueue,
-  generateEndlessQueue,
+  generateEndlessTopicQueue,
   checkAnswer,
+  checkReverseAnswer,
   calculateScore,
   STORAGE_KEYS,
   loadFromStorage,
@@ -24,6 +26,7 @@ import { topics } from './topics';
 import TopicSelector from './TopicSelector';
 import GameHUD from './GameHUD';
 import EmojiGrid from './layouts/EmojiGrid';
+import HanziGrid from './layouts/HanziGrid';
 import DirectionDiagram from './layouts/DirectionDiagram';
 import FamilyTree from './layouts/FamilyTree';
 
@@ -31,9 +34,13 @@ export default function HanziVisualGame() {
   // Game state
   const [phase, setPhase] = useState<GamePhase>('topic-select');
   const [mode, setMode] = useState<GameMode>('single-topic');
+  const [direction, setDirection] = useState<GameDirection>('hanzi-to-emoji');
   const [currentTopic, setCurrentTopic] = useState<Topic | null>(null);
+  const [topicQueue, setTopicQueue] = useState<Topic[]>([]); // For endless mode
   const [currentItem, setCurrentItem] = useState<TopicItem | null>(null);
   const [itemQueue, setItemQueue] = useState<TopicItem[]>([]);
+  const [selectedHanzi, setSelectedHanzi] = useState<string | null>(null);
+  const [completedHanzi, setCompletedHanzi] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
@@ -118,38 +125,50 @@ export default function HanziVisualGame() {
   }, [phase, playAudio]);
 
   // Start game with a specific topic
-  const startTopic = useCallback((topic: Topic) => {
+  const startTopic = useCallback((topic: Topic, gameDirection: GameDirection = direction) => {
     const queue = generateTopicQueue(topic);
+    const firstItem = queue[0];
     setCurrentTopic(topic);
     setItemQueue(queue.slice(1));
-    setCurrentItem(queue[0]);
+    setCurrentItem(firstItem);
     setMode('single-topic');
+    setDirection(gameDirection);
     setScore(0);
     setStreak(0);
     setQuestionsAnswered(0);
     setCorrectAnswers(0);
     setSelectedPosition(null);
+    setSelectedHanzi(null);
     setFeedback(null);
     setCompletedPositions(new Set());
+    setCompletedHanzi(new Set());
     setHadWrongAttempt(false);
     setPhase('playing');
     lastPlayedItemRef.current = null; // Reset to allow auto-play
-  }, []);
+  }, [direction]);
 
   // Start endless mode
   const startEndless = useCallback(() => {
-    const queue = generateEndlessQueue(topics, 3);
-    setCurrentTopic(topics[0]); // Use first topic's layout initially
-    setItemQueue(queue.slice(1));
-    setCurrentItem(queue[0]);
+    const shuffledTopics = generateEndlessTopicQueue(topics);
+    const firstTopic = shuffledTopics[0];
+    const itemsQueue = generateTopicQueue(firstTopic);
+    const randomDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
+
+    setTopicQueue(shuffledTopics.slice(1));
+    setCurrentTopic(firstTopic);
+    setItemQueue(itemsQueue.slice(1));
+    setCurrentItem(itemsQueue[0]);
     setMode('endless');
+    setDirection(randomDirection);
     setScore(0);
     setStreak(0);
     setQuestionsAnswered(0);
     setCorrectAnswers(0);
     setSelectedPosition(null);
+    setSelectedHanzi(null);
     setFeedback(null);
     setCompletedPositions(new Set());
+    setCompletedHanzi(new Set());
     setHadWrongAttempt(false);
     setPhase('playing');
     lastPlayedItemRef.current = null; // Reset to allow auto-play
@@ -180,23 +199,29 @@ export default function HanziVisualGame() {
       // Move to next item after feedback delay
       setTimeout(() => {
         if (itemQueue.length > 0) {
-          // In endless mode, find the topic for the next item
-          if (mode === 'endless') {
-            const nextItem = itemQueue[0];
-            const nextTopic = topics.find(t =>
-              t.items.some(i => i.hanzi === nextItem.hanzi)
-            );
-            if (nextTopic && nextTopic.id !== currentTopic?.id) {
-              setCurrentTopic(nextTopic);
-              setCompletedPositions(new Set()); // Reset for new topic
-            }
-          }
+          // More items in current topic
           setCurrentItem(itemQueue[0]);
           setItemQueue(prev => prev.slice(1));
           setSelectedPosition(null);
           setFeedback(null);
-          setHadWrongAttempt(false); // Reset for next item
-          lastPlayedItemRef.current = null; // Reset to allow auto-play for next item
+          setHadWrongAttempt(false);
+          lastPlayedItemRef.current = null;
+        } else if (mode === 'endless' && topicQueue.length > 0) {
+          // Move to next topic in endless mode with random direction
+          const nextTopic = topicQueue[0];
+          const nextItems = generateTopicQueue(nextTopic);
+          const nextDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
+          setTopicQueue(prev => prev.slice(1));
+          setCurrentTopic(nextTopic);
+          setItemQueue(nextItems.slice(1));
+          setCurrentItem(nextItems[0]);
+          setDirection(nextDirection);
+          setCompletedPositions(new Set());
+          setCompletedHanzi(new Set());
+          setSelectedPosition(null);
+          setFeedback(null);
+          setHadWrongAttempt(false);
+          lastPlayedItemRef.current = null;
         } else {
           // Game complete
           if (score + points > highScore) {
@@ -210,13 +235,82 @@ export default function HanziVisualGame() {
       // Wrong answer - allow retry after brief feedback
       setFeedback('incorrect');
       setStreak(0);
-      setHadWrongAttempt(true); // Mark that this item had a wrong attempt
+      setHadWrongAttempt(true);
       setTimeout(() => {
         setSelectedPosition(null);
         setFeedback(null);
       }, 600);
     }
-  }, [currentItem, feedback, itemQueue, mode, score, streak, highScore, completedPositions, currentTopic, hadWrongAttempt]);
+  }, [currentItem, feedback, itemQueue, topicQueue, mode, score, streak, highScore, completedPositions, hadWrongAttempt]);
+
+  // Handle Hanzi selection in reverse mode (emoji-to-hanzi)
+  const handleHanziSelect = useCallback((hanzi: string) => {
+    if (!currentItem || !currentTopic || feedback) return;
+    // Don't allow selecting already completed hanzi
+    if (completedHanzi.has(hanzi)) return;
+
+    setSelectedHanzi(hanzi);
+    const isCorrect = checkReverseAnswer(currentItem, hanzi);
+
+    if (isCorrect) {
+      setFeedback('correct');
+      // Only award points and count as correct if no wrong attempts on this item
+      const points = hadWrongAttempt ? 0 : calculateScore(streak + 1);
+      if (!hadWrongAttempt) {
+        setStreak(prev => prev + 1);
+        setScore(prev => prev + points);
+        setCorrectAnswers(prev => prev + 1);
+      }
+      setQuestionsAnswered(prev => prev + 1);
+      // Mark this hanzi as completed
+      setCompletedHanzi(prev => new Set([...prev, hanzi]));
+
+      // Move to next item after feedback delay
+      setTimeout(() => {
+        if (itemQueue.length > 0) {
+          // More items in current topic
+          setCurrentItem(itemQueue[0]);
+          setItemQueue(prev => prev.slice(1));
+          setSelectedHanzi(null);
+          setFeedback(null);
+          setHadWrongAttempt(false);
+          lastPlayedItemRef.current = null;
+        } else if (mode === 'endless' && topicQueue.length > 0) {
+          // Move to next topic in endless mode with random direction
+          const nextTopic = topicQueue[0];
+          const nextItems = generateTopicQueue(nextTopic);
+          const nextDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
+          setTopicQueue(prev => prev.slice(1));
+          setCurrentTopic(nextTopic);
+          setItemQueue(nextItems.slice(1));
+          setCurrentItem(nextItems[0]);
+          setDirection(nextDirection);
+          setCompletedPositions(new Set());
+          setCompletedHanzi(new Set());
+          setSelectedHanzi(null);
+          setFeedback(null);
+          setHadWrongAttempt(false);
+          lastPlayedItemRef.current = null;
+        } else {
+          // Game complete
+          if (score + points > highScore) {
+            setHighScore(score + points);
+            saveToStorage(STORAGE_KEYS.highScore, score + points);
+          }
+          setPhase('complete');
+        }
+      }, 1000);
+    } else {
+      // Wrong answer - allow retry after brief feedback
+      setFeedback('incorrect');
+      setStreak(0);
+      setHadWrongAttempt(true);
+      setTimeout(() => {
+        setSelectedHanzi(null);
+        setFeedback(null);
+      }, 600);
+    }
+  }, [currentItem, currentTopic, feedback, itemQueue, topicQueue, mode, score, streak, highScore, hadWrongAttempt, completedHanzi]);
 
   // Return to topic selection
   const returnToTopics = useCallback(() => {
@@ -226,10 +320,34 @@ export default function HanziVisualGame() {
     setItemQueue([]);
   }, []);
 
-  // Render visual area based on topic layout type
+  // Reset current game
+  const resetGame = useCallback(() => {
+    if (mode === 'endless') {
+      startEndless();
+    } else if (currentTopic) {
+      startTopic(currentTopic, direction);
+    }
+  }, [currentTopic, mode, direction, startTopic, startEndless]);
+
+  // Render visual area based on topic layout type and direction
   const renderVisualArea = () => {
     if (!currentTopic || !currentItem) return null;
 
+    // In reverse mode (emoji-to-hanzi), always show HanziGrid
+    if (direction === 'emoji-to-hanzi') {
+      return (
+        <HanziGrid
+          items={currentTopic.items}
+          columns={currentTopic.gridColumns || 3}
+          onSelect={handleHanziSelect}
+          feedback={feedback}
+          selectedHanzi={selectedHanzi}
+          completedHanzi={completedHanzi}
+        />
+      );
+    }
+
+    // Normal mode (hanzi-to-emoji) - use layout-specific components
     const commonProps = {
       items: currentTopic.items,
       onSelect: handleSelect,
@@ -261,6 +379,8 @@ export default function HanziVisualGame() {
       <div className="hanzi-visual-game">
         <TopicSelector
           topics={topics}
+          direction={direction}
+          onDirectionChange={setDirection}
           onSelectTopic={startTopic}
           onStartEndless={startEndless}
         />
@@ -293,10 +413,30 @@ export default function HanziVisualGame() {
             <button
               type="button"
               className="btn btn-primary"
-              onClick={() => currentTopic && startTopic(currentTopic)}
+              onClick={() => {
+                if (mode === 'endless') {
+                  startEndless();
+                } else if (currentTopic) {
+                  startTopic(currentTopic, direction);
+                }
+              }}
             >
               Play Again
             </button>
+            {mode !== 'endless' && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  const reverseDirection = direction === 'hanzi-to-emoji' ? 'emoji-to-hanzi' : 'hanzi-to-emoji';
+                  if (currentTopic) {
+                    startTopic(currentTopic, reverseDirection);
+                  }
+                }}
+              >
+                Play Reverse
+              </button>
+            )}
             <button
               type="button"
               className="btn btn-secondary"
@@ -320,6 +460,8 @@ export default function HanziVisualGame() {
       {currentItem && (
         <GameHUD
           hanzi={currentItem.hanzi}
+          emoji={currentItem.emoji}
+          meaning={currentItem.meaning}
           pinyin={getPinyinDisplay(currentItem.pinyin)}
           score={score}
           streak={streak}
@@ -329,6 +471,9 @@ export default function HanziVisualGame() {
           }}
           onPlayAudio={playAudio}
           isPlayingAudio={isPlayingAudio}
+          direction={direction}
+          onBack={returnToTopics}
+          onReset={resetGame}
         />
       )}
 

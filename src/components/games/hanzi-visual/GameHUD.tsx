@@ -1,31 +1,69 @@
 /**
- * GameHUD - Displays current Hanzi, score, and controls
+ * GameHUD - Displays current Hanzi or Emoji, score, and controls
  */
+
+import type { GameDirection } from './visualGameEngine';
 
 interface GameHUDProps {
   hanzi: string;
+  emoji?: string;
+  meaning?: string;
   pinyin?: string;
   score: number;
   streak: number;
   progress: { current: number; total: number };
   onPlayAudio: () => void;
   isPlayingAudio: boolean;
+  direction: GameDirection;
+  onBack: () => void;
+  onReset: () => void;
 }
 
 export default function GameHUD({
   hanzi,
+  emoji,
+  meaning,
   pinyin,
   score,
   streak,
   progress,
   onPlayAudio,
   isPlayingAudio,
+  direction,
+  onBack,
+  onReset,
 }: GameHUDProps) {
+  const isReverse = direction === 'emoji-to-hanzi';
+
   return (
     <div className="game-hud">
-      <div className="current-hanzi">{hanzi}</div>
+      <div className="hud-nav">
+        <button
+          type="button"
+          className="nav-btn"
+          onClick={onBack}
+          aria-label="Back to topics"
+        >
+          ←
+        </button>
+        <button
+          type="button"
+          className="nav-btn"
+          onClick={onReset}
+          aria-label="Reset game"
+        >
+          ↺
+        </button>
+      </div>
+
+      {isReverse ? (
+        <div className="current-emoji">{emoji}</div>
+      ) : (
+        <div className="current-hanzi">{hanzi}</div>
+      )}
 
       <div className="audio-row">
+        {isReverse && meaning && <span className="current-meaning">{meaning}</span>}
         <button
           type="button"
           className="audio-btn"

@@ -125,25 +125,62 @@
   color: var(--color-text-tertiary);
 }
 
+/* Direction Toggle */
+.direction-toggle {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.direction-toggle .toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-lg);
+}
+
+.direction-toggle .toggle-btn:hover {
+  border-color: var(--color-primary);
+}
+
+.direction-toggle .toggle-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.direction-toggle .toggle-icon {
+  font-size: var(--font-size-xl);
+}
+
+.direction-toggle .toggle-arrow {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+}
+
 .endless-mode-btn {
   display: block;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto var(--spacing-xl);
-  padding: var(--spacing-md) var(--spacing-xl);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-info));
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  margin: 0 auto var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .endless-mode-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary);
+  color: var(--color-text);
 }
 
 /* Game HUD */
@@ -154,6 +191,36 @@
   padding: var(--spacing-md);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+
+.hud-nav {
+  position: absolute;
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.nav-btn {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  width: 36px;
+  height: 36px;
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.nav-btn:hover {
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+  color: var(--color-text);
 }
 
 .current-hanzi {
@@ -163,6 +230,19 @@
   line-height: 1;
   margin-bottom: var(--spacing-sm);
   font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* Emoji display for reverse mode */
+.prompt-text {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.current-emoji {
+  font-size: clamp(5rem, 18vw, 10rem);
+  line-height: 1;
+  margin-bottom: var(--spacing-sm);
 }
 
 .audio-row {
@@ -182,6 +262,14 @@
   position: absolute;
   left: 50%;
   margin-left: 36px;
+}
+
+.current-meaning {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  position: absolute;
+  right: 50%;
+  margin-right: 36px;
 }
 
 .game-stats {
@@ -245,6 +333,105 @@
 .emoji-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .emoji-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
 
+/* Hanzi Grid Layout (Reverse Mode) */
+.hanzi-grid {
+  display: grid;
+  gap: var(--spacing-md);
+  max-width: 500px;
+  width: 100%;
+}
+
+.hanzi-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.hanzi-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.hanzi-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.hanzi-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  background: var(--color-surface);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 120px;
+}
+
+.hanzi-option:hover {
+  border-color: var(--color-primary);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.hanzi-option.correct {
+  border-color: var(--color-success);
+  background: rgba(39, 174, 96, 0.1);
+  animation: correctPulse 0.5s ease;
+}
+
+.hanzi-option.incorrect {
+  border-color: var(--color-error);
+  background: rgba(231, 76, 60, 0.1);
+  animation: shake 0.5s ease;
+}
+
+.hanzi-option .hanzi-char {
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  font-weight: var(--font-weight-bold);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--color-text);
+}
+
+.hanzi-option.small-text .hanzi-char {
+  font-size: clamp(1rem, 4vw, 1.5rem);
+}
+
+.hanzi-option:disabled {
+  cursor: default;
+}
+
+.hanzi-option:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.hanzi-option.completed {
+  border-color: var(--color-success);
+  background: rgba(39, 174, 96, 0.15);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.hanzi-option.completed:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.hanzi-option.peeking {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  opacity: 1;
+}
+
+.hanzi-option .emoji-peek {
+  font-size: 2.5rem;
+}
+
+.hanzi-option .meaning {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.hanzi-option {
+  position: relative;
+}
+
 /* Clickable Region */
 .clickable-region {
   display: flex;
@@ -295,6 +482,10 @@
   margin-bottom: var(--spacing-xs);
 }
 
+.clickable-region.small-emoji .emoji {
+  font-size: 1.8rem;
+}
+
 .clickable-region .label {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
@@ -312,6 +503,34 @@
 
 .clickable-region {
   position: relative;
+}
+
+.clickable-region.completed {
+  cursor: pointer;
+}
+
+.clickable-region.peeking {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.clickable-region .peek-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.clickable-region .hanzi-peek {
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  font-weight: var(--font-weight-bold);
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: white;
+}
+
+.clickable-region .pinyin-peek {
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Direction Diagram Layout */
