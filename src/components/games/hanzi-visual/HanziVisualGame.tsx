@@ -15,6 +15,7 @@ import {
   type FeedbackType,
   generateTopicQueue,
   generateEndlessTopicQueue,
+  shuffleGridPositions,
   checkAnswer,
   checkReverseAnswer,
   calculateScore,
@@ -127,9 +128,11 @@ export default function HanziVisualGame() {
 
   // Start game with a specific topic
   const startTopic = useCallback((topic: Topic, gameDirection: GameDirection = direction) => {
-    const queue = generateTopicQueue(topic);
+    // Shuffle grid positions for emoji-grid layouts to prevent memorization
+    const shuffledTopic = shuffleGridPositions(topic);
+    const queue = generateTopicQueue(shuffledTopic);
     const firstItem = queue[0];
-    setCurrentTopic(topic);
+    setCurrentTopic(shuffledTopic);
     setItemQueue(queue.slice(1));
     setCurrentItem(firstItem);
     setMode('single-topic');
@@ -153,7 +156,7 @@ export default function HanziVisualGame() {
     if (filteredTopics.length === 0) return;
 
     const shuffledTopics = generateEndlessTopicQueue(filteredTopics);
-    const firstTopic = shuffledTopics[0];
+    const firstTopic = shuffleGridPositions(shuffledTopics[0]);
     const itemsQueue = generateTopicQueue(firstTopic);
     const randomDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
 
@@ -212,7 +215,7 @@ export default function HanziVisualGame() {
           lastPlayedItemRef.current = null;
         } else if (mode === 'endless' && topicQueue.length > 0) {
           // Move to next topic in endless mode with random direction
-          const nextTopic = topicQueue[0];
+          const nextTopic = shuffleGridPositions(topicQueue[0]);
           const nextItems = generateTopicQueue(nextTopic);
           const nextDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
           setTopicQueue(prev => prev.slice(1));
@@ -281,7 +284,7 @@ export default function HanziVisualGame() {
           lastPlayedItemRef.current = null;
         } else if (mode === 'endless' && topicQueue.length > 0) {
           // Move to next topic in endless mode with random direction
-          const nextTopic = topicQueue[0];
+          const nextTopic = shuffleGridPositions(topicQueue[0]);
           const nextItems = generateTopicQueue(nextTopic);
           const nextDirection: GameDirection = Math.random() < 0.5 ? 'hanzi-to-emoji' : 'emoji-to-hanzi';
           setTopicQueue(prev => prev.slice(1));

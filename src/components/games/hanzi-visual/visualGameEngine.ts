@@ -95,6 +95,28 @@ export function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+// Shuffle item positions for emoji-grid layouts (prevents position memorization)
+export function shuffleGridPositions(topic: Topic): Topic {
+  if (topic.layoutType !== 'emoji-grid') {
+    return topic;
+  }
+
+  // Get all positions and shuffle them
+  const positions = topic.items.map(item => item.position);
+  const shuffledPositions = shuffleArray([...positions]);
+
+  // Create new items with reassigned positions
+  const shuffledItems = topic.items.map((item, index) => ({
+    ...item,
+    position: shuffledPositions[index],
+  }));
+
+  return {
+    ...topic,
+    items: shuffledItems,
+  };
+}
+
 // Generate item queue for a topic
 export function generateTopicQueue(topic: Topic): TopicItem[] {
   return shuffleArray([...topic.items]);
