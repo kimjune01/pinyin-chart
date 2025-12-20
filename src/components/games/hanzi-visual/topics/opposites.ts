@@ -13,6 +13,7 @@ export const oppositesTopic: Topic = {
   difficulty: 2,
   layoutType: 'emoji-grid',
   gridColumns: 2,
+  shuffleMode: 'pairs',
   previewEmojis: ['🐘', '🐜', '🔥', '❄️'],
   items: [
     { hanzi: '大', pinyin: 'da4', meaning: 'big', emoji: '🐘', position: 0 },

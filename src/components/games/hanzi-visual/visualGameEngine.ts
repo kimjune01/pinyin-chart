@@ -46,6 +46,7 @@ export interface Topic {
   difficulty: 1 | 2 | 3;
   layoutType: 'emoji-grid' | 'family-tree' | 'direction-diagram';
   gridColumns?: number;
+  shuffleMode?: 'full' | 'pairs'; // 'pairs' only swaps within pairs (for opposites)
   items: TopicItem[];
   previewEmojis?: string[]; // For display in topic selector
 }
@@ -101,15 +102,33 @@ export function shuffleGridPositions(topic: Topic): Topic {
     return topic;
   }
 
-  // Get all positions and shuffle them
-  const positions = topic.items.map(item => item.position);
-  const shuffledPositions = shuffleArray([...positions]);
+  let shuffledItems: TopicItem[];
 
-  // Create new items with reassigned positions
-  const shuffledItems = topic.items.map((item, index) => ({
-    ...item,
-    position: shuffledPositions[index],
-  }));
+  if (topic.shuffleMode === 'pairs') {
+    // Only swap within pairs (for opposites layout)
+    // Items are in pairs: [0,1], [2,3], [4,5], etc.
+    shuffledItems = [];
+    for (let i = 0; i < topic.items.length; i += 2) {
+      const left = topic.items[i];
+      const right = topic.items[i + 1];
+      if (right && Math.random() < 0.5) {
+        // Swap positions within the pair
+        shuffledItems.push({ ...left, position: right.position });
+        shuffledItems.push({ ...right, position: left.position });
+      } else {
+        shuffledItems.push(left);
+        if (right) shuffledItems.push(right);
+      }
+    }
+  } else {
+    // Full shuffle - reassign all positions randomly
+    const positions = topic.items.map(item => item.position);
+    const shuffledPositions = shuffleArray([...positions]);
+    shuffledItems = topic.items.map((item, index) => ({
+      ...item,
+      position: shuffledPositions[index],
+    }));
+  }
 
   return {
     ...topic,
