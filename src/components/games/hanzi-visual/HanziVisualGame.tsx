@@ -37,6 +37,7 @@ export default function HanziVisualGame() {
   const [mode, setMode] = useState<GameMode>('single-topic');
   const [direction, setDirection] = useState<GameDirection>('hanzi-to-emoji');
   const [currentTopic, setCurrentTopic] = useState<Topic | null>(null);
+  const [originalTopic, setOriginalTopic] = useState<Topic | null>(null); // Unshuffled for replay
   const [topicQueue, setTopicQueue] = useState<Topic[]>([]); // For endless mode
   const [endlessTopicPool, setEndlessTopicPool] = useState<Topic[]>([]); // Topics used for endless restart
   const [currentItem, setCurrentItem] = useState<TopicItem | null>(null);
@@ -132,6 +133,7 @@ export default function HanziVisualGame() {
     const shuffledTopic = shuffleGridPositions(topic);
     const queue = generateTopicQueue(shuffledTopic);
     const firstItem = queue[0];
+    setOriginalTopic(topic); // Store original for replay with fresh shuffle
     setCurrentTopic(shuffledTopic);
     setItemQueue(queue.slice(1));
     setCurrentItem(firstItem);
@@ -331,10 +333,10 @@ export default function HanziVisualGame() {
   const resetGame = useCallback(() => {
     if (mode === 'endless') {
       startEndless(endlessTopicPool);
-    } else if (currentTopic) {
-      startTopic(currentTopic, direction);
+    } else if (originalTopic) {
+      startTopic(originalTopic, direction);
     }
-  }, [currentTopic, mode, direction, startTopic, startEndless, endlessTopicPool]);
+  }, [originalTopic, mode, direction, startTopic, startEndless, endlessTopicPool]);
 
   // Render visual area based on topic layout type and direction
   const renderVisualArea = () => {
@@ -423,8 +425,8 @@ export default function HanziVisualGame() {
               onClick={() => {
                 if (mode === 'endless') {
                   startEndless(endlessTopicPool);
-                } else if (currentTopic) {
-                  startTopic(currentTopic, direction);
+                } else if (originalTopic) {
+                  startTopic(originalTopic, direction);
                 }
               }}
             >
@@ -436,8 +438,8 @@ export default function HanziVisualGame() {
                 className="btn btn-secondary"
                 onClick={() => {
                   const reverseDirection = direction === 'hanzi-to-emoji' ? 'emoji-to-hanzi' : 'hanzi-to-emoji';
-                  if (currentTopic) {
-                    startTopic(currentTopic, reverseDirection);
+                  if (originalTopic) {
+                    startTopic(originalTopic, reverseDirection);
                   }
                 }}
               >
