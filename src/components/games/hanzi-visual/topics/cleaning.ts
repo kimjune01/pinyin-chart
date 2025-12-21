@@ -23,6 +23,6 @@ export const cleaningTopic: Topic = {
     { hanzi: '洗发水', pinyin: 'xi3fa4shui3', meaning: 'shampoo', emoji: '🧴', position: 5 },
     { hanzi: '卫生纸', pinyin: 'wei4sheng1zhi3', meaning: 'toilet paper', emoji: '🧻', position: 6 },
     { hanzi: '牙刷', pinyin: 'ya2shua1', meaning: 'toothbrush', emoji: '🪥', position: 7 },
-    { hanzi: '毛巾', pinyin: 'mao2jin1', meaning: 'towel', emoji: '🛁', position: 8 },
+    { hanzi: '马桶塞', pinyin: 'ma3tong3sai1', meaning: 'plunger', emoji: '🪠', position: 8 },
   ],
 };

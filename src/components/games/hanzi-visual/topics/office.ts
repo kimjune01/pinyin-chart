@@ -22,7 +22,7 @@ export const officeTopic: Topic = {
     { hanzi: '邮件', pinyin: 'you2jian4', meaning: 'email', emoji: '📧', position: 4 },
     { hanzi: '电话', pinyin: 'dian4hua4', meaning: 'phone', emoji: '📞', position: 5 },
     { hanzi: '日历', pinyin: 'ri4li4', meaning: 'calendar', emoji: '📅', position: 6 },
-    { hanzi: '订书机', pinyin: 'ding4shu1ji1', meaning: 'stapler', emoji: '🔗', position: 7 },
+    { hanzi: '计算器', pinyin: 'ji4suan4qi4', meaning: 'calculator', emoji: '🧮', position: 7 },
     { hanzi: '回形针', pinyin: 'hui2xing2zhen1', meaning: 'paperclip', emoji: '📎', position: 8 },
   ],
 };

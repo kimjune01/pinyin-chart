@@ -2,20 +2,66 @@
  * PinyinTyper - Type a syllable and select a tone to hear it
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { PINYIN_SYLLABLES } from '../../data/pinyinSyllables';
+import { HSK_CHARACTERS } from '../../data/hskCharacters';
 import { audioService } from '../../lib/audio/AudioService';
 import { addToneMarks } from '../../lib/utils/pinyinUtils';
 import ToneIcon from '../shared/ToneIcon';
+import HanziCard from '../hanzi/HanziCard';
 
 export default function PinyinTyper() {
   const [input, setInput] = useState('');
   const [lastPlayed, setLastPlayed] = useState<string | null>(null);
+  const [selectedTone, setSelectedTone] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Find hanzi that match the current syllable+tone
+  const matchingHanzi = useMemo(() => {
+    const syllable = input.trim().toLowerCase();
+    if (!syllable) return [];
+
+    // The pinyin format in HSK_CHARACTERS is like "wo3", "ni3", "wo3men5", etc.
+    // We need to match syllables within multi-syllable words too
+    const results = HSK_CHARACTERS.filter(char => {
+      const pinyinWithTones = char.pinyin.toLowerCase();
+
+      // Split pinyin into individual syllables (e.g., "wo3men5" -> ["wo3", "men5"])
+      const syllables = pinyinWithTones.match(/[a-zü]+[0-9]/g) || [];
+
+      // Check if any syllable matches
+      const matchingSyllable = syllables.find(s => {
+        const baseSyllable = s.replace(/[0-9]/g, '');
+        const tone = parseInt(s.match(/[0-9]/)?.[0] || '0');
+
+        if (baseSyllable !== syllable) return false;
+
+        // If tone is selected, also filter by tone
+        if (selectedTone !== null) {
+          return tone === selectedTone;
+        }
+
+        return true;
+      });
+
+      return !!matchingSyllable;
+    });
+
+    // Sort: single characters first, then by HSK level
+    return results.sort((a, b) => {
+      if (a.hanzi.length !== b.hanzi.length) {
+        return a.hanzi.length - b.hanzi.length;
+      }
+      return a.level - b.level;
+    });
+  }, [input, selectedTone]);
+
   const handleToneClick = useCallback(async (tone: number) => {
     const syllable = input.trim().toLowerCase();
+
+    // Update selected tone for hanzi display
+    setSelectedTone(tone);
 
     if (!syllable) {
       setError('Type a syllable first');
@@ -58,6 +104,7 @@ export default function PinyinTyper() {
     const value = e.target.value.replace(/[^a-züA-ZÜ]/g, '').toLowerCase();
     setInput(value);
     setError(null);
+    setSelectedTone(null); // Reset tone selection when input changes
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -113,6 +160,20 @@ export default function PinyinTyper() {
           <div className="pinyin-typer-hint">Type a syllable, then press 1-4 or click a tone</div>
         )}
       </div>
+
+      {/* Display matching hanzi from HSK characters */}
+      {matchingHanzi.length > 0 && (
+        <div className="pinyin-typer-hanzi">
+          <div className="pinyin-typer-hanzi-label">
+            Hanzi with this pronunciation:
+          </div>
+          <div className="pinyin-typer-hanzi-list">
+            {matchingHanzi.map((char, idx) => (
+              <HanziCard key={`${char.hanzi}-${idx}`} character={char} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

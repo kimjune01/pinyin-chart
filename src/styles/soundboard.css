@@ -609,6 +609,27 @@ tr.highlighted .final-header {
   font-size: var(--font-size-sm);
 }
 
+/* Hanzi display section */
+.pinyin-typer-hanzi {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.pinyin-typer-hanzi-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.pinyin-typer-hanzi-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
 @media (max-width: 768px) {
   .pinyin-typer {
     padding: var(--spacing-lg);
