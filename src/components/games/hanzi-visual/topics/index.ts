@@ -56,6 +56,8 @@ import { seasonsTopic } from './seasons';
 import { shoppingTopic } from './shopping';
 import { pronounsTopic } from './pronouns';
 import { cookingTopic } from './cooking';
+import { mathTopic } from './math';
+import { plantsTopic } from './plants';
 
 // All available topics
 export const topics: Topic[] = [
@@ -82,6 +84,7 @@ export const topics: Topic[] = [
   greetingsTopic,
   shoppingTopic,
   pronounsTopic,
+  plantsTopic,
   // Difficulty 2
   directionsTopic,
   positionsTopic,
@@ -113,6 +116,7 @@ export const topics: Topic[] = [
   reptilesTopic,
   seasonsTopic,
   cookingTopic,
+  mathTopic,
   // Difficulty 3
   zodiacTopic,
 ];
