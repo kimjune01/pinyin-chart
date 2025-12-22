@@ -13,10 +13,10 @@ export const schoolTopic: Topic = {
   difficulty: 1,
   layoutType: 'emoji-grid',
   gridColumns: 3,
-  previewEmojis: ['📚', '✏️', '🎒'],
+  previewEmojis: ['📚', '🖊️', '🎒'],
   items: [
     { hanzi: '书', pinyin: 'shu1', meaning: 'book', emoji: '📚', position: 0 },
-    { hanzi: '笔', pinyin: 'bi3', meaning: 'pen', emoji: '✏️', position: 1 },
+    { hanzi: '笔', pinyin: 'bi3', meaning: 'pen', emoji: '🖊️', position: 1 },
     { hanzi: '书包', pinyin: 'shu1bao1', meaning: 'backpack', emoji: '🎒', position: 2 },
     { hanzi: '本子', pinyin: 'ben3zi5', meaning: 'notebook', emoji: '📓', position: 3 },
     { hanzi: '尺子', pinyin: 'chi3zi5', meaning: 'ruler', emoji: '📏', position: 4 },
