@@ -21,28 +21,76 @@ export default function SentenceBuilder() {
   const [selectedWords, setSelectedWords] = useState<Record<string, Word | null>>({});
   const [isPlaying, setIsPlaying] = useState(false);
   const [isQuestion, setIsQuestion] = useState(false);
+  const [isNegated, setIsNegated] = useState(false);
+
+  // Patterns that support negation toggle
+  const supportsNegation = [
+    'adj-pattern', 'noun-pattern', 'verb-pattern', 'go-pattern',
+    'location-pattern', 'have-pattern', 'can-pattern', 'want-pattern'
+  ].includes(selectedPattern.id);
 
   // Build the sentence from selected words
   const buildSentence = useCallback(() => {
     const parts: { hanzi: string; pinyin: string; english: string }[] = [];
 
+    const connectorMap: Record<string, { pinyin: string; english: string }> = {
+      '很': { pinyin: 'hěn', english: 'very' },
+      '是': { pinyin: 'shì', english: 'is' },
+      '不': { pinyin: 'bù', english: 'not' },
+      '不是': { pinyin: 'bú shì', english: 'is not' },
+      '想去': { pinyin: 'xiǎng qù', english: 'want to go' },
+      '不想去': { pinyin: 'bù xiǎng qù', english: "don't want to go" },
+      '去': { pinyin: 'qù', english: 'go to' },
+      '有多少': { pinyin: 'yǒu duōshao', english: 'have how many' },
+      '为什么': { pinyin: 'wèishénme', english: 'why' },
+      '什么时候': { pinyin: 'shénme shíhou', english: 'when' },
+      '在': { pinyin: 'zài', english: 'at' },
+      '不在': { pinyin: 'bú zài', english: 'not at' },
+      '有': { pinyin: 'yǒu', english: 'have' },
+      '没有': { pinyin: 'méiyǒu', english: "don't have" },
+      '会': { pinyin: 'huì', english: 'can' },
+      '不会': { pinyin: 'bú huì', english: "can't" },
+      '想': { pinyin: 'xiǎng', english: 'want to' },
+      '不想': { pinyin: 'bù xiǎng', english: "don't want to" },
+      '太': { pinyin: 'tài', english: 'too' },
+    };
+
     for (const slot of selectedPattern.slots) {
       // Add connector if present
       if (slot.connector) {
+        let connector = slot.connector;
+
+        // Apply negation transformations
+        if (isNegated && supportsNegation) {
+          if (selectedPattern.id === 'adj-pattern' && connector === '很') {
+            connector = '不';
+          } else if (selectedPattern.id === 'noun-pattern' && connector === '是') {
+            connector = '不是';
+          } else if (selectedPattern.id === 'go-pattern' && connector === '想去') {
+            connector = '不想去';
+          } else if (selectedPattern.id === 'location-pattern' && connector === '在') {
+            connector = '不在';
+          } else if (selectedPattern.id === 'have-pattern' && connector === '有') {
+            connector = '没有'; // Special: 有 uses 没有, not 不有
+          } else if (selectedPattern.id === 'can-pattern' && connector === '会') {
+            connector = '不会';
+          } else if (selectedPattern.id === 'want-pattern' && connector === '想') {
+            connector = '不想';
+          }
+        }
+
+        const info = connectorMap[connector] || { pinyin: connector, english: connector };
         parts.push({
-          hanzi: slot.connector,
-          pinyin: slot.connector === '很' ? 'hěn' :
-                  slot.connector === '是' ? 'shì' :
-                  slot.connector === '不' ? 'bù' :
-                  slot.connector === '不是' ? 'bú shì' :
-                  slot.connector === '想去' ? 'xiǎng qù' :
-                  slot.connector,
-          english: slot.connector === '很' ? 'very' :
-                   slot.connector === '是' ? 'is' :
-                   slot.connector === '不' ? 'not' :
-                   slot.connector === '不是' ? 'is not' :
-                   slot.connector === '想去' ? 'want to go' :
-                   slot.connector,
+          hanzi: connector,
+          pinyin: info.pinyin,
+          english: info.english,
+        });
+      } else if (isNegated && supportsNegation && selectedPattern.id === 'verb-pattern' && slot.id === 'verb') {
+        // For verb-pattern, add 不 before the verb (which has no connector)
+        parts.push({
+          hanzi: '不',
+          pinyin: 'bù',
+          english: "don't",
         });
       }
 
@@ -52,13 +100,18 @@ export default function SentenceBuilder() {
       }
     }
 
+    // Add 了 suffix for too-pattern
+    if (selectedPattern.id === 'too-pattern' && selectedWords['adjective']) {
+      parts.push({ hanzi: '了', pinyin: 'le', english: '!' });
+    }
+
     // Add 吗 if question toggle is enabled
     if (isQuestion) {
       parts.push({ hanzi: '吗?', pinyin: 'ma', english: '?' });
     }
 
     return parts;
-  }, [selectedPattern, selectedWords, isQuestion]);
+  }, [selectedPattern, selectedWords, isQuestion, isNegated, supportsNegation]);
 
   const sentenceParts = buildSentence();
   const isComplete = selectedPattern.slots.every(slot => selectedWords[slot.id]);
@@ -75,16 +128,8 @@ export default function SentenceBuilder() {
       });
     }
 
-    // Tip: 不 with adjectives (not 不是)
-    if (selectedPattern.id === 'neg-adj-pattern') {
-      feedback.push({
-        type: 'tip',
-        message: "To negate adjectives, use 不 directly before the adjective, not 不是. Say \"我不累\", not \"我不是累\".",
-      });
-    }
-
     // Warning: 有 should use 没有, not 不有
-    if (selectedPattern.id === 'neg-verb-pattern') {
+    if (isNegated && selectedPattern.id === 'verb-pattern') {
       const selectedVerb = selectedWords['verb'];
       if (selectedVerb?.hanzi === '有') {
         feedback.push({
@@ -92,6 +137,73 @@ export default function SentenceBuilder() {
           message: "⚠️ 有 (yǒu) is ALWAYS negated with 没有 (méiyǒu), never 不有! Say \"我没有钱\", not \"我不有钱\".",
         });
       }
+    }
+
+    // Tip: Negation patterns
+    if (isNegated && supportsNegation) {
+      if (selectedPattern.id === 'adj-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "To negate adjectives, use 不 directly before the adjective. The 很 is removed.",
+        });
+      } else if (selectedPattern.id === 'noun-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "To negate 是, use 不是 (bú shì) meaning \"is not\".",
+        });
+      } else if (selectedPattern.id === 'verb-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "To negate most verbs, put 不 before the verb. Exception: 有 uses 没有.",
+        });
+      } else if (selectedPattern.id === 'go-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "不想去 means \"don't want to go\". 不 negates 想, not 去.",
+        });
+      } else if (selectedPattern.id === 'location-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "不在 means \"not at\" or \"not present\". Use this to say someone isn't somewhere.",
+        });
+      } else if (selectedPattern.id === 'have-pattern') {
+        feedback.push({
+          type: 'correct',
+          message: "有 is ALWAYS negated with 没有 (méiyǒu), never 不有. This is automatic!",
+        });
+      } else if (selectedPattern.id === 'can-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "不会 means \"can't\" or \"don't know how to\". It negates learned abilities.",
+        });
+      } else if (selectedPattern.id === 'want-pattern') {
+        feedback.push({
+          type: 'tip',
+          message: "不想 means \"don't want to\". Use this to politely decline or express disinterest.",
+        });
+      }
+    }
+
+    // Pattern-specific tips (non-negated)
+    if (selectedPattern.id === 'have-pattern' && !isNegated) {
+      feedback.push({
+        type: 'tip',
+        message: "有 (yǒu) expresses possession. Remember: negate with 没有, never 不有!",
+      });
+    }
+
+    if (selectedPattern.id === 'can-pattern' && !isNegated) {
+      feedback.push({
+        type: 'tip',
+        message: "会 (huì) indicates learned skills or abilities. For physical ability, use 能 (néng).",
+      });
+    }
+
+    if (selectedPattern.id === 'too-pattern') {
+      feedback.push({
+        type: 'tip',
+        message: "太...了 is an emphatic pattern. It can express \"too much\" or strong emotion (太好了 = Great!).",
+      });
     }
 
     // Tip: 吗 questions
@@ -103,7 +215,7 @@ export default function SentenceBuilder() {
     }
 
     return feedback;
-  }, [selectedPattern, selectedWords, isQuestion]);
+  }, [selectedPattern, selectedWords, isQuestion, isNegated, supportsNegation]);
 
   const grammarFeedback = getGrammarFeedback();
 
@@ -155,6 +267,8 @@ export default function SentenceBuilder() {
     if (pattern) {
       setSelectedPattern(pattern);
       setSelectedWords({});
+      setIsNegated(false);
+      setIsQuestion(false);
     }
   };
 
@@ -173,11 +287,24 @@ export default function SentenceBuilder() {
           value={selectedPattern.id}
           onChange={(e) => handlePatternChange(e.target.value)}
         >
-          {sentencePatterns.map(pattern => (
-            <option key={pattern.id} value={pattern.id}>
-              {pattern.name}
-            </option>
-          ))}
+          <optgroup label="Statements">
+            {sentencePatterns
+              .filter(pattern => pattern.category === 'statement')
+              .map(pattern => (
+                <option key={pattern.id} value={pattern.id}>
+                  {pattern.name}
+                </option>
+              ))}
+          </optgroup>
+          <optgroup label="Questions">
+            {sentencePatterns
+              .filter(pattern => pattern.category === 'question')
+              .map(pattern => (
+                <option key={pattern.id} value={pattern.id}>
+                  {pattern.name}
+                </option>
+              ))}
+          </optgroup>
         </select>
         <p className="pattern-description">{selectedPattern.description}</p>
       </div>
@@ -192,44 +319,108 @@ export default function SentenceBuilder() {
 
       {/* Word Selection Slots */}
       <div className="slots-section">
-        {selectedPattern.slots.map((slot, index) => (
-          <div key={slot.id} className="slot-group">
-            {/* Show connector before slot (except for first slot) */}
-            {slot.connector && (
-              <div className="connector">
-                <span className="connector-hanzi">{slot.connector}</span>
-                <span className="connector-pinyin">
-                  {slot.connector === '很' ? 'hěn' :
-                   slot.connector === '是' ? 'shì' :
-                   slot.connector === '不' ? 'bù' :
-                   slot.connector === '不是' ? 'bú shì' :
-                   slot.connector === '想去' ? 'xiǎng qù' :
-                   ''}
-                </span>
-              </div>
-            )}
+        {selectedPattern.slots.map((slot, index) => {
+          // Determine if negation toggle should appear before this slot
+          const showNegationToggle = supportsNegation && (
+            // For verb-pattern: show before verb slot
+            (selectedPattern.id === 'verb-pattern' && slot.id === 'verb') ||
+            // For patterns with connectors that get negated: show at connector position
+            (selectedPattern.id === 'adj-pattern' && slot.connector === '很') ||
+            (selectedPattern.id === 'noun-pattern' && slot.connector === '是') ||
+            (selectedPattern.id === 'go-pattern' && slot.connector === '想去') ||
+            (selectedPattern.id === 'location-pattern' && slot.connector === '在') ||
+            (selectedPattern.id === 'have-pattern' && slot.connector === '有') ||
+            (selectedPattern.id === 'can-pattern' && slot.connector === '会') ||
+            (selectedPattern.id === 'want-pattern' && slot.connector === '想')
+          );
 
-            <div className="slot">
-              <label className="slot-label">{slot.label}</label>
-              <div className="word-grid">
-                {slot.words.map(word => (
-                  <button
-                    key={word.hanzi}
-                    className={`word-btn ${selectedWords[slot.id]?.hanzi === word.hanzi ? 'selected' : ''}`}
-                    onClick={() => {
-                      selectWord(slot.id, word);
-                      playWord(word);
-                    }}
-                  >
-                    <span className="word-hanzi">{word.hanzi}</span>
-                    <span className="word-pinyin">{word.pinyin}</span>
-                    <span className="word-english">{word.english}</span>
-                  </button>
-                ))}
+          // Connector pinyin lookup
+          const connectorPinyinMap: Record<string, string> = {
+            '很': 'hěn', '是': 'shì', '不': 'bù', '不是': 'bú shì',
+            '想去': 'xiǎng qù', '不想去': 'bù xiǎng qù',
+            '在': 'zài', '不在': 'bú zài',
+            '有': 'yǒu', '没有': 'méiyǒu',
+            '会': 'huì', '不会': 'bú huì',
+            '想': 'xiǎng', '不想': 'bù xiǎng',
+            '太': 'tài', '去': 'qù',
+            '有多少': 'yǒu duōshao', '为什么': 'wèishénme', '什么时候': 'shénme shíhou',
+          };
+
+          // Get the display connector (modified by negation state)
+          const getConnectorDisplay = () => {
+            if (!slot.connector) return null;
+
+            let hanzi = slot.connector;
+
+            if (isNegated && supportsNegation) {
+              if (selectedPattern.id === 'adj-pattern' && slot.connector === '很') {
+                hanzi = '不';
+              } else if (selectedPattern.id === 'noun-pattern' && slot.connector === '是') {
+                hanzi = '不是';
+              } else if (selectedPattern.id === 'go-pattern' && slot.connector === '想去') {
+                hanzi = '不想去';
+              } else if (selectedPattern.id === 'location-pattern' && slot.connector === '在') {
+                hanzi = '不在';
+              } else if (selectedPattern.id === 'have-pattern' && slot.connector === '有') {
+                hanzi = '没有';
+              } else if (selectedPattern.id === 'can-pattern' && slot.connector === '会') {
+                hanzi = '不会';
+              } else if (selectedPattern.id === 'want-pattern' && slot.connector === '想') {
+                hanzi = '不想';
+              }
+            }
+
+            return { hanzi, pinyin: connectorPinyinMap[hanzi] || '' };
+          };
+
+          const connectorDisplay = getConnectorDisplay();
+
+          return (
+            <div key={slot.id} className="slot-group">
+              {/* For verb-pattern: show negation toggle before verb (no connector) */}
+              {showNegationToggle && selectedPattern.id === 'verb-pattern' && (
+                <div
+                  className={`negation-toggle inline ${isNegated ? 'active' : ''}`}
+                  onClick={() => setIsNegated(!isNegated)}
+                >
+                  <span className="connector-hanzi">不</span>
+                  <span className="connector-pinyin">bù</span>
+                </div>
+              )}
+
+              {/* Show connector with integrated negation toggle for other patterns */}
+              {slot.connector && (
+                <div
+                  className={`connector ${showNegationToggle ? 'toggleable' : ''} ${isNegated && showNegationToggle ? 'negated' : ''}`}
+                  onClick={showNegationToggle ? () => setIsNegated(!isNegated) : undefined}
+                >
+                  <span className="connector-hanzi">{connectorDisplay?.hanzi}</span>
+                  <span className="connector-pinyin">{connectorDisplay?.pinyin}</span>
+                </div>
+              )}
+
+              <div className="slot">
+                <label className="slot-label">{slot.label}</label>
+                <div className="word-grid">
+                  {slot.words.map(word => (
+                    <button
+                      key={word.hanzi}
+                      className={`word-btn ${selectedWords[slot.id]?.hanzi === word.hanzi ? 'selected' : ''}`}
+                      onClick={() => {
+                        selectWord(slot.id, word);
+                        playWord(word);
+                      }}
+                    >
+                      <span className="word-hanzi">{word.hanzi}</span>
+                      <span className="word-pinyin">{word.pinyin}</span>
+                      <span className="word-english">{word.english}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Question toggle */}
         <div className="question-toggle">
@@ -421,6 +612,47 @@ export default function SentenceBuilder() {
 
         .question-toggle:has(input:not(:checked)) {
           opacity: 0.4;
+        }
+
+        /* Inline negation toggle for verb-pattern */
+        .negation-toggle.inline {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          gap: var(--spacing-md);
+          padding: var(--spacing-md) var(--spacing-lg);
+          background: var(--color-border);
+          border-radius: var(--radius-lg);
+          width: 100%;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          opacity: 0.4;
+        }
+
+        .negation-toggle.inline:hover {
+          opacity: 0.7;
+        }
+
+        .negation-toggle.inline.active {
+          opacity: 1;
+          background: rgba(220, 53, 69, 0.15);
+        }
+
+        /* Toggleable connectors */
+        .connector.toggleable {
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 2px dashed transparent;
+        }
+
+        .connector.toggleable:hover {
+          border-color: var(--color-primary);
+        }
+
+        .connector.toggleable.negated {
+          background: rgba(220, 53, 69, 0.15);
+          border: 2px solid rgba(220, 53, 69, 0.3);
         }
 
         .toggle-label {

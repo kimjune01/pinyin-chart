@@ -18,6 +18,7 @@ export interface Word {
 export interface SentencePattern {
   id: string;
   name: string;
+  category: 'statement' | 'question';
   description: string;
   template: string; // e.g., "{subject} + 很 + {adjective}"
   slots: PatternSlot[];
@@ -135,10 +136,59 @@ const places: Word[] = [
   { hanzi: '家', pinyin: 'jiā', english: 'home' },
 ];
 
+// Question words
+const questionWords: Word[] = [
+  { hanzi: '什么', pinyin: 'shénme', english: 'what' },
+  { hanzi: '谁', pinyin: 'shéi', english: 'who' },
+  { hanzi: '哪里', pinyin: 'nǎlǐ', english: 'where' },
+  { hanzi: '哪个', pinyin: 'nǎge', english: 'which' },
+  { hanzi: '怎么', pinyin: 'zěnme', english: 'how' },
+  { hanzi: '为什么', pinyin: 'wèishénme', english: 'why' },
+  { hanzi: '几', pinyin: 'jǐ', english: 'how many' },
+  { hanzi: '多少', pinyin: 'duōshao', english: 'how much' },
+];
+
+// Skills for 会 pattern
+const skills: Word[] = [
+  { hanzi: '说中文', pinyin: 'shuō zhōngwén', english: 'speak Chinese' },
+  { hanzi: '说英文', pinyin: 'shuō yīngwén', english: 'speak English' },
+  { hanzi: '做饭', pinyin: 'zuò fàn', english: 'cook' },
+  { hanzi: '开车', pinyin: 'kāi chē', english: 'drive' },
+  { hanzi: '游泳', pinyin: 'yóuyǒng', english: 'swim' },
+  { hanzi: '唱歌', pinyin: 'chàng gē', english: 'sing' },
+  { hanzi: '跳舞', pinyin: 'tiào wǔ', english: 'dance' },
+  { hanzi: '写汉字', pinyin: 'xiě hànzì', english: 'write characters' },
+];
+
+// Verb phrases for 想 + Verb pattern
+const verbPhrases: Word[] = [
+  { hanzi: '吃饭', pinyin: 'chī fàn', english: 'eat' },
+  { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drink coffee' },
+  { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watch a movie' },
+  { hanzi: '听音乐', pinyin: 'tīng yīnyuè', english: 'listen to music' },
+  { hanzi: '学中文', pinyin: 'xué zhōngwén', english: 'learn Chinese' },
+  { hanzi: '买东西', pinyin: 'mǎi dōngxi', english: 'go shopping' },
+  { hanzi: '睡觉', pinyin: 'shuì jiào', english: 'sleep' },
+  { hanzi: '休息', pinyin: 'xiūxi', english: 'rest' },
+];
+
+// Possessions for 有 pattern
+const possessions: Word[] = [
+  { hanzi: '钱', pinyin: 'qián', english: 'money' },
+  { hanzi: '时间', pinyin: 'shíjiān', english: 'time' },
+  { hanzi: '书', pinyin: 'shū', english: 'books' },
+  { hanzi: '朋友', pinyin: 'péngyou', english: 'friends' },
+  { hanzi: '问题', pinyin: 'wèntí', english: 'questions' },
+  { hanzi: '手机', pinyin: 'shǒujī', english: 'phone' },
+  { hanzi: '车', pinyin: 'chē', english: 'car' },
+  { hanzi: '工作', pinyin: 'gōngzuò', english: 'job' },
+];
+
 export const sentencePatterns: SentencePattern[] = [
   {
     id: 'adj-pattern',
     name: 'Subject + 很 + Adjective',
+    category: 'statement',
     description: 'Describe states and feelings. In Chinese, use 很 (not 是) before adjectives!',
     template: '{subject} 很 {adjective}',
     example: {
@@ -165,6 +215,7 @@ export const sentencePatterns: SentencePattern[] = [
   {
     id: 'noun-pattern',
     name: 'Subject + 是 + Noun',
+    category: 'statement',
     description: 'State identity or what something is. Use 是 with nouns.',
     template: '{subject} 是 {noun}',
     example: {
@@ -191,6 +242,7 @@ export const sentencePatterns: SentencePattern[] = [
   {
     id: 'verb-pattern',
     name: 'Subject + Verb + Object',
+    category: 'statement',
     description: 'Basic action sentences. Chinese word order is Subject-Verb-Object.',
     template: '{subject} {verb} {object}',
     example: {
@@ -222,6 +274,7 @@ export const sentencePatterns: SentencePattern[] = [
   {
     id: 'go-pattern',
     name: 'Subject + 想去 + Place',
+    category: 'statement',
     description: 'Express wanting to go somewhere.',
     template: '{subject} 想去 {place}',
     example: {
@@ -246,66 +299,156 @@ export const sentencePatterns: SentencePattern[] = [
     ],
   },
   {
-    id: 'neg-adj-pattern',
-    name: 'Subject + 不 + Adjective',
-    description: 'Negate adjectives. Use 不 (not 不是) before adjectives.',
-    template: '{subject} 不 {adjective}',
+    id: 'location-pattern',
+    name: 'Subject + 在 + Place',
+    category: 'statement',
+    description: 'Say where someone or something is located.',
+    template: '{subject} 在 {place}',
     example: {
-      chinese: '我不累',
-      pinyin: 'wǒ bú lèi',
-      english: 'I am not tired',
+      chinese: '我在家',
+      pinyin: 'wǒ zài jiā',
+      english: 'I am at home',
     },
     slots: [
       {
         id: 'subject',
         label: 'Subject',
         position: 0,
-        words: subjects,
+        words: subjects.slice(0, 6),
       },
+      {
+        id: 'place',
+        label: 'Place',
+        position: 1,
+        connector: '在',
+        words: places,
+      },
+    ],
+  },
+  {
+    id: 'have-pattern',
+    name: 'Subject + 有 + Object',
+    category: 'statement',
+    description: 'Express possession. Negated with 没有, not 不有!',
+    template: '{subject} 有 {object}',
+    example: {
+      chinese: '我有书',
+      pinyin: 'wǒ yǒu shū',
+      english: 'I have books',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'object',
+        label: 'Object',
+        position: 1,
+        connector: '有',
+        words: possessions,
+      },
+    ],
+  },
+  {
+    id: 'can-pattern',
+    name: 'Subject + 会 + Skill',
+    category: 'statement',
+    description: 'Express ability or learned skills. 会 means "can" or "know how to".',
+    template: '{subject} 会 {skill}',
+    example: {
+      chinese: '我会说中文',
+      pinyin: 'wǒ huì shuō zhōngwén',
+      english: 'I can speak Chinese',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'skill',
+        label: 'Skill',
+        position: 1,
+        connector: '会',
+        words: skills,
+      },
+    ],
+  },
+  {
+    id: 'want-pattern',
+    name: 'Subject + 想 + Verb',
+    category: 'statement',
+    description: 'Express wanting to do something. 想 means "want to" or "would like to".',
+    template: '{subject} 想 {verb}',
+    example: {
+      chinese: '我想吃饭',
+      pinyin: 'wǒ xiǎng chī fàn',
+      english: 'I want to eat',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'verb',
+        label: 'Action',
+        position: 1,
+        connector: '想',
+        words: verbPhrases,
+      },
+    ],
+  },
+  {
+    id: 'too-pattern',
+    name: '太 + Adjective + 了',
+    category: 'statement',
+    description: 'Express "too much" of something. 太...了 is a common emphatic pattern.',
+    template: '太 {adjective} 了',
+    example: {
+      chinese: '太贵了',
+      pinyin: 'tài guì le',
+      english: 'Too expensive!',
+    },
+    slots: [
       {
         id: 'adjective',
         label: 'Adjective',
-        position: 1,
-        connector: '不',
-        words: adjectives,
-      },
-    ],
-  },
-  {
-    id: 'neg-noun-pattern',
-    name: 'Subject + 不是 + Noun',
-    description: 'Negate identity. Use 不是 to say "is not".',
-    template: '{subject} 不是 {noun}',
-    example: {
-      chinese: '我不是老师',
-      pinyin: 'wǒ bú shì lǎoshī',
-      english: 'I am not a teacher',
-    },
-    slots: [
-      {
-        id: 'subject',
-        label: 'Subject',
         position: 0,
-        words: subjects,
-      },
-      {
-        id: 'noun',
-        label: 'Noun',
-        position: 1,
-        connector: '不是',
-        words: nouns,
+        connector: '太',
+        words: [
+          { hanzi: '贵', pinyin: 'guì', english: 'expensive' },
+          { hanzi: '便宜', pinyin: 'piányi', english: 'cheap' },
+          { hanzi: '大', pinyin: 'dà', english: 'big' },
+          { hanzi: '小', pinyin: 'xiǎo', english: 'small' },
+          { hanzi: '热', pinyin: 'rè', english: 'hot' },
+          { hanzi: '冷', pinyin: 'lěng', english: 'cold' },
+          { hanzi: '难', pinyin: 'nán', english: 'difficult' },
+          { hanzi: '好', pinyin: 'hǎo', english: 'good' },
+          { hanzi: '忙', pinyin: 'máng', english: 'busy' },
+          { hanzi: '累', pinyin: 'lèi', english: 'tired' },
+        ],
       },
     ],
   },
+  // Question patterns
   {
-    id: 'neg-verb-pattern',
-    name: 'Subject + 不 + Verb + Object',
-    description: 'Negate actions. Put 不 before the verb.',
-    template: '{subject} 不 {verb} {object}',
+    id: 'q-verb-what',
+    name: 'Subject + Verb + 什么?',
+    category: 'question',
+    description: 'Ask "what" questions. The question word goes where the answer would be.',
+    template: '{subject} {verb} 什么?',
     example: {
-      chinese: '我不喜欢咖啡',
-      pinyin: 'wǒ bù xǐhuan kāfēi',
-      english: "I don't like coffee",
+      chinese: '你吃什么?',
+      pinyin: 'nǐ chī shénme?',
+      english: 'What do you eat?',
     },
     slots: [
       {
@@ -318,7 +461,51 @@ export const sentencePatterns: SentencePattern[] = [
         id: 'verb',
         label: 'Verb',
         position: 1,
-        connector: '不',
+        words: [
+          { hanzi: '吃', pinyin: 'chī', english: 'eat' },
+          { hanzi: '喝', pinyin: 'hē', english: 'drink' },
+          { hanzi: '看', pinyin: 'kàn', english: 'watch/read' },
+          { hanzi: '听', pinyin: 'tīng', english: 'listen to' },
+          { hanzi: '学', pinyin: 'xué', english: 'study' },
+          { hanzi: '买', pinyin: 'mǎi', english: 'buy' },
+          { hanzi: '喜欢', pinyin: 'xǐhuan', english: 'like' },
+          { hanzi: '想', pinyin: 'xiǎng', english: 'want' },
+        ],
+      },
+      {
+        id: 'question',
+        label: 'Question Word',
+        position: 2,
+        words: [
+          { hanzi: '什么', pinyin: 'shénme', english: 'what' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'q-who',
+    name: '谁 + Verb + Object?',
+    category: 'question',
+    description: 'Ask "who" questions. 谁 takes the place of the subject.',
+    template: '谁 {verb} {object}?',
+    example: {
+      chinese: '谁喜欢咖啡?',
+      pinyin: 'shéi xǐhuan kāfēi?',
+      english: 'Who likes coffee?',
+    },
+    slots: [
+      {
+        id: 'question',
+        label: 'Question Word',
+        position: 0,
+        words: [
+          { hanzi: '谁', pinyin: 'shéi', english: 'who' },
+        ],
+      },
+      {
+        id: 'verb',
+        label: 'Verb',
+        position: 1,
         words: verbs,
       },
       {
@@ -326,6 +513,136 @@ export const sentencePatterns: SentencePattern[] = [
         label: 'Object',
         position: 2,
         words: objects,
+      },
+    ],
+  },
+  {
+    id: 'q-where',
+    name: 'Subject + 去哪里?',
+    category: 'question',
+    description: 'Ask "where" questions about going places.',
+    template: '{subject} 去 哪里?',
+    example: {
+      chinese: '你去哪里?',
+      pinyin: 'nǐ qù nǎlǐ?',
+      english: 'Where are you going?',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'verb',
+        label: 'Verb',
+        position: 1,
+        connector: '去',
+        words: [
+          { hanzi: '哪里', pinyin: 'nǎlǐ', english: 'where' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'q-how-many',
+    name: 'Subject + 有多少 + Object?',
+    category: 'question',
+    description: 'Ask "how many/much" questions.',
+    template: '{subject} 有多少 {object}?',
+    example: {
+      chinese: '你有多少钱?',
+      pinyin: 'nǐ yǒu duōshao qián?',
+      english: 'How much money do you have?',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'object',
+        label: 'Object',
+        position: 1,
+        connector: '有多少',
+        words: [
+          { hanzi: '钱', pinyin: 'qián', english: 'money' },
+          { hanzi: '书', pinyin: 'shū', english: 'books' },
+          { hanzi: '朋友', pinyin: 'péngyou', english: 'friends' },
+          { hanzi: '时间', pinyin: 'shíjiān', english: 'time' },
+          { hanzi: '水', pinyin: 'shuǐ', english: 'water' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'q-why',
+    name: 'Subject + 为什么 + Verb?',
+    category: 'question',
+    description: 'Ask "why" questions. 为什么 comes before the verb.',
+    template: '{subject} 为什么 {verb}?',
+    example: {
+      chinese: '你为什么学中文?',
+      pinyin: 'nǐ wèishénme xué zhōngwén?',
+      english: 'Why do you study Chinese?',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'verb',
+        label: 'Action',
+        position: 1,
+        connector: '为什么',
+        words: [
+          { hanzi: '学中文', pinyin: 'xué zhōngwén', english: 'study Chinese' },
+          { hanzi: '去中国', pinyin: 'qù zhōngguó', english: 'go to China' },
+          { hanzi: '吃这个', pinyin: 'chī zhège', english: 'eat this' },
+          { hanzi: '喜欢他', pinyin: 'xǐhuan tā', english: 'like him' },
+          { hanzi: '不高兴', pinyin: 'bù gāoxìng', english: 'unhappy' },
+          { hanzi: '很忙', pinyin: 'hěn máng', english: 'so busy' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'q-when',
+    name: 'Subject + 什么时候 + Verb?',
+    category: 'question',
+    description: 'Ask "when" questions. 什么时候 means "what time" or "when".',
+    template: '{subject} 什么时候 {verb}?',
+    example: {
+      chinese: '你什么时候去?',
+      pinyin: 'nǐ shénme shíhou qù?',
+      english: 'When are you going?',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'verb',
+        label: 'Action',
+        position: 1,
+        connector: '什么时候',
+        words: [
+          { hanzi: '去', pinyin: 'qù', english: 'go' },
+          { hanzi: '来', pinyin: 'lái', english: 'come' },
+          { hanzi: '回家', pinyin: 'huí jiā', english: 'go home' },
+          { hanzi: '吃饭', pinyin: 'chī fàn', english: 'eat' },
+          { hanzi: '睡觉', pinyin: 'shuì jiào', english: 'sleep' },
+          { hanzi: '工作', pinyin: 'gōngzuò', english: 'work' },
+        ],
       },
     ],
   },
