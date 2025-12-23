@@ -6,6 +6,7 @@
  */
 
 import { getAudioUrl, getVocabAudioUrl, AUDIO_CONFIG, TTS_OVERRIDE_SYLLABLES, TTS_OVERRIDE_VOCAB, PINYIN_TO_HANZI } from './audioConfig';
+import * as EdgeTTS from './EdgeTTSService';
 
 export type AudioLoadState = 'idle' | 'loading' | 'loaded' | 'error';
 
@@ -204,7 +205,7 @@ class AudioServiceClass {
   async playVocabulary(hanzi: string, waitForEnd: boolean = false): Promise<void> {
     // Check if this word should use TTS override
     if (TTS_OVERRIDE_VOCAB.has(hanzi)) {
-      await this.speakWithWebSpeech(hanzi, waitForEnd);
+      await this.speakWithTTS(hanzi, waitForEnd);
       return;
     }
 
@@ -213,8 +214,8 @@ class AudioServiceClass {
     // Check if we already know this word is missing from CDN
     const cached = this.audioCache.get(cacheKey);
     if (cached?.state === 'error') {
-      // Use Web Speech API fallback
-      await this.speakWithWebSpeech(hanzi, waitForEnd);
+      // Use Edge TTS fallback
+      await this.speakWithTTS(hanzi, waitForEnd);
       return;
     }
 
@@ -252,9 +253,9 @@ class AudioServiceClass {
         };
       }
     } catch {
-      // CDN failed, use Web Speech API fallback
-      console.log(`[AudioService] CDN audio not available for "${hanzi}", using Web Speech`);
-      await this.speakWithWebSpeech(hanzi, waitForEnd);
+      // CDN failed, use Edge TTS fallback
+      console.log(`[AudioService] CDN audio not available for "${hanzi}", using Edge TTS`);
+      await this.speakWithTTS(hanzi, waitForEnd);
     }
   }
 
@@ -310,7 +311,51 @@ class AudioServiceClass {
   }
 
   /**
-   * Use Web Speech API to speak Chinese text
+   * Speak Chinese text using Edge TTS (high quality) with Web Speech API fallback
+   * @param text - Chinese text to speak
+   * @param waitForEnd - If true, wait for speech to finish
+   */
+  private async speakWithTTS(text: string, waitForEnd: boolean = false): Promise<void> {
+    // Stop any currently playing audio
+    this.stop();
+
+    // Try Edge TTS first (higher quality)
+    try {
+      const audioUrl = await EdgeTTS.synthesizeSpeech(text);
+      const audio = new Audio(audioUrl);
+      audio.volume = this.volume;
+      this.currentlyPlaying = audio;
+
+      if (waitForEnd) {
+        await new Promise<void>((resolve, reject) => {
+          audio.onended = () => {
+            if (this.currentlyPlaying === audio) {
+              this.currentlyPlaying = null;
+            }
+            resolve();
+          };
+          audio.onerror = () => reject(new Error(`EdgeTTS playback failed for: ${text}`));
+          audio.play().catch(reject);
+        });
+      } else {
+        await audio.play();
+        audio.onended = () => {
+          if (this.currentlyPlaying === audio) {
+            this.currentlyPlaying = null;
+          }
+        };
+      }
+      return;
+    } catch (error) {
+      console.warn('[AudioService] Edge TTS failed, falling back to Web Speech:', error);
+    }
+
+    // Fallback to Web Speech API
+    await this.speakWithWebSpeech(text, waitForEnd);
+  }
+
+  /**
+   * Fallback: Use Web Speech API to speak Chinese text
    * @param text - Chinese text to speak
    * @param waitForEnd - If true, wait for speech to finish
    */
@@ -320,8 +365,6 @@ class AudioServiceClass {
       return;
     }
 
-    // Stop any currently playing audio
-    this.stop();
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -368,13 +411,13 @@ class AudioServiceClass {
     if (!hanziMap) {
       console.warn(`[AudioService] No hanzi mapping for pinyin: ${base}`);
       // Fall back to speaking the pinyin directly
-      await this.speakWithWebSpeech(pinyin, waitForEnd);
+      await this.speakWithTTS(pinyin, waitForEnd);
       return;
     }
 
     const hanzi = hanziMap[tone - 1]; // tones are 1-indexed
-    console.log(`[AudioService] Using TTS for ${pinyin} -> ${hanzi}`);
-    await this.speakWithWebSpeech(hanzi, waitForEnd);
+    console.log(`[AudioService] Using Edge TTS for ${pinyin} -> ${hanzi}`);
+    await this.speakWithTTS(hanzi, waitForEnd);
   }
 
   /**
