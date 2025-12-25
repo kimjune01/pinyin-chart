@@ -646,6 +646,44 @@ export const sentencePatterns: SentencePattern[] = [
       },
     ],
   },
+  {
+    id: 'q-permission',
+    name: 'Subject + 可以 + Verb + 吗?',
+    category: 'question',
+    description: 'Ask for permission. 可以 means "may" or "can" for permission.',
+    template: '{subject} 可以 {verb} 吗?',
+    example: {
+      chinese: '我可以进来吗?',
+      pinyin: 'wǒ kěyǐ jìnlái ma?',
+      english: 'May I come in?',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'verb',
+        label: 'Action',
+        position: 1,
+        connector: '可以',
+        words: [
+          { hanzi: '进来', pinyin: 'jìnlái', english: 'come in' },
+          { hanzi: '坐这里', pinyin: 'zuò zhèlǐ', english: 'sit here' },
+          { hanzi: '用这个', pinyin: 'yòng zhège', english: 'use this' },
+          { hanzi: '问你', pinyin: 'wèn nǐ', english: 'ask you' },
+          { hanzi: '看看', pinyin: 'kànkan', english: 'take a look' },
+          { hanzi: '试试', pinyin: 'shìshi', english: 'try' },
+          { hanzi: '走了', pinyin: 'zǒu le', english: 'leave' },
+          { hanzi: '帮忙', pinyin: 'bāngmáng', english: 'help' },
+          { hanzi: '借一下', pinyin: 'jiè yíxià', english: 'borrow' },
+          { hanzi: '拍照', pinyin: 'pāizhào', english: 'take photos' },
+        ],
+      },
+    ],
+  },
 ];
 
 // Helper to get pinyin with tone numbers for audio
