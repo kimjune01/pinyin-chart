@@ -300,7 +300,7 @@ export default function SentenceBuilder() {
               .filter(pattern => pattern.category === 'statement')
               .map(pattern => (
                 <option key={pattern.id} value={pattern.id}>
-                  {pattern.name}
+                  {pattern.name} ({pattern.example.english})
                 </option>
               ))}
           </optgroup>
@@ -309,7 +309,7 @@ export default function SentenceBuilder() {
               .filter(pattern => pattern.category === 'question')
               .map(pattern => (
                 <option key={pattern.id} value={pattern.id}>
-                  {pattern.name}
+                  {pattern.name} ({pattern.example.english})
                 </option>
               ))}
           </optgroup>
