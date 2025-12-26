@@ -18,6 +18,7 @@ interface FamilyLevels {
   grandparents: TopicItem[];
   parents: TopicItem[];
   self: TopicItem[];
+  spouse: TopicItem[];
   grandchildren: TopicItem[];
 }
 
@@ -26,6 +27,7 @@ function groupByLevel(items: TopicItem[]): FamilyLevels {
     grandparents: [],
     parents: [],
     self: [],
+    spouse: [],
     grandchildren: [],
   };
 
@@ -37,6 +39,8 @@ function groupByLevel(items: TopicItem[]): FamilyLevels {
       levels.parents.push(item);
     } else if (pos.startsWith('s-')) {
       levels.self.push(item);
+    } else if (pos.startsWith('sp-')) {
+      levels.spouse.push(item);
     } else if (pos.startsWith('gc-')) {
       levels.grandchildren.push(item);
     }
@@ -53,6 +57,7 @@ function groupByLevel(items: TopicItem[]): FamilyLevels {
   levels.grandparents.sort(sortFn);
   levels.parents.sort(sortFn);
   levels.self.sort(sortFn);
+  levels.spouse.sort(sortFn);
   levels.grandchildren.sort(sortFn);
 
   return levels;
@@ -161,6 +166,22 @@ export default function FamilyTree({
       {levels.self.length > 0 && (
         <div className="tree-level self-level">
           {levels.self.map(item => (
+            <FamilyMember
+              key={item.position}
+              item={item}
+              onClick={onSelect}
+              feedback={feedback}
+              selectedPosition={selectedPosition}
+              isCompleted={completedPositions.has(item.position)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Spouse level */}
+      {levels.spouse.length > 0 && (
+        <div className="tree-level spouse-level">
+          {levels.spouse.map(item => (
             <FamilyMember
               key={item.position}
               item={item}

@@ -684,6 +684,44 @@ export const sentencePatterns: SentencePattern[] = [
       },
     ],
   },
+  {
+    id: 'q-how-so',
+    name: 'Subject + 怎么这么 + Adj?',
+    category: 'question',
+    description: 'Express surprise or reproach about how something is. 怎么这么 means "how so" or "how can...be so".',
+    template: '{subject} 怎么这么 {adjective}?',
+    example: {
+      chinese: '你怎么这么懒?',
+      pinyin: 'nǐ zěnme zhème lǎn?',
+      english: 'How can you be so lazy?',
+    },
+    slots: [
+      {
+        id: 'subject',
+        label: 'Subject',
+        position: 0,
+        words: subjects.slice(0, 6),
+      },
+      {
+        id: 'adjective',
+        label: 'Adjective',
+        position: 1,
+        connector: '怎么这么',
+        words: [
+          { hanzi: '懒', pinyin: 'lǎn', english: 'lazy' },
+          { hanzi: '笨', pinyin: 'bèn', english: 'dumb' },
+          { hanzi: '慢', pinyin: 'màn', english: 'slow' },
+          { hanzi: '快', pinyin: 'kuài', english: 'fast' },
+          { hanzi: '忙', pinyin: 'máng', english: 'busy' },
+          { hanzi: '累', pinyin: 'lèi', english: 'tired' },
+          { hanzi: '贵', pinyin: 'guì', english: 'expensive' },
+          { hanzi: '难', pinyin: 'nán', english: 'difficult' },
+          { hanzi: '厉害', pinyin: 'lìhai', english: 'amazing' },
+          { hanzi: '可爱', pinyin: 'kěài', english: 'cute' },
+        ],
+      },
+    ],
+  },
 ];
 
 // Helper to get pinyin with tone numbers for audio

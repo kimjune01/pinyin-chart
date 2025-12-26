@@ -53,6 +53,8 @@ export default function SentenceBuilder() {
       '想': { pinyin: 'xiǎng', english: 'want to' },
       '不想': { pinyin: 'bù xiǎng', english: "don't want to" },
       '太': { pinyin: 'tài', english: 'too' },
+      '可以': { pinyin: 'kěyǐ', english: 'may' },
+      '怎么这么': { pinyin: 'zěnme zhème', english: 'how so' },
     };
 
     for (const slot of selectedPattern.slots) {
@@ -105,8 +107,13 @@ export default function SentenceBuilder() {
       parts.push({ hanzi: '了', pinyin: 'le', english: '!' });
     }
 
-    // Add 吗 if question toggle is enabled
-    if (isQuestion) {
+    // Add 吗 suffix for permission pattern (it's a yes/no question)
+    if (selectedPattern.id === 'q-permission' && selectedWords['verb']) {
+      parts.push({ hanzi: '吗?', pinyin: 'ma', english: '?' });
+    }
+
+    // Add 吗 if question toggle is enabled (for turning statements into questions)
+    if (isQuestion && selectedPattern.id !== 'q-permission') {
       parts.push({ hanzi: '吗?', pinyin: 'ma', english: '?' });
     }
 
@@ -269,6 +276,7 @@ export default function SentenceBuilder() {
       setSelectedWords({});
       setIsNegated(false);
       setIsQuestion(false);
+      setIsPlaying(false); // Reset playing state to prevent stuck disabled buttons
     }
   };
 
@@ -344,6 +352,7 @@ export default function SentenceBuilder() {
             '想': 'xiǎng', '不想': 'bù xiǎng',
             '太': 'tài', '去': 'qù',
             '有多少': 'yǒu duōshao', '为什么': 'wèishénme', '什么时候': 'shénme shíhou',
+            '可以': 'kěyǐ', '怎么这么': 'zěnme zhème',
           };
 
           // Get the display connector (modified by negation state)

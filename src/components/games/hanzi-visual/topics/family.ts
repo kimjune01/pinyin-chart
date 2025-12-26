@@ -24,6 +24,9 @@ export const familyTopic: Topic = {
     { hanzi: '哥哥', pinyin: 'ge1ge5', meaning: 'older brother', emoji: '🧔', position: 's-left' },
     { hanzi: '我', pinyin: 'wo3', meaning: 'me', emoji: '🙋', position: 's-center', isSelf: true },
     { hanzi: '妹妹', pinyin: 'mei4mei5', meaning: 'younger sister', emoji: '👧', position: 's-right' },
+    // Spouse level
+    { hanzi: '先生', pinyin: 'xian1sheng5', meaning: 'husband/Mr.', emoji: '🤵👨', position: 'sp-left' },
+    { hanzi: '太太', pinyin: 'tai4tai5', meaning: 'wife/Mrs.', emoji: '👰👩', position: 'sp-right' },
     // Children level
     { hanzi: '儿子', pinyin: 'er2zi5', meaning: 'son', emoji: '👦', position: 'gc-left' },
     { hanzi: '女儿', pinyin: 'nv3er2', meaning: 'daughter', emoji: '👧', position: 'gc-right' },
