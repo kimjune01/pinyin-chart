@@ -26,7 +26,7 @@ export default function SentenceBuilder() {
   // Patterns that support negation toggle
   const supportsNegation = [
     'adj-pattern', 'noun-pattern', 'verb-pattern', 'go-pattern',
-    'location-pattern', 'have-pattern', 'can-pattern', 'want-pattern'
+    'location-pattern', 'have-pattern', 'can-pattern', 'want-pattern', 'past-pattern'
   ].includes(selectedPattern.id);
 
   // Build the sentence from selected words
@@ -55,6 +55,8 @@ export default function SentenceBuilder() {
       '太': { pinyin: 'tài', english: 'too' },
       '可以': { pinyin: 'kěyǐ', english: 'may' },
       '怎么这么': { pinyin: 'zěnme zhème', english: 'how so' },
+      '没': { pinyin: 'méi', english: "didn't" },
+      '了': { pinyin: 'le', english: '(completed)' },
     };
 
     for (const slot of selectedPattern.slots) {
@@ -94,6 +96,13 @@ export default function SentenceBuilder() {
           pinyin: 'bù',
           english: "don't",
         });
+      } else if (isNegated && supportsNegation && selectedPattern.id === 'past-pattern' && slot.id === 'verb') {
+        // For past-pattern negation, add 没 before the verb (no 了 suffix)
+        parts.push({
+          hanzi: '没',
+          pinyin: 'méi',
+          english: "didn't",
+        });
       }
 
       const word = selectedWords[slot.id];
@@ -107,13 +116,30 @@ export default function SentenceBuilder() {
       parts.push({ hanzi: '了', pinyin: 'le', english: '!' });
     }
 
+    // Add 了 suffix for past-pattern (but NOT when negated - Chinese past negation uses 没 without 了)
+    if (selectedPattern.id === 'past-pattern' && selectedWords['verb'] && !isNegated) {
+      parts.push({ hanzi: '了', pinyin: 'le', english: '' });
+    }
+
     // Add 吗 suffix for permission pattern (it's a yes/no question)
     if (selectedPattern.id === 'q-permission' && selectedWords['verb']) {
       parts.push({ hanzi: '吗?', pinyin: 'ma', english: '?' });
     }
 
+    // Add 了没有 suffix for "did you" question pattern
+    if (selectedPattern.id === 'q-did-you' && selectedWords['verb']) {
+      parts.push({ hanzi: '了没有?', pinyin: 'le méiyǒu', english: '(or not)?' });
+    }
+
+    // Add 去哪里? suffix for "where going" question pattern
+    if (selectedPattern.id === 'q-where' && selectedWords['subject']) {
+      parts.push({ hanzi: '去哪里?', pinyin: 'qù nǎlǐ', english: 'going where?' });
+    }
+
     // Add 吗 if question toggle is enabled (for turning statements into questions)
-    if (isQuestion && selectedPattern.id !== 'q-permission') {
+    // Exclude question-word patterns (什么, 谁, 哪里, etc.) - they don't use 吗
+    const noMaPatterns = ['q-permission', 'q-did-you', 'q-verb-what', 'q-who', 'q-where', 'q-how-many', 'q-why', 'q-when', 'q-how-so'];
+    if (isQuestion && !noMaPatterns.includes(selectedPattern.id)) {
       parts.push({ hanzi: '吗?', pinyin: 'ma', english: '?' });
     }
 
@@ -188,6 +214,11 @@ export default function SentenceBuilder() {
           type: 'tip',
           message: "不想 means \"don't want to\". Use this to politely decline or express disinterest.",
         });
+      } else if (selectedPattern.id === 'past-pattern') {
+        feedback.push({
+          type: 'correct',
+          message: "Past tense negation uses 没 (méi), NOT 不. And there's no 了 in negative past!",
+        });
       }
     }
 
@@ -210,6 +241,13 @@ export default function SentenceBuilder() {
       feedback.push({
         type: 'tip',
         message: "太...了 is an emphatic pattern. It can express \"too much\" or strong emotion (太好了 = Great!).",
+      });
+    }
+
+    if (selectedPattern.id === 'past-pattern' && !isNegated) {
+      feedback.push({
+        type: 'tip',
+        message: "了 (le) after the verb indicates a completed action. Negate with 没 (no 了 needed).",
       });
     }
 
@@ -330,8 +368,9 @@ export default function SentenceBuilder() {
         {selectedPattern.slots.map((slot, index) => {
           // Determine if negation toggle should appear before this slot
           const showNegationToggle = supportsNegation && (
-            // For verb-pattern: show before verb slot
+            // For verb-pattern and past-pattern: show before verb slot
             (selectedPattern.id === 'verb-pattern' && slot.id === 'verb') ||
+            (selectedPattern.id === 'past-pattern' && slot.id === 'verb') ||
             // For patterns with connectors that get negated: show at connector position
             (selectedPattern.id === 'adj-pattern' && slot.connector === '很') ||
             (selectedPattern.id === 'noun-pattern' && slot.connector === '是') ||
@@ -352,7 +391,7 @@ export default function SentenceBuilder() {
             '想': 'xiǎng', '不想': 'bù xiǎng',
             '太': 'tài', '去': 'qù',
             '有多少': 'yǒu duōshao', '为什么': 'wèishénme', '什么时候': 'shénme shíhou',
-            '可以': 'kěyǐ', '怎么这么': 'zěnme zhème',
+            '可以': 'kěyǐ', '怎么这么': 'zěnme zhème', '没': 'méi',
           };
 
           // Get the display connector (modified by negation state)
@@ -397,6 +436,17 @@ export default function SentenceBuilder() {
                 </div>
               )}
 
+              {/* For past-pattern: show negation toggle with 没 before verb */}
+              {showNegationToggle && selectedPattern.id === 'past-pattern' && (
+                <div
+                  className={`negation-toggle inline ${isNegated ? 'active' : ''}`}
+                  onClick={() => setIsNegated(!isNegated)}
+                >
+                  <span className="connector-hanzi">没</span>
+                  <span className="connector-pinyin">méi</span>
+                </div>
+              )}
+
               {/* Show connector with integrated negation toggle for other patterns */}
               {slot.connector && (
                 <div
@@ -431,21 +481,23 @@ export default function SentenceBuilder() {
           );
         })}
 
-        {/* Question toggle */}
-        <div className="question-toggle">
-          <label className="toggle-label">
-            <input
-              type="checkbox"
-              checked={isQuestion}
-              onChange={(e) => setIsQuestion(e.target.checked)}
-            />
-            <span className="toggle-switch"></span>
-            <span className="toggle-text">
-              <span className="toggle-hanzi">吗?</span>
-              <span className="toggle-pinyin">ma</span>
-            </span>
-          </label>
-        </div>
+        {/* Question toggle - only show for statement patterns */}
+        {selectedPattern.category === 'statement' && (
+          <div className="question-toggle">
+            <label className="toggle-label">
+              <input
+                type="checkbox"
+                checked={isQuestion}
+                onChange={(e) => setIsQuestion(e.target.checked)}
+              />
+              <span className="toggle-switch"></span>
+              <span className="toggle-text">
+                <span className="toggle-hanzi">吗?</span>
+                <span className="toggle-pinyin">ma</span>
+              </span>
+            </label>
+          </div>
+        )}
       </div>
 
       {/* Result Sentence */}
