@@ -74,20 +74,18 @@ const adjectives: Word[] = [
   { hanzi: '近', pinyin: 'jìn', english: 'close' },
 ];
 
-// Nouns (used with 是)
+// Nouns (used with 是 for identity/profession)
 const nouns: Word[] = [
   { hanzi: '学生', pinyin: 'xuésheng', english: 'student' },
   { hanzi: '老师', pinyin: 'lǎoshī', english: 'teacher' },
   { hanzi: '医生', pinyin: 'yīshēng', english: 'doctor' },
   { hanzi: '朋友', pinyin: 'péngyou', english: 'friend' },
-  { hanzi: '中国人', pinyin: 'zhōngguórén', english: 'Chinese person' },
+  { hanzi: '中国人', pinyin: 'zhōngguórén', english: 'Chinese' },
   { hanzi: '美国人', pinyin: 'měiguórén', english: 'American' },
-  { hanzi: '咖啡', pinyin: 'kāfēi', english: 'coffee' },
-  { hanzi: '茶', pinyin: 'chá', english: 'tea' },
-  { hanzi: '水', pinyin: 'shuǐ', english: 'water' },
-  { hanzi: '书', pinyin: 'shū', english: 'book' },
-  { hanzi: '手机', pinyin: 'shǒujī', english: 'phone' },
-  { hanzi: '电脑', pinyin: 'diànnǎo', english: 'computer' },
+  { hanzi: '英国人', pinyin: 'yīngguórén', english: 'British' },
+  { hanzi: '日本人', pinyin: 'rìběnrén', english: 'Japanese' },
+  { hanzi: '工程师', pinyin: 'gōngchéngshī', english: 'engineer' },
+  { hanzi: '律师', pinyin: 'lǜshī', english: 'lawyer' },
 ];
 
 // Objects for verb patterns
@@ -95,6 +93,7 @@ const objects: Word[] = [
   { hanzi: '咖啡', pinyin: 'kāfēi', english: 'coffee' },
   { hanzi: '茶', pinyin: 'chá', english: 'tea' },
   { hanzi: '水', pinyin: 'shuǐ', english: 'water' },
+  { hanzi: '啤酒', pinyin: 'píjiǔ', english: 'beer' },
   { hanzi: '饭', pinyin: 'fàn', english: 'food/rice' },
   { hanzi: '中国菜', pinyin: 'zhōngguócài', english: 'Chinese food' },
   { hanzi: '书', pinyin: 'shū', english: 'book' },
@@ -102,8 +101,6 @@ const objects: Word[] = [
   { hanzi: '音乐', pinyin: 'yīnyuè', english: 'music' },
   { hanzi: '中文', pinyin: 'zhōngwén', english: 'Chinese' },
   { hanzi: '英文', pinyin: 'yīngwén', english: 'English' },
-  { hanzi: '钱', pinyin: 'qián', english: 'money' },
-  { hanzi: '时间', pinyin: 'shíjiān', english: 'time' },
 ];
 
 // Verbs
