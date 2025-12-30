@@ -48,7 +48,7 @@ export function SentenceDisplay({
 
       const isRevealed = revealedSlots.includes(slotId);
 
-      // Add connector if present (these are always shown)
+      // Add connector if present (revealed with its associated word)
       const step = question.steps.find(s => s.slotId === slotId);
       if (step) {
         const pattern = getPatternConnector(question.patternId, slotId);
@@ -56,7 +56,7 @@ export function SentenceDisplay({
           parts.push({
             text: pattern.connector,
             pinyin: pattern.connectorPinyin,
-            revealed: true, // Connectors are always visible
+            revealed: isRevealed, // Connector pinyin revealed with the word
           });
         }
       }
