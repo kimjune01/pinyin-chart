@@ -116,25 +116,12 @@ export function SentenceDisplay({
       <div className="sentence-content">
         {showVisual ? (
           <>
-            {/* Hanzi row */}
+            {/* Hanzi row - always visible */}
             <div className="sentence-hanzi">
-              {allRevealed ? (
-                // Show full sentence when all parts revealed
-                <span className="hanzi-text">{question.fullHanzi}</span>
-              ) : (
-                // Show partial sentence with blanks
-                sentenceParts.map((part, idx) => (
-                  <span
-                    key={idx}
-                    className={`hanzi-part ${part.revealed ? 'revealed' : 'hidden'}`}
-                  >
-                    {part.revealed ? part.text : '___'}
-                  </span>
-                ))
-              )}
+              <span className="hanzi-text">{question.fullHanzi}</span>
             </div>
 
-            {/* Pinyin row */}
+            {/* Pinyin row - revealed progressively */}
             <div className="sentence-pinyin">
               {allRevealed ? (
                 <span className="pinyin-text">{question.fullPinyin}</span>
