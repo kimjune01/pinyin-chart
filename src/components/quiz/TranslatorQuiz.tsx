@@ -17,8 +17,8 @@ import QuizCompletionScreen from './QuizCompletionScreen';
 const TRANSLATOR_LEVELS: LevelConfig[] = [
   {
     id: 0,
-    name: 'Basic Statements',
-    description: 'Simple "I am..." patterns with adjectives and nouns',
+    name: 'HSK 1 Basics',
+    description: 'Simple "I am..." patterns with HSK 1 vocabulary',
     questionCount: 5,
     optionCount: 4,
     difficulty: 'easy',
@@ -26,8 +26,8 @@ const TRANSLATOR_LEVELS: LevelConfig[] = [
   },
   {
     id: 1,
-    name: 'More Patterns',
-    description: 'Add verbs, possession, and more vocabulary',
+    name: 'HSK 1 Extended',
+    description: 'More patterns with HSK 1 verbs and possession',
     questionCount: 7,
     optionCount: 4,
     difficulty: 'easy',
@@ -35,8 +35,8 @@ const TRANSLATOR_LEVELS: LevelConfig[] = [
   },
   {
     id: 2,
-    name: 'Expanded Vocabulary',
-    description: 'Abilities, desires, and more complex sentences',
+    name: 'HSK 1-2 Mix',
+    description: 'Abilities, desires, with HSK 2 vocabulary added',
     questionCount: 8,
     optionCount: 4,
     difficulty: 'medium',
@@ -44,8 +44,8 @@ const TRANSLATOR_LEVELS: LevelConfig[] = [
   },
   {
     id: 3,
-    name: 'All Statements',
-    description: 'All statement patterns including location and going',
+    name: 'HSK 1-2 Full',
+    description: 'All statement patterns with full HSK 1-2 vocabulary',
     questionCount: 10,
     optionCount: 4,
     difficulty: 'medium',
@@ -54,7 +54,7 @@ const TRANSLATOR_LEVELS: LevelConfig[] = [
   {
     id: 4,
     name: 'Advanced',
-    description: 'Exclamations and past tense patterns',
+    description: 'Exclamations and past tense with HSK 1-2 words',
     questionCount: 10,
     optionCount: 4,
     difficulty: 'hard',

@@ -13,6 +13,7 @@ export interface Word {
   hanzi: string;
   pinyin: string;
   english: string;
+  hskLevel?: 1 | 2;  // HSK level (1 or 2, undefined defaults to 1)
 }
 
 export interface SentencePattern {
@@ -50,60 +51,68 @@ const subjects: Word[] = [
 ];
 
 // Adjectives (used with 很, NOT 是)
+// HSK 1: 高兴, 累, 忙, 饿, 冷, 热, 好, 大, 小
+// HSK 2: 贵, 便宜, 漂亮, 可爱, 快, 慢, 远, 近, 渴, 帅, 难, 容易
 const adjectives: Word[] = [
   { hanzi: '高兴', pinyin: 'gāoxìng', english: 'happy' },
   { hanzi: '累', pinyin: 'lèi', english: 'tired' },
   { hanzi: '忙', pinyin: 'máng', english: 'busy' },
   { hanzi: '饿', pinyin: 'è', english: 'hungry' },
-  { hanzi: '渴', pinyin: 'kě', english: 'thirsty' },
+  { hanzi: '渴', pinyin: 'kě', english: 'thirsty', hskLevel: 2 },
   { hanzi: '冷', pinyin: 'lěng', english: 'cold' },
   { hanzi: '热', pinyin: 'rè', english: 'hot' },
   { hanzi: '好', pinyin: 'hǎo', english: 'good' },
   { hanzi: '大', pinyin: 'dà', english: 'big' },
   { hanzi: '小', pinyin: 'xiǎo', english: 'small' },
-  { hanzi: '贵', pinyin: 'guì', english: 'expensive' },
-  { hanzi: '便宜', pinyin: 'piányi', english: 'cheap' },
-  { hanzi: '漂亮', pinyin: 'piàoliang', english: 'beautiful' },
-  { hanzi: '帅', pinyin: 'shuài', english: 'handsome' },
-  { hanzi: '可爱', pinyin: 'kěài', english: 'cute' },
-  { hanzi: '难', pinyin: 'nán', english: 'difficult' },
-  { hanzi: '容易', pinyin: 'róngyì', english: 'easy' },
-  { hanzi: '快', pinyin: 'kuài', english: 'fast' },
-  { hanzi: '慢', pinyin: 'màn', english: 'slow' },
-  { hanzi: '远', pinyin: 'yuǎn', english: 'far' },
-  { hanzi: '近', pinyin: 'jìn', english: 'close' },
+  { hanzi: '贵', pinyin: 'guì', english: 'expensive', hskLevel: 2 },
+  { hanzi: '便宜', pinyin: 'piányi', english: 'cheap', hskLevel: 2 },
+  { hanzi: '漂亮', pinyin: 'piàoliang', english: 'beautiful', hskLevel: 2 },
+  { hanzi: '帅', pinyin: 'shuài', english: 'handsome', hskLevel: 2 },
+  { hanzi: '可爱', pinyin: 'kěài', english: 'cute', hskLevel: 2 },
+  { hanzi: '难', pinyin: 'nán', english: 'difficult', hskLevel: 2 },
+  { hanzi: '容易', pinyin: 'róngyì', english: 'easy', hskLevel: 2 },
+  { hanzi: '快', pinyin: 'kuài', english: 'fast', hskLevel: 2 },
+  { hanzi: '慢', pinyin: 'màn', english: 'slow', hskLevel: 2 },
+  { hanzi: '远', pinyin: 'yuǎn', english: 'far', hskLevel: 2 },
+  { hanzi: '近', pinyin: 'jìn', english: 'close', hskLevel: 2 },
 ];
 
 // Nouns (used with 是 for identity/profession)
+// HSK 1: 学生, 老师, 医生, 朋友, 中国人
+// HSK 2: 美国人, 英国人, 日本人, 工程师, 律师
 const nouns: Word[] = [
   { hanzi: '学生', pinyin: 'xuésheng', english: 'student' },
   { hanzi: '老师', pinyin: 'lǎoshī', english: 'teacher' },
   { hanzi: '医生', pinyin: 'yīshēng', english: 'doctor' },
   { hanzi: '朋友', pinyin: 'péngyou', english: 'friend' },
   { hanzi: '中国人', pinyin: 'zhōngguórén', english: 'Chinese' },
-  { hanzi: '美国人', pinyin: 'měiguórén', english: 'American' },
-  { hanzi: '英国人', pinyin: 'yīngguórén', english: 'British' },
-  { hanzi: '日本人', pinyin: 'rìběnrén', english: 'Japanese' },
-  { hanzi: '工程师', pinyin: 'gōngchéngshī', english: 'engineer' },
-  { hanzi: '律师', pinyin: 'lǜshī', english: 'lawyer' },
+  { hanzi: '美国人', pinyin: 'měiguórén', english: 'American', hskLevel: 2 },
+  { hanzi: '英国人', pinyin: 'yīngguórén', english: 'British', hskLevel: 2 },
+  { hanzi: '日本人', pinyin: 'rìběnrén', english: 'Japanese', hskLevel: 2 },
+  { hanzi: '工程师', pinyin: 'gōngchéngshī', english: 'engineer', hskLevel: 2 },
+  { hanzi: '律师', pinyin: 'lǜshī', english: 'lawyer', hskLevel: 2 },
 ];
 
 // Objects for verb patterns
+// HSK 1: 茶, 水, 饭, 书
+// HSK 2: 咖啡, 啤酒, 中国菜, 电影, 音乐, 中文, 英文
 const objects: Word[] = [
-  { hanzi: '咖啡', pinyin: 'kāfēi', english: 'coffee' },
+  { hanzi: '咖啡', pinyin: 'kāfēi', english: 'coffee', hskLevel: 2 },
   { hanzi: '茶', pinyin: 'chá', english: 'tea' },
   { hanzi: '水', pinyin: 'shuǐ', english: 'water' },
-  { hanzi: '啤酒', pinyin: 'píjiǔ', english: 'beer' },
+  { hanzi: '啤酒', pinyin: 'píjiǔ', english: 'beer', hskLevel: 2 },
   { hanzi: '饭', pinyin: 'fàn', english: 'food/rice' },
-  { hanzi: '中国菜', pinyin: 'zhōngguócài', english: 'Chinese food' },
+  { hanzi: '中国菜', pinyin: 'zhōngguócài', english: 'Chinese food', hskLevel: 2 },
   { hanzi: '书', pinyin: 'shū', english: 'book' },
-  { hanzi: '电影', pinyin: 'diànyǐng', english: 'movie' },
-  { hanzi: '音乐', pinyin: 'yīnyuè', english: 'music' },
-  { hanzi: '中文', pinyin: 'zhōngwén', english: 'Chinese' },
-  { hanzi: '英文', pinyin: 'yīngwén', english: 'English' },
+  { hanzi: '电影', pinyin: 'diànyǐng', english: 'movie', hskLevel: 2 },
+  { hanzi: '音乐', pinyin: 'yīnyuè', english: 'music', hskLevel: 2 },
+  { hanzi: '中文', pinyin: 'zhōngwén', english: 'Chinese', hskLevel: 2 },
+  { hanzi: '英文', pinyin: 'yīngwén', english: 'English', hskLevel: 2 },
 ];
 
 // Verbs
+// HSK 1: 喜欢, 想, 要, 有, 吃, 喝, 看, 听, 学, 说, 买
+// HSK 2: 知道
 const verbs: Word[] = [
   { hanzi: '喜欢', pinyin: 'xǐhuan', english: 'like' },
   { hanzi: '想', pinyin: 'xiǎng', english: 'want/think' },
@@ -116,20 +125,22 @@ const verbs: Word[] = [
   { hanzi: '学', pinyin: 'xué', english: 'learn/study' },
   { hanzi: '说', pinyin: 'shuō', english: 'speak' },
   { hanzi: '买', pinyin: 'mǎi', english: 'buy' },
-  { hanzi: '知道', pinyin: 'zhīdào', english: 'know' },
+  { hanzi: '知道', pinyin: 'zhīdào', english: 'know', hskLevel: 2 },
 ];
 
 // Places for 去 pattern
+// HSK 1: 中国, 北京, 上海, 学校, 家
+// HSK 2: 公司, 医院, 机场, 餐厅, 超市
 const places: Word[] = [
   { hanzi: '中国', pinyin: 'zhōngguó', english: 'China' },
   { hanzi: '北京', pinyin: 'běijīng', english: 'Beijing' },
   { hanzi: '上海', pinyin: 'shànghǎi', english: 'Shanghai' },
   { hanzi: '学校', pinyin: 'xuéxiào', english: 'school' },
-  { hanzi: '公司', pinyin: 'gōngsī', english: 'company' },
-  { hanzi: '医院', pinyin: 'yīyuàn', english: 'hospital' },
-  { hanzi: '机场', pinyin: 'jīchǎng', english: 'airport' },
-  { hanzi: '餐厅', pinyin: 'cāntīng', english: 'restaurant' },
-  { hanzi: '超市', pinyin: 'chāoshì', english: 'supermarket' },
+  { hanzi: '公司', pinyin: 'gōngsī', english: 'company', hskLevel: 2 },
+  { hanzi: '医院', pinyin: 'yīyuàn', english: 'hospital', hskLevel: 2 },
+  { hanzi: '机场', pinyin: 'jīchǎng', english: 'airport', hskLevel: 2 },
+  { hanzi: '餐厅', pinyin: 'cāntīng', english: 'restaurant', hskLevel: 2 },
+  { hanzi: '超市', pinyin: 'chāoshì', english: 'supermarket', hskLevel: 2 },
   { hanzi: '家', pinyin: 'jiā', english: 'home' },
 ];
 
@@ -146,39 +157,44 @@ const questionWords: Word[] = [
 ];
 
 // Skills for 会 pattern
+// HSK 2: All skill phrases (more complex constructions)
 const skills: Word[] = [
-  { hanzi: '说中文', pinyin: 'shuō zhōngwén', english: 'speak Chinese' },
-  { hanzi: '说英文', pinyin: 'shuō yīngwén', english: 'speak English' },
-  { hanzi: '做饭', pinyin: 'zuò fàn', english: 'cook' },
-  { hanzi: '开车', pinyin: 'kāi chē', english: 'drive' },
-  { hanzi: '游泳', pinyin: 'yóuyǒng', english: 'swim' },
-  { hanzi: '唱歌', pinyin: 'chàng gē', english: 'sing' },
-  { hanzi: '跳舞', pinyin: 'tiào wǔ', english: 'dance' },
-  { hanzi: '写汉字', pinyin: 'xiě hànzì', english: 'write characters' },
+  { hanzi: '说中文', pinyin: 'shuō zhōngwén', english: 'speak Chinese', hskLevel: 2 },
+  { hanzi: '说英文', pinyin: 'shuō yīngwén', english: 'speak English', hskLevel: 2 },
+  { hanzi: '做饭', pinyin: 'zuò fàn', english: 'cook', hskLevel: 2 },
+  { hanzi: '开车', pinyin: 'kāi chē', english: 'drive', hskLevel: 2 },
+  { hanzi: '游泳', pinyin: 'yóuyǒng', english: 'swim', hskLevel: 2 },
+  { hanzi: '唱歌', pinyin: 'chàng gē', english: 'sing', hskLevel: 2 },
+  { hanzi: '跳舞', pinyin: 'tiào wǔ', english: 'dance', hskLevel: 2 },
+  { hanzi: '写汉字', pinyin: 'xiě hànzì', english: 'write characters', hskLevel: 2 },
 ];
 
 // Verb phrases for 想 + Verb pattern
+// HSK 1: 吃饭, 睡觉
+// HSK 2: 喝咖啡, 看电影, 听音乐, 学中文, 买东西, 休息
 const verbPhrases: Word[] = [
   { hanzi: '吃饭', pinyin: 'chī fàn', english: 'eat' },
-  { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drink coffee' },
-  { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watch a movie' },
-  { hanzi: '听音乐', pinyin: 'tīng yīnyuè', english: 'listen to music' },
-  { hanzi: '学中文', pinyin: 'xué zhōngwén', english: 'learn Chinese' },
-  { hanzi: '买东西', pinyin: 'mǎi dōngxi', english: 'go shopping' },
+  { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drink coffee', hskLevel: 2 },
+  { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watch a movie', hskLevel: 2 },
+  { hanzi: '听音乐', pinyin: 'tīng yīnyuè', english: 'listen to music', hskLevel: 2 },
+  { hanzi: '学中文', pinyin: 'xué zhōngwén', english: 'learn Chinese', hskLevel: 2 },
+  { hanzi: '买东西', pinyin: 'mǎi dōngxi', english: 'go shopping', hskLevel: 2 },
   { hanzi: '睡觉', pinyin: 'shuì jiào', english: 'sleep' },
-  { hanzi: '休息', pinyin: 'xiūxi', english: 'rest' },
+  { hanzi: '休息', pinyin: 'xiūxi', english: 'rest', hskLevel: 2 },
 ];
 
 // Possessions for 有 pattern
+// HSK 1: 钱, 时间, 书, 朋友
+// HSK 2: 问题, 手机, 车, 工作
 const possessions: Word[] = [
   { hanzi: '钱', pinyin: 'qián', english: 'money' },
   { hanzi: '时间', pinyin: 'shíjiān', english: 'time' },
   { hanzi: '书', pinyin: 'shū', english: 'books' },
   { hanzi: '朋友', pinyin: 'péngyou', english: 'friends' },
-  { hanzi: '问题', pinyin: 'wèntí', english: 'questions' },
-  { hanzi: '手机', pinyin: 'shǒujī', english: 'phone' },
-  { hanzi: '车', pinyin: 'chē', english: 'car' },
-  { hanzi: '工作', pinyin: 'gōngzuò', english: 'job' },
+  { hanzi: '问题', pinyin: 'wèntí', english: 'questions', hskLevel: 2 },
+  { hanzi: '手机', pinyin: 'shǒujī', english: 'phone', hskLevel: 2 },
+  { hanzi: '车', pinyin: 'chē', english: 'car', hskLevel: 2 },
+  { hanzi: '工作', pinyin: 'gōngzuò', english: 'job', hskLevel: 2 },
 ];
 
 export const sentencePatterns: SentencePattern[] = [
@@ -421,13 +437,13 @@ export const sentencePatterns: SentencePattern[] = [
         position: 0,
         connector: '太',
         words: [
-          { hanzi: '贵', pinyin: 'guì', english: 'expensive' },
-          { hanzi: '便宜', pinyin: 'piányi', english: 'cheap' },
+          { hanzi: '贵', pinyin: 'guì', english: 'expensive', hskLevel: 2 },
+          { hanzi: '便宜', pinyin: 'piányi', english: 'cheap', hskLevel: 2 },
           { hanzi: '大', pinyin: 'dà', english: 'big' },
           { hanzi: '小', pinyin: 'xiǎo', english: 'small' },
           { hanzi: '热', pinyin: 'rè', english: 'hot' },
           { hanzi: '冷', pinyin: 'lěng', english: 'cold' },
-          { hanzi: '难', pinyin: 'nán', english: 'difficult' },
+          { hanzi: '难', pinyin: 'nán', english: 'difficult', hskLevel: 2 },
           { hanzi: '好', pinyin: 'hǎo', english: 'good' },
           { hanzi: '忙', pinyin: 'máng', english: 'busy' },
           { hanzi: '累', pinyin: 'lèi', english: 'tired' },
@@ -459,14 +475,14 @@ export const sentencePatterns: SentencePattern[] = [
         position: 1,
         words: [
           { hanzi: '吃', pinyin: 'chī', english: 'ate' },
-          { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drank coffee' },
-          { hanzi: '喝啤酒', pinyin: 'hē píjiǔ', english: 'drank beer' },
+          { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drank coffee', hskLevel: 2 },
+          { hanzi: '喝啤酒', pinyin: 'hē píjiǔ', english: 'drank beer', hskLevel: 2 },
           { hanzi: '睡觉', pinyin: 'shuì jiào', english: 'slept' },
-          { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watched a movie' },
+          { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watched a movie', hskLevel: 2 },
           { hanzi: '看书', pinyin: 'kàn shū', english: 'read a book' },
-          { hanzi: '听音乐', pinyin: 'tīng yīnyuè', english: 'listened to music' },
-          { hanzi: '买东西', pinyin: 'mǎi dōngxi', english: 'bought stuff' },
-          { hanzi: '做作业', pinyin: 'zuò zuòyè', english: 'did homework' },
+          { hanzi: '听音乐', pinyin: 'tīng yīnyuè', english: 'listened to music', hskLevel: 2 },
+          { hanzi: '买东西', pinyin: 'mǎi dōngxi', english: 'bought stuff', hskLevel: 2 },
+          { hanzi: '做作业', pinyin: 'zuò zuòyè', english: 'did homework', hskLevel: 2 },
         ],
       },
     ],
@@ -626,7 +642,7 @@ export const sentencePatterns: SentencePattern[] = [
         position: 1,
         connector: '为什么',
         words: [
-          { hanzi: '学中文', pinyin: 'xué zhōngwén', english: 'study Chinese' },
+          { hanzi: '学中文', pinyin: 'xué zhōngwén', english: 'study Chinese', hskLevel: 2 },
           { hanzi: '去中国', pinyin: 'qù zhōngguó', english: 'go to China' },
           { hanzi: '吃这个', pinyin: 'chī zhège', english: 'eat this' },
           { hanzi: '喜欢他', pinyin: 'xǐhuan tā', english: 'like him' },
@@ -665,7 +681,7 @@ export const sentencePatterns: SentencePattern[] = [
           { hanzi: '回家', pinyin: 'huí jiā', english: 'go home' },
           { hanzi: '吃饭', pinyin: 'chī fàn', english: 'eat' },
           { hanzi: '睡觉', pinyin: 'shuì jiào', english: 'sleep' },
-          { hanzi: '工作', pinyin: 'gōngzuò', english: 'work' },
+          { hanzi: '工作', pinyin: 'gōngzuò', english: 'work', hskLevel: 2 },
         ],
       },
     ],
@@ -694,16 +710,16 @@ export const sentencePatterns: SentencePattern[] = [
         position: 1,
         connector: '可以',
         words: [
-          { hanzi: '进来', pinyin: 'jìnlái', english: 'come in' },
-          { hanzi: '坐这里', pinyin: 'zuò zhèlǐ', english: 'sit here' },
-          { hanzi: '用这个', pinyin: 'yòng zhège', english: 'use this' },
-          { hanzi: '问你', pinyin: 'wèn nǐ', english: 'ask you' },
-          { hanzi: '看看', pinyin: 'kànkan', english: 'take a look' },
-          { hanzi: '试试', pinyin: 'shìshi', english: 'try' },
-          { hanzi: '走了', pinyin: 'zǒu le', english: 'leave' },
-          { hanzi: '帮忙', pinyin: 'bāngmáng', english: 'help' },
-          { hanzi: '借一下', pinyin: 'jiè yíxià', english: 'borrow' },
-          { hanzi: '拍照', pinyin: 'pāizhào', english: 'take photos' },
+          { hanzi: '进来', pinyin: 'jìnlái', english: 'come in', hskLevel: 2 },
+          { hanzi: '坐这里', pinyin: 'zuò zhèlǐ', english: 'sit here', hskLevel: 2 },
+          { hanzi: '用这个', pinyin: 'yòng zhège', english: 'use this', hskLevel: 2 },
+          { hanzi: '问你', pinyin: 'wèn nǐ', english: 'ask you', hskLevel: 2 },
+          { hanzi: '看看', pinyin: 'kànkan', english: 'take a look', hskLevel: 2 },
+          { hanzi: '试试', pinyin: 'shìshi', english: 'try', hskLevel: 2 },
+          { hanzi: '走了', pinyin: 'zǒu le', english: 'leave', hskLevel: 2 },
+          { hanzi: '帮忙', pinyin: 'bāngmáng', english: 'help', hskLevel: 2 },
+          { hanzi: '借一下', pinyin: 'jiè yíxià', english: 'borrow', hskLevel: 2 },
+          { hanzi: '拍照', pinyin: 'pāizhào', english: 'take photos', hskLevel: 2 },
         ],
       },
     ],
@@ -732,10 +748,10 @@ export const sentencePatterns: SentencePattern[] = [
         position: 1,
         words: [
           { hanzi: '吃', pinyin: 'chī', english: 'eat' },
-          { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drink coffee' },
+          { hanzi: '喝咖啡', pinyin: 'hē kāfēi', english: 'drink coffee', hskLevel: 2 },
           { hanzi: '睡觉', pinyin: 'shuì jiào', english: 'sleep' },
-          { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watch the movie' },
-          { hanzi: '做作业', pinyin: 'zuò zuòyè', english: 'do homework' },
+          { hanzi: '看电影', pinyin: 'kàn diànyǐng', english: 'watch the movie', hskLevel: 2 },
+          { hanzi: '做作业', pinyin: 'zuò zuòyè', english: 'do homework', hskLevel: 2 },
           { hanzi: '买', pinyin: 'mǎi', english: 'buy it' },
           { hanzi: '来', pinyin: 'lái', english: 'come' },
           { hanzi: '走', pinyin: 'zǒu', english: 'leave' },
@@ -767,16 +783,16 @@ export const sentencePatterns: SentencePattern[] = [
         position: 1,
         connector: '怎么这么',
         words: [
-          { hanzi: '懒', pinyin: 'lǎn', english: 'lazy' },
-          { hanzi: '笨', pinyin: 'bèn', english: 'dumb' },
-          { hanzi: '慢', pinyin: 'màn', english: 'slow' },
-          { hanzi: '快', pinyin: 'kuài', english: 'fast' },
+          { hanzi: '懒', pinyin: 'lǎn', english: 'lazy', hskLevel: 2 },
+          { hanzi: '笨', pinyin: 'bèn', english: 'dumb', hskLevel: 2 },
+          { hanzi: '慢', pinyin: 'màn', english: 'slow', hskLevel: 2 },
+          { hanzi: '快', pinyin: 'kuài', english: 'fast', hskLevel: 2 },
           { hanzi: '忙', pinyin: 'máng', english: 'busy' },
           { hanzi: '累', pinyin: 'lèi', english: 'tired' },
-          { hanzi: '贵', pinyin: 'guì', english: 'expensive' },
-          { hanzi: '难', pinyin: 'nán', english: 'difficult' },
-          { hanzi: '厉害', pinyin: 'lìhai', english: 'amazing' },
-          { hanzi: '可爱', pinyin: 'kěài', english: 'cute' },
+          { hanzi: '贵', pinyin: 'guì', english: 'expensive', hskLevel: 2 },
+          { hanzi: '难', pinyin: 'nán', english: 'difficult', hskLevel: 2 },
+          { hanzi: '厉害', pinyin: 'lìhai', english: 'amazing', hskLevel: 2 },
+          { hanzi: '可爱', pinyin: 'kěài', english: 'cute', hskLevel: 2 },
         ],
       },
     ],

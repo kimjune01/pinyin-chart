@@ -20,6 +20,28 @@ const LEVEL_PATTERNS: Record<number, string[]> = {
   5: [], // All patterns including questions (empty means all)
 };
 
+// HSK level filter for each quiz level
+// Level 0-1: HSK 1 only (beginner vocabulary)
+// Level 2+: HSK 1 + HSK 2 (expanded vocabulary)
+const LEVEL_HSK_FILTER: Record<number, (1 | 2)[]> = {
+  0: [1],     // HSK 1 only
+  1: [1],     // HSK 1 only
+  2: [1, 2],  // HSK 1 + 2
+  3: [1, 2],  // HSK 1 + 2
+  4: [1, 2],  // HSK 1 + 2
+  5: [1, 2],  // HSK 1 + 2
+};
+
+/**
+ * Filter words by HSK level
+ */
+function filterWordsByHSK(words: Word[], allowedLevels: (1 | 2)[]): Word[] {
+  return words.filter(w => {
+    const level = w.hskLevel || 1; // Default to HSK 1 if not specified
+    return allowedLevels.includes(level);
+  });
+}
+
 // Patterns that can be converted to 吗 questions (yes/no questions)
 const QUESTIONABLE_PATTERNS = [
   'adj-pattern',
@@ -199,9 +221,13 @@ function getConnectorPinyin(connector: string): string {
 function generateDistractors(
   slot: PatternSlot,
   correctWord: Word,
-  count: number
+  count: number,
+  allowedHSK: (1 | 2)[] = [1, 2]
 ): QuizOption[] {
-  const otherWords = slot.words.filter(w => w.hanzi !== correctWord.hanzi);
+  // Filter by HSK level first, then exclude correct word
+  const hskFilteredWords = filterWordsByHSK(slot.words, allowedHSK);
+  const wordsPool = hskFilteredWords.length > 1 ? hskFilteredWords : slot.words;
+  const otherWords = wordsPool.filter(w => w.hanzi !== correctWord.hanzi);
   const distractorWords = randomItems(otherWords, Math.min(count, otherWords.length));
 
   return distractorWords.map((w, idx) => ({
@@ -362,6 +388,9 @@ export async function generateTranslatorQuestions(
     ? sentencePatterns.filter(p => levelPatterns.includes(p.id))
     : sentencePatterns.filter(p => p.category === 'statement'); // Default to statements
 
+  // Get allowed HSK levels for this quiz level
+  const allowedHSK = LEVEL_HSK_FILTER[level.id] || [1, 2];
+
   for (let i = 0; i < count; i++) {
     // Pick a pattern (avoid recent repeats)
     let pattern: SentencePattern;
@@ -374,10 +403,13 @@ export async function generateTranslatorQuestions(
     recentPatternIds.push(pattern.id);
     if (recentPatternIds.length > 5) recentPatternIds.shift();
 
-    // Select random words for each slot
+    // Select random words for each slot (filtered by HSK level)
     const selectedWords: Record<string, Word> = {};
     for (const slot of pattern.slots) {
-      selectedWords[slot.id] = randomItem(slot.words);
+      const filteredWords = filterWordsByHSK(slot.words, allowedHSK);
+      // Fall back to all words if filtering leaves none
+      const wordsToUse = filteredWords.length > 0 ? filteredWords : slot.words;
+      selectedWords[slot.id] = randomItem(wordsToUse);
     }
 
     // Randomly decide if this should be a 吗 question (30% chance for eligible patterns)
@@ -396,7 +428,7 @@ export async function generateTranslatorQuestions(
       if (slot.words.length <= 1) continue;
 
       const correctWord = selectedWords[slot.id];
-      const distractors = generateDistractors(slot, correctWord, (level.optionCount || 4) - 1);
+      const distractors = generateDistractors(slot, correctWord, (level.optionCount || 4) - 1, allowedHSK);
 
       steps.push({
         id: `step-${slot.id}-${i}`,
