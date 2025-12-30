@@ -20,6 +20,7 @@ interface TranslatorGameAreaProps {
   isCorrect: boolean | null;
   currentAttempts: number;
   displayMode: SentenceDisplayMode;
+  isQuestionPerfect: boolean;
   onSubmitAnswer: (answer: string) => void;
   onNextStep: () => void;
   onDisplayModeChange: (mode: SentenceDisplayMode) => void;
@@ -36,6 +37,7 @@ export function TranslatorGameArea({
   isCorrect,
   currentAttempts,
   displayMode,
+  isQuestionPerfect,
   onSubmitAnswer,
   onNextStep,
   onDisplayModeChange,
@@ -43,15 +45,25 @@ export function TranslatorGameArea({
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingMode, setPlayingMode] = useState<'sentence' | 'syllables' | null>(null);
   const [showWrongFeedback, setShowWrongFeedback] = useState(false);
+  const [showPerfectEmoji, setShowPerfectEmoji] = useState(false);
   const syllableAbortRef = useRef(false);
 
   const currentStep = question.steps[currentStepIndex];
   const isAnswered = isCorrect === true;
+  const isLastStep = currentStepIndex === totalSteps - 1;
 
-  // Reset feedback when step changes
+  // Reset feedback when step/question changes
   useEffect(() => {
     setShowWrongFeedback(false);
+    setShowPerfectEmoji(false);
   }, [currentStepIndex, question.id]);
+
+  // Show perfect emoji when completing last step perfectly
+  useEffect(() => {
+    if (isLastStep && isCorrect === true && isQuestionPerfect) {
+      setShowPerfectEmoji(true);
+    }
+  }, [isLastStep, isCorrect, isQuestionPerfect]);
 
   // Show wrong feedback briefly
   useEffect(() => {
@@ -299,6 +311,13 @@ export function TranslatorGameArea({
           </div>
         )}
       </div>
+
+      {/* Perfect sentence celebration */}
+      {showPerfectEmoji && (
+        <div className="perfect-celebration">
+          <span className="perfect-emoji">⭐</span>
+        </div>
+      )}
     </div>
   );
 }

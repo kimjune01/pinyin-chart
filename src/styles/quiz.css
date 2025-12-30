@@ -1144,3 +1144,37 @@
     font-size: var(--font-size-xs);
   }
 }
+
+/* Perfect sentence celebration */
+.perfect-celebration {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+.perfect-emoji {
+  display: block;
+  font-size: 80px;
+  animation: celebrateEmoji 1s ease-out forwards;
+}
+
+@keyframes celebrateEmoji {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translateY(-20px);
+  }
+}

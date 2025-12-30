@@ -95,6 +95,7 @@ export interface TranslatorEngineState {
   // Scoring
   score: number;              // Percentage correct
   perfectQuestions: number;   // Questions with all steps correct on first try
+  currentQuestionPerfect: boolean; // Is current question still perfect
   totalStepsCompleted: number;
   totalStepsAttempted: number;
 }

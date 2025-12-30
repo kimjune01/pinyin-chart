@@ -81,6 +81,7 @@ export default function TranslatorQuiz() {
     displayMode,
     score,
     perfectQuestions,
+    currentQuestionPerfect,
 
     startLevel,
     submitStepAnswer,
@@ -152,6 +153,7 @@ export default function TranslatorQuiz() {
           isCorrect={isCorrect}
           currentAttempts={currentAttempts}
           displayMode={displayMode}
+          isQuestionPerfect={currentQuestionPerfect}
           onSubmitAnswer={submitStepAnswer}
           onNextStep={nextStep}
           onDisplayModeChange={setDisplayMode}

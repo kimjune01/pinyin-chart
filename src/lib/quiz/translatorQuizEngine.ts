@@ -412,6 +412,7 @@ export function useTranslatorQuizEngine(
     displayMode,
     score,
     perfectQuestions, // Questions with all steps correct on first try
+    currentQuestionPerfect, // Is current question still perfect (no wrong answers yet)
     totalStepsCompleted,
     totalStepsAttempted,
 
