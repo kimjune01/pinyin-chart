@@ -20,6 +20,21 @@ const LEVEL_PATTERNS: Record<number, string[]> = {
   5: [], // All patterns including questions (empty means all)
 };
 
+// Patterns that can be converted to 吗 questions (yes/no questions)
+const QUESTIONABLE_PATTERNS = [
+  'adj-pattern',
+  'noun-pattern',
+  'verb-pattern',
+  'have-pattern',
+  'can-pattern',
+  'want-pattern',
+  'location-pattern',
+  'go-pattern',
+];
+
+// Probability of converting a statement to a question (30%)
+const QUESTION_PROBABILITY = 0.3;
+
 // English template mappings for generating full sentences
 const PATTERN_ENGLISH_TEMPLATES: Record<string, (words: Record<string, Word>) => string> = {
   'adj-pattern': (words) => `${words.subject.english} ${words.subject.english === 'I' ? 'am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'are' : 'is'} ${words.adjective.english}`,
@@ -41,6 +56,18 @@ const PATTERN_ENGLISH_TEMPLATES: Record<string, (words: Record<string, Word>) =>
   'q-permission': (words) => `May ${words.subject.english.toLowerCase()} ${words.verb.english}?`,
   'q-did-you': (words) => `Did ${words.subject.english.toLowerCase()} ${words.verb.english.replace(/ed$/, '').replace(/drank/, 'drink').replace(/ate/, 'eat').replace(/slept/, 'sleep').replace(/watched/, 'watch').replace(/listened/, 'listen').replace(/bought/, 'buy')}?`,
   'q-how-so': (words) => `How can ${words.subject.english.toLowerCase()} be so ${words.adjective.english}?`,
+};
+
+// English question templates for 吗 questions (converting statements to yes/no questions)
+const PATTERN_QUESTION_TEMPLATES: Record<string, (words: Record<string, Word>) => string> = {
+  'adj-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} ${words.adjective.english}?`,
+  'noun-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} a ${words.noun.english}?`,
+  'verb-pattern': (words) => `${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Do' : 'Does'} ${words.subject.english.toLowerCase()} ${words.verb.english} ${words.object.english}?`,
+  'go-pattern': (words) => `${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Do' : 'Does'} ${words.subject.english.toLowerCase()} want to go to ${words.place.english}?`,
+  'location-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} at ${words.place.english}?`,
+  'have-pattern': (words) => `${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Do' : 'Does'} ${words.subject.english.toLowerCase()} have ${words.object.english}?`,
+  'can-pattern': (words) => `Can ${words.subject.english.toLowerCase()} ${words.skill.english}?`,
+  'want-pattern': (words) => `${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Do' : 'Does'} ${words.subject.english.toLowerCase()} want to ${words.verb.english}?`,
 };
 
 /**
@@ -72,10 +99,12 @@ function randomItems<T>(array: T[], count: number): T[] {
 
 /**
  * Build a sentence from a pattern and selected words
+ * @param asQuestion - If true, convert to a 吗 question (for questionable patterns)
  */
 function buildSentence(
   pattern: SentencePattern,
-  selectedWords: Record<string, Word>
+  selectedWords: Record<string, Word>,
+  asQuestion: boolean = false
 ): { hanzi: string; pinyin: string; english: string } {
   const parts: { hanzi: string; pinyin: string }[] = [];
 
@@ -123,16 +152,24 @@ function buildSentence(
     parts.push({ hanzi: '?', pinyin: '' });
   } else if (pattern.id === 'q-how-so') {
     parts.push({ hanzi: '?', pinyin: '' });
+  } else if (asQuestion && QUESTIONABLE_PATTERNS.includes(pattern.id)) {
+    // Convert statement to 吗 question
+    parts.push({ hanzi: '吗?', pinyin: 'ma?' });
   }
 
   const hanzi = parts.map(p => p.hanzi).join('');
   const pinyin = parts.map(p => p.pinyin).filter(p => p).join(' ');
 
-  // Generate English using template
-  const englishTemplate = PATTERN_ENGLISH_TEMPLATES[pattern.id];
-  const english = englishTemplate
-    ? englishTemplate(selectedWords)
-    : pattern.example.english;
+  // Generate English using appropriate template
+  let english: string;
+  if (asQuestion && PATTERN_QUESTION_TEMPLATES[pattern.id]) {
+    english = PATTERN_QUESTION_TEMPLATES[pattern.id](selectedWords);
+  } else {
+    const englishTemplate = PATTERN_ENGLISH_TEMPLATES[pattern.id];
+    english = englishTemplate
+      ? englishTemplate(selectedWords)
+      : pattern.example.english;
+  }
 
   return { hanzi, pinyin, english };
 }
@@ -343,8 +380,12 @@ export async function generateTranslatorQuestions(
       selectedWords[slot.id] = randomItem(slot.words);
     }
 
+    // Randomly decide if this should be a 吗 question (30% chance for eligible patterns)
+    const canBeQuestion = QUESTIONABLE_PATTERNS.includes(pattern.id);
+    const asQuestion = canBeQuestion && Math.random() < QUESTION_PROBABILITY;
+
     // Build the full sentence
-    const { hanzi, pinyin, english } = buildSentence(pattern, selectedWords);
+    const { hanzi, pinyin, english } = buildSentence(pattern, selectedWords, asQuestion);
 
     // Generate steps for each slot (excluding fixed question words)
     const steps: TranslatorStep[] = [];

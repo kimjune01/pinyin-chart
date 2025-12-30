@@ -68,8 +68,8 @@ export function SentenceDisplay({
       });
     }
 
-    // Add pattern-specific suffixes
-    const suffix = getPatternSuffix(question.patternId);
+    // Add pattern-specific suffixes (pass fullHanzi to detect 吗 questions)
+    const suffix = getPatternSuffix(question.patternId, question.fullHanzi);
     if (suffix.text) {
       parts.push({
         text: suffix.text,
@@ -204,9 +204,14 @@ function getPatternConnector(patternId: string, slotId: string): { connector: st
 }
 
 /**
- * Get suffix for a pattern
+ * Get suffix for a pattern (or detect 吗 question from hanzi)
  */
-function getPatternSuffix(patternId: string): { text: string; pinyin: string } {
+function getPatternSuffix(patternId: string, fullHanzi?: string): { text: string; pinyin: string } {
+  // Check if this is a 吗 question (statement converted to question)
+  if (fullHanzi?.endsWith('吗?')) {
+    return { text: '吗?', pinyin: 'ma?' };
+  }
+
   const suffixes: Record<string, { text: string; pinyin: string }> = {
     'too-pattern': { text: '了', pinyin: 'le' },
     'past-pattern': { text: '了', pinyin: 'le' },

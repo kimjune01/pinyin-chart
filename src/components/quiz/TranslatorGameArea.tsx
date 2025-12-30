@@ -140,11 +140,16 @@ export function TranslatorGameArea({
       'too-pattern': { adjective: '太' },
     };
 
-    // Suffixes for each pattern
-    const suffixes: Record<string, string> = {
-      'too-pattern': '了',
-      'past-pattern': '了',
-      'q-permission': '吗',
+    // Suffixes for each pattern (or detect from fullHanzi)
+    const getSuffix = () => {
+      // Detect 吗 question from sentence ending
+      if (question.fullHanzi.endsWith('吗?')) return '吗';
+      const suffixes: Record<string, string> = {
+        'too-pattern': '了',
+        'past-pattern': '了',
+        'q-permission': '吗',
+      };
+      return suffixes[question.patternId] || '';
     };
 
     for (const slotId of stepSlots) {
@@ -162,7 +167,7 @@ export function TranslatorGameArea({
     }
 
     // Add suffix if present
-    const suffix = suffixes[question.patternId];
+    const suffix = getSuffix();
     if (suffix) {
       parts.push(suffix);
     }
