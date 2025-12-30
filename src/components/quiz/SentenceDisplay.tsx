@@ -86,31 +86,35 @@ export function SentenceDisplay({
     .filter(s => !s.isStructureStep)
     .every(s => revealedSlots.includes(s.slotId));
 
+  const showAudio = displayMode !== 'visual-only';
+
   return (
     <div className="sentence-display">
-      {/* Audio buttons */}
-      <div className="sentence-audio-buttons">
-        <button
-          className={`sentence-audio-btn ${isPlaying && playingMode === 'syllables' ? 'playing' : ''}`}
-          onClick={onPlaySyllables}
-          disabled={isPlaying}
-          aria-label="Play syllable by syllable"
-          title="Play syllable by syllable"
-        >
-          <span className="audio-icon">{isPlaying && playingMode === 'syllables' ? '🔊' : '▶'}</span>
-          <span className="audio-label">Syllables</span>
-        </button>
-        <button
-          className={`sentence-audio-btn ${isPlaying && playingMode === 'sentence' ? 'playing' : ''}`}
-          onClick={onPlaySentence}
-          disabled={isPlaying}
-          aria-label="Play full sentence"
-          title="Play full sentence"
-        >
-          <span className="audio-icon">{isPlaying && playingMode === 'sentence' ? '🔊' : '▶'}</span>
-          <span className="audio-label">Sentence</span>
-        </button>
-      </div>
+      {/* Audio buttons - hidden in visual-only mode */}
+      {showAudio && (
+        <div className="sentence-audio-buttons">
+          <button
+            className={`sentence-audio-btn ${isPlaying && playingMode === 'syllables' ? 'playing' : ''}`}
+            onClick={onPlaySyllables}
+            disabled={isPlaying}
+            aria-label="Play syllable by syllable"
+            title="Play syllable by syllable"
+          >
+            <span className="audio-icon">{isPlaying && playingMode === 'syllables' ? '🔊' : '▶'}</span>
+            <span className="audio-label">Syllables</span>
+          </button>
+          <button
+            className={`sentence-audio-btn ${isPlaying && playingMode === 'sentence' ? 'playing' : ''}`}
+            onClick={onPlaySentence}
+            disabled={isPlaying}
+            aria-label="Play full sentence"
+            title="Play full sentence"
+          >
+            <span className="audio-icon">{isPlaying && playingMode === 'sentence' ? '🔊' : '▶'}</span>
+            <span className="audio-label">Sentence</span>
+          </button>
+        </div>
+      )}
 
       {/* Sentence content */}
       <div className="sentence-content">
