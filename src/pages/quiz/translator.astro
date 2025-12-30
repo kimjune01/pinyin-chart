@@ -1,0 +1,19 @@
+---
+/**
+ * Sentence Translator Quiz Page
+ *
+ * Multi-step quiz where users translate Chinese sentences
+ * by guessing each constituent word, then the full meaning.
+ */
+
+import AppLayout from '../../components/layout/AppLayout.astro';
+import TranslatorQuiz from '../../components/quiz/TranslatorQuiz';
+import '../../styles/quiz.css';
+
+const title = 'Sentence Translator Quiz';
+const description = 'Listen to Chinese sentences and identify their meaning step by step.';
+---
+
+<AppLayout title={title} currentSection="quiz">
+  <TranslatorQuiz client:load />
+</AppLayout>
