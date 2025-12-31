@@ -57,10 +57,29 @@ const QUESTIONABLE_PATTERNS = [
 // Probability of converting a statement to a question (30%)
 const QUESTION_PROBABILITY = 0.3;
 
+// Helper to check if subject is plural
+const isPlural = (subject: string) => subject === 'we' || subject === 'they';
+
+// Helper to pluralize a noun (simple version)
+const pluralize = (noun: string) => {
+  // Nationalities ending in "ese" or "ish" don't change
+  if (noun.endsWith('ese') || noun.endsWith('ish')) return noun;
+  return noun + 's';
+};
+
 // English template mappings for generating full sentences
 const PATTERN_ENGLISH_TEMPLATES: Record<string, (words: Record<string, Word>) => string> = {
-  'adj-pattern': (words) => `${words.subject.english} ${words.subject.english === 'I' ? 'am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'are' : 'is'} ${words.adjective.english}`,
-  'noun-pattern': (words) => `${words.subject.english} ${words.subject.english === 'I' ? 'am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'are' : 'is'} a ${words.noun.english}`,
+  'adj-pattern': (words) => `${words.subject.english} ${words.subject.english === 'I' ? 'am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'are' : 'is'} very ${words.adjective.english}`,
+  'noun-pattern': (words) => {
+    const subj = words.subject.english;
+    const verb = subj === 'I' ? 'am' : (subj === 'you' || subj === 'we' || subj === 'they') ? 'are' : 'is';
+    const noun = words.noun.english;
+    // Plural subjects: no article, pluralize noun
+    if (isPlural(subj)) {
+      return `${subj} ${verb} ${pluralize(noun)}`;
+    }
+    return `${subj} ${verb} a ${noun}`;
+  },
   'verb-pattern': (words) => `${words.subject.english} ${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? words.verb.english : words.verb.english + 's'} ${words.object.english}`,
   'go-pattern': (words) => `${words.subject.english} want${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? '' : 's'} to go to ${words.place.english}`,
   'location-pattern': (words) => `${words.subject.english} ${words.subject.english === 'I' ? 'am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'are' : 'is'} at ${words.place.english}`,
@@ -82,8 +101,16 @@ const PATTERN_ENGLISH_TEMPLATES: Record<string, (words: Record<string, Word>) =>
 
 // English question templates for 吗 questions (converting statements to yes/no questions)
 const PATTERN_QUESTION_TEMPLATES: Record<string, (words: Record<string, Word>) => string> = {
-  'adj-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} ${words.adjective.english}?`,
-  'noun-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} a ${words.noun.english}?`,
+  'adj-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} very ${words.adjective.english}?`,
+  'noun-pattern': (words) => {
+    const subj = words.subject.english;
+    const verb = subj === 'I' ? 'Am' : (subj === 'you' || subj === 'we' || subj === 'they') ? 'Are' : 'Is';
+    const noun = words.noun.english;
+    if (isPlural(subj)) {
+      return `${verb} ${subj.toLowerCase()} ${pluralize(noun)}?`;
+    }
+    return `${verb} ${subj.toLowerCase()} a ${noun}?`;
+  },
   'verb-pattern': (words) => `${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Do' : 'Does'} ${words.subject.english.toLowerCase()} ${words.verb.english} ${words.object.english}?`,
   'go-pattern': (words) => `${words.subject.english === 'I' || words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Do' : 'Does'} ${words.subject.english.toLowerCase()} want to go to ${words.place.english}?`,
   'location-pattern': (words) => `${words.subject.english === 'I' ? 'Am' : words.subject.english === 'you' || words.subject.english === 'we' || words.subject.english === 'they' ? 'Are' : 'Is'} ${words.subject.english.toLowerCase()} at ${words.place.english}?`,
