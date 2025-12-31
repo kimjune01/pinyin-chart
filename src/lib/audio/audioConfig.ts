@@ -28,6 +28,7 @@ export const TTS_OVERRIDE_SYLLABLES = new Set([
 export const TTS_OVERRIDE_VOCAB = new Set([
   '工人',   // CDN pronunciation incorrect
   '握手',   // CDN pronunciation incorrect
+  '热',     // CDN pronunciation incorrect
 ]);
 
 /**
