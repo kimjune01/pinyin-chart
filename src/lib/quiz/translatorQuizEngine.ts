@@ -181,10 +181,8 @@ export function useTranslatorQuizEngine(
       // Mark step as completed
       setTotalStepsCompleted(prev => prev + 1);
 
-      // Add to revealed slots (for non-structure steps)
-      if (!currentStep.isStructureStep) {
-        setRevealedSlots(prev => [...prev, currentStep.slotId]);
-      }
+      // Add to revealed slots (including structure step for full pinyin reveal)
+      setRevealedSlots(prev => [...prev, currentStep.slotId]);
 
       setGameState('answered');
     } else {
