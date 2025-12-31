@@ -41,6 +41,9 @@ export function SentenceDisplay({
       .filter(s => !s.isStructureStep)
       .map(s => s.slotId);
 
+    // Structure step complete means all pinyin can be shown
+    const structureRevealed = revealedSlots.includes('structure');
+
     // For each slot, check if it's revealed
     for (const slotId of stepSlots) {
       const word = question.selectedWords[slotId];
@@ -48,7 +51,7 @@ export function SentenceDisplay({
 
       const isRevealed = revealedSlots.includes(slotId);
 
-      // Add connector if present (revealed with its associated word)
+      // Add connector if present (only revealed after structure step)
       const step = question.steps.find(s => s.slotId === slotId);
       if (step) {
         const pattern = getPatternConnector(question.patternId, slotId);
@@ -56,7 +59,7 @@ export function SentenceDisplay({
           parts.push({
             text: pattern.connector,
             pinyin: pattern.connectorPinyin,
-            revealed: isRevealed, // Connector pinyin revealed with the word
+            revealed: structureRevealed, // Connector pinyin hidden until structure guessed
           });
         }
       }
@@ -74,7 +77,7 @@ export function SentenceDisplay({
       parts.push({
         text: suffix.text,
         pinyin: suffix.pinyin,
-        revealed: true,
+        revealed: structureRevealed, // Suffix pinyin hidden until structure guessed
       });
     }
 
