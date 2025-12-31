@@ -85,9 +85,8 @@ export function SentenceDisplay({
   };
 
   const sentenceParts = buildRevealedSentence();
-  const allRevealed = question.steps
-    .filter(s => !s.isStructureStep)
-    .every(s => revealedSlots.includes(s.slotId));
+  // Only show full pinyin after structure step is complete (all steps including structure)
+  const allRevealed = question.steps.every(s => revealedSlots.includes(s.slotId));
 
   const showAudio = displayMode !== 'visual-only';
 
